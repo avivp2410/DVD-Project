@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core">
+<h:head>
+    <title>Blockk Busterr Login</title>
+    <h:outputStylesheet name="style.css" library="css"/>
+</h:head>
+<h:body styleClass="login-page">
+    <div class="logo-container">
+        <h:graphicImage library="img" name="blockkbusterr.jpg" class="logo-img" />
+    </div>
+    
+    <div class="login-container">
+        <h1 class="title">Blockk Busterr</h1>
+
+        <h:form class="login-form">
+            <h:outputLabel for="username" value="Enter username" />
+            <h:inputText id="username" value="" />
+
+            <h:outputLabel for="password" value="Enter password" />
+            <h:inputSecret id="password" value="" />
+
+            <br/><br/>
+
+            <h:commandButton value="log in" styleClass="login-button" />
+            <br/><br/>
+            <h:commandButton value="sign up" styleClass="login-button" />
+        </h:form>
+    </div>
+
+</h:body>
+</html>

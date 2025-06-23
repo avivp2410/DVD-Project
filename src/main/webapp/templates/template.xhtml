@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:ui="jakarta.faces.facelets">
+
+<h:head>
+    <title><ui:insert name="title">Blockk Busterr</ui:insert></title>
+    <h:outputStylesheet name="style.css" library="css"/>
+</h:head>
+
+<body>
+    <div class="header-bar">
+        <div class="header-left">
+            <h:form> <ui:insert name="header-left-content">
+                    <h:outputText value="username" styleClass="username-display" />
+                    
+                    <h:commandLink value="filter" styleClass="filter-text" action="#" />
+                    
+                    <h:inputText value="" styleClass="search-input" placeholder="search" />
+                </ui:insert>
+            </h:form>
+        </div>
+        <div class="header-center">
+            <ui:insert name="main-title">Main Page</ui:insert>
+        </div>
+        <div class="header-right">
+            <h:graphicImage library="img" name="blockkbusterr.jpg" styleClass="logo-img" /> 
+        </div>
+    </div>
+
+    <div class="content">
+        <ui:insert name="content">
+            </ui:insert>
+    </div>
+</body>
+
+</html>
