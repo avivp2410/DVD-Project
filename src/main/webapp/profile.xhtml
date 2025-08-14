@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<ui:composition template="/templates/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:ui="jakarta.faces.facelets">
+
+    <ui:define name="title">Blockk Busterr - User Profile</ui:define>
+    <ui:define name="main-title">User Profile</ui:define>
+
+    <ui:define name="content">
+        <div class="profile-container">
+            <!-- Last Orders Section -->
+            <div class="profile-section">
+                <h2>Last Orders</h2>
+                <div class="scroll-container">
+                    <div class="order-list">
+                        <div class="order-box">
+                            <h:panelGroup layout="block" styleClass="order-detail">
+                                <span class="info-label">Order #1</span>
+                                <h:outputText value="Client: John Doe" />
+                                <h:outputText value="Movie: Movie A" />
+                                <h:outputText value="Borrow Date: 2025-05-15" />
+                                <h:outputText value="Return Date: 2025-05-22" />
+                            </h:panelGroup>
+                        </div>
+                        <div class="order-box">
+                            <h:panelGroup layout="block" styleClass="order-detail">
+                                <span class="info-label">Order #2</span>
+                                <h:outputText value="Client: John Doe" />
+                                <h:outputText value="Movie: Movie B" />
+                                <h:outputText value="Borrow Date: 2025-04-10" />
+                                <h:outputText value="Return Date: 2025-04-17" />
+                            </h:panelGroup>
+                        </div>
+                        <div class="order-box">
+                            <h:panelGroup layout="block" styleClass="order-detail">
+                                <span class="info-label">Order #3</span>
+                                <h:outputText value="Client: John Doe" />
+                                <h:outputText value="Movie: Movie C" />
+                                <h:outputText value="Borrow Date: 2025-03-05" />
+                                <h:outputText value="Return Date: 2025-03-12" />
+                            </h:panelGroup>
+                        </div>
+                        <div class="order-box">
+                            <h:panelGroup layout="block" styleClass="order-detail">
+                                <span class="info-label">Order #4</span>
+                                <h:outputText value="Client: John Doe" />
+                                <h:outputText value="Movie: Movie D" />
+                                <h:outputText value="Borrow Date: 2025-02-01" />
+                                <h:outputText value="Return Date: 2025-02-08" />
+                            </h:panelGroup>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Client Details Section -->
+            <div class="profile-section">
+                <h2>Client Details</h2>
+                <div class="details-box">
+                    <h:panelGroup layout="block" styleClass="info-item">
+                        <span class="info-label">First Name:</span> John
+                    </h:panelGroup>
+                    <h:panelGroup layout="block" styleClass="info-item">
+                        <span class="info-label">Last Name:</span> Doe
+                    </h:panelGroup>
+                    <h:panelGroup layout="block" styleClass="info-item">
+                        <span class="info-label">Email:</span> john.doe@example.com
+                    </h:panelGroup>
+                    <h:panelGroup layout="block" styleClass="info-item">
+                        <span class="info-label">Username:</span> johndoe
+                    </h:panelGroup>
+                    <h:panelGroup layout="block" styleClass="info-item">
+                        <span class="info-label">Password:</span> ********
+                    </h:panelGroup>
+                </div>
+            </div>
+        </div>
+
+        <style type="text/css">
+            .profile-container {
+                max-width: 900px;
+                margin: 0 auto;
+            }
+            .profile-section {
+                margin-bottom: 40px;
+            }
+            .profile-section h2 {
+                color: var(--secondary-color);
+                font-size: 2em;
+                margin-bottom: 20px;
+                text-shadow: 2px 2px 5px var(--shadow-dark);
+            }
+            .order-list {
+                display: flex;
+                gap: 20px;
+            }
+            .scroll-container {
+                overflow-x: auto;
+                white-space: nowrap;
+                padding: 10px 0;
+            }
+            .order-detail {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 5px;
+                font-size: 1.1em;
+                color: var(--light-text);
+            }
+            .order-box, .details-box {
+                background-color: var(--darker-gray-bg);
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0 3px 10px var(--shadow-dark);
+                text-align: left;
+            }
+            .order-box {
+                font-size: 1.1em;
+                color: var(--light-text);
+            }
+            .info-item {
+                margin-bottom: 15px;
+                font-size: 1.2em;
+            }
+            .info-label {
+                font-weight: bold;
+                color: var(--secondary-color);
+                margin-right: 10px;
+            }
+        </style>
+    </ui:define>
+
+</ui:composition>

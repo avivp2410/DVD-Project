@@ -30,6 +30,8 @@ body.login-page {
     align-items: center;
     min-height: 100vh;
     text-align: center;
+    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('../img/cinematic-bg.jpg') no-repeat center center fixed;
+    background-size: cover;
 }
 
 .login-container {
@@ -69,14 +71,14 @@ body.login-page {
 
 /* Login and Sign up buttons */
 .login-form input[type="submit"] {
-    background: linear-gradient(to bottom, #444444, #222222);
-    border: 1px solid #666666;
+    background: linear-gradient(to bottom, var(--primary-color), var(--hover-blue));
+    border: 1px solid var(--hover-blue);
     border-radius: 5px;
-    box-shadow: 0px 5px 0px 0px #111111;
+    box-shadow: 0px 5px 0px 0px rgba(0, 86, 179, 0.5);
     color: #FFFFFF;
     padding: 10px 20px;
-    text-shadow: 1px 1px 0px #000000;
-    transition: all 0.1s ease-in-out;
+    text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.5);
+    transition: all 0.2s ease-in-out;
     position: relative;
     top: 0px;
     margin-top: 10px;
@@ -88,9 +90,15 @@ body.login-page {
     min-width: 120px;
 }
 
+.login-form input[type="submit"]:hover {
+    transform: scale(1.05);
+    box-shadow: 0px 5px 15px var(--shadow-blue);
+}
+
 .login-form input[type="submit"]:active {
-    box-shadow: 0px 0px 0px 0px #111111;
+    box-shadow: 0px 0px 0px 0px rgba(0, 86, 179, 0.5);
     top: 5px;
+    transform: scale(0.95);
 }
 
 /* Logo position on Login page (separate from other pages) */
@@ -168,6 +176,8 @@ body.login-page {
 .search-input:focus {
     border-color: var(--primary-color);
     box-shadow: 0 0 8px var(--shadow-blue);
+    transform: scale(1.02);
+    transition: all 0.2s ease;
 }
 
 .search-input::placeholder {
@@ -256,22 +266,36 @@ body.login-page {
 }
 .movies-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 30px;
     padding: 0px;
     margin: 0px auto;
     max-width: 1200px;
 }
 
+@media (max-width: 768px) {
+    .movies-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .movies-grid {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 15px;
+    }
+}
+
 .movie-item {
     background-color: var(--primary-color);
-    height: 200px;
+    height: 250px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-end;
     align-items: center;
     color: var(--light-text);
-    font-size: 1.3em;
+    font-size: 1.2em;
     font-weight: bold;
     border-radius: 12px;
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
@@ -279,10 +303,317 @@ body.login-page {
     transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
     overflow: hidden;
     position: relative;
+    padding-bottom: 10px;
+    background-image: url('../img/movie-placeholder.jpg');
+    background-size: cover;
+    background-position: center;
 }
 
 .movie-item:hover {
     transform: translateY(-8px) scale(1.03);
     box-shadow: 0 12px 25px rgba(0, 0, 0, 0.6), 0 0 20px var(--shadow-blue);
     background-color: var(--hover-blue);
+}
+
+.movie-item:hover::after {
+    content: 'View Details';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 10px 0;
+    background: rgba(0, 86, 179, 0.7);
+    color: var(--light-text);
+    font-size: 1em;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.movie-item:hover::after {
+    opacity: 1;
+}
+
+/* Movie Details Page Styling (movie.xhtml) */
+.movie-details-container {
+    background-color: var(--darker-gray-bg);
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px var(--shadow-dark);
+    margin: 20px auto;
+    max-width: 900px;
+    text-align: left;
+}
+
+.movie-details-container h2 {
+    color: var(--secondary-color);
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 5px var(--shadow-dark);
+    text-align: center;
+}
+
+.movie-details {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.movie-image {
+    flex: 1;
+    min-width: 200px;
+    max-width: 300px;
+}
+
+.movie-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px var(--shadow-dark);
+    transition: transform 0.3s ease;
+}
+
+.movie-image img:hover {
+    transform: scale(1.03);
+}
+
+.movie-info {
+    flex: 2;
+    min-width: 300px;
+    color: var(--light-text);
+}
+
+.info-item {
+    margin-bottom: 15px;
+    font-size: 1.2em;
+}
+
+.info-label {
+    font-weight: bold;
+    color: var(--secondary-color);
+    margin-right: 10px;
+}
+
+.description {
+    font-size: 1.1em;
+    line-height: 1.6;
+    margin-top: 20px;
+}
+
+.review-section {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: var(--input-bg);
+    border-radius: 10px;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.review-section h3 {
+    color: var(--secondary-color);
+    font-size: 1.8em;
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 3px var(--shadow-dark);
+}
+
+.reviews-list {
+    margin-bottom: 20px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.review-item {
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    font-size: 1.1em;
+    line-height: 1.5;
+}
+
+.review-author {
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-right: 10px;
+}
+
+.review-form {
+    margin-top: 20px;
+}
+
+.review-form label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: var(--secondary-color);
+}
+
+.review-form textarea {
+    width: 100%;
+    padding: 10px;
+    background-color: var(--dark-bg);
+    color: var(--light-text);
+    border: 1px solid var(--border-gray);
+    border-radius: 5px;
+    resize: vertical;
+    min-height: 100px;
+    font-size: 1.1em;
+}
+
+.review-button {
+    background: linear-gradient(to bottom, var(--primary-color), var(--hover-blue));
+    border: 1px solid var(--hover-blue);
+    border-radius: 5px;
+    color: var(--light-text);
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 1.1em;
+    margin-top: 10px;
+    transition: all 0.2s ease;
+}
+
+.review-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px var(--shadow-blue);
+}
+
+.loan-form {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.loan-button {
+    background: linear-gradient(to bottom, var(--green-button), var(--green-button-hover));
+    border: none;
+    border-radius: 5px;
+    color: var(--light-text);
+    padding: 12px 25px;
+    cursor: pointer;
+    font-size: 1.2em;
+    transition: all 0.2s ease;
+}
+
+.loan-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
+}
+
+/* Admin Dashboard Styling (adminPage.xhtml) */
+.admin-dashboard {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+.admin-section {
+    margin-bottom: 40px;
+}
+.admin-section h2 {
+    color: var(--secondary-color);
+    font-size: 2em;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 5px var(--shadow-dark);
+}
+.scroll-container {
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 10px 0;
+}
+.order-list, .movie-stock-list, .user-list {
+    display: flex;
+    gap: 20px;
+}
+.order-item, .movie-item, .user-item {
+    background-color: var(--darker-gray-bg);
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 3px 10px var(--shadow-dark);
+    min-width: 200px;
+    text-align: center;
+    display: inline-block;
+}
+.order-detail {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    font-size: 1.1em;
+    color: var(--light-text);
+}
+.movie-item:hover::after {
+    content: 'Edit Movie';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 10px 0;
+    background: rgba(0, 86, 179, 0.7);
+    color: var(--light-text);
+    font-size: 1em;
+    text-align: center;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+.stock-count {
+    display: block;
+    margin-top: 10px;
+    font-size: 0.9em;
+    color: var(--light-text);
+}
+.search-users-form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    justify-content: center;
+}
+.search-button {
+    background: linear-gradient(to bottom, var(--primary-color), var(--hover-blue));
+    border: 1px solid var(--hover-blue);
+    border-radius: 5px;
+    color: var(--light-text);
+    padding: 8px 15px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: all 0.2s ease;
+}
+.search-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px var(--shadow-blue);
+}
+
+/* User Profile Styling (profile.xhtml) */
+.profile-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+.profile-section {
+    margin-bottom: 40px;
+}
+.profile-section h2 {
+    color: var(--secondary-color);
+    font-size: 2em;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 5px var(--shadow-dark);
+}
+.order-list {
+    display: flex;
+    gap: 20px;
+}
+.order-box, .details-box {
+    background-color: var(--darker-gray-bg);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px var(--shadow-dark);
+    text-align: left;
+}
+.order-box {
+    font-size: 1.1em;
+    color: var(--light-text);
+}
+.info-item {
+    margin-bottom: 15px;
+    font-size: 1.2em;
+}
+.info-label {
+    font-weight: bold;
+    color: var(--secondary-color);
+    margin-right: 10px;
 }

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<ui:composition template="/templates/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:ui="jakarta.faces.facelets">
+
+    <ui:define name="title">Blockk Busterr - Movie Details</ui:define>
+    <ui:define name="main-title">Movie Details</ui:define>
+
+    <ui:define name="content">
+        <div class="movie-details-container">
+            <h2>Movie Title</h2>
+            <div class="movie-details">
+                <div class="movie-image">
+                    <h:graphicImage library="img" name="movie-placeholder.jpg" alt="Movie Poster" />
+                </div>
+                <div class="movie-info">
+                    <h:panelGroup layout="block" styleClass="info-item">
+                        <span class="info-label">Released Year:</span> 2023
+                    </h:panelGroup>
+                    <h:panelGroup layout="block" styleClass="info-item">
+                        <span class="info-label">Duration:</span> 120 min
+                    </h:panelGroup>
+                    <h:panelGroup layout="block" styleClass="info-item">
+                        <span class="info-label">Genre:</span> Action, Drama
+                    </h:panelGroup>
+                    <h:panelGroup layout="block" styleClass="description">
+                        <span class="info-label">Description:</span> This is a placeholder description for the movie. It tells the story of an epic adventure with thrilling action sequences and deep emotional moments.
+                    </h:panelGroup>
+                </div>
+            </div>
+            
+            <div class="review-section">
+                <h3>User Reviews</h3>
+                <div class="reviews-list">
+                    <h:panelGroup layout="block" styleClass="review-item">
+                        <span class="review-author">User1:</span> Great movie, really enjoyed the plot twists!
+                    </h:panelGroup>
+                    <h:panelGroup layout="block" styleClass="review-item">
+                        <span class="review-author">User2:</span> Amazing visuals, but the ending was predictable.
+                    </h:panelGroup>
+                </div>
+                <h:form class="review-form">
+                    <h:outputLabel for="reviewInput" value="Write your review:" />
+                    <h:inputTextarea id="reviewInput" value="" rows="3" cols="50" />
+                    <br/>
+                    <h:commandButton value="Post Review" styleClass="review-button" />
+                </h:form>
+            </div>
+            
+            <h:form class="loan-form">
+                <h:commandButton value="Loan Review" styleClass="loan-button" />
+            </h:form>
+        </div>
+    </ui:define>
+
+</ui:composition>

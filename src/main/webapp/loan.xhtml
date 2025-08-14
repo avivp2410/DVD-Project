@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<ui:composition template="/templates/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:ui="jakarta.faces.facelets">
+
+    <ui:define name="title">Blockk Busterr - Loan Movie</ui:define>
+    <ui:define name="main-title">Loan Movie</ui:define>
+
+    <ui:define name="content">
+        <div class="register-form-container">
+            <h2>Loan a Movie</h2>
+            <h:form class="register-form">
+                <h:outputLabel for="username" value="Username:" />
+                <h:inputText id="username" value="" />
+                <h:outputLabel for="currentDate" value="Current Date:" />
+                <h:inputText id="currentDate" value="" />
+                <h:outputLabel for="returnDate" value="Return Date:" />
+                <h:inputText id="returnDate" value="" />
+                <h:outputLabel for="phoneNumber" value="Phone Number:" />
+                <h:inputText id="phoneNumber" value="" />
+                <h:outputLabel value="Movie Image:" />
+                <h:graphicImage library="img" name="movie-placeholder.jpg" alt="Movie Image" styleClass="movie-img" />
+                <h:commandButton value="Add" type="submit" />
+            </h:form>
+        </div>
+    </ui:define>
+
+</ui:composition>

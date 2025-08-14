@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<ui:composition template="/templates/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:ui="jakarta.faces.facelets">
+
+    <ui:define name="title">Blockk Busterr - Register</ui:define>
+    <ui:define name="main-title">Register</ui:define>
+
+    <ui:define name="content">
+        <div class="register-form-container">
+            <h2>Register New User</h2>
+            <h:form class="register-form">
+                <h:outputLabel for="firstName" value="First Name:" />
+                <h:inputText id="firstName" value="" />
+                <h:outputLabel for="lastName" value="Last Name:" />
+                <h:inputText id="lastName" value="" />
+                <h:outputLabel for="email" value="Email:" />
+                <h:inputText id="email" value="" />
+                <h:outputLabel for="username" value="Username:" />
+                <h:inputText id="username" value="" />
+                <h:outputLabel for="password" value="Password:" />
+                <h:inputSecret id="password" value="" />
+                <h:commandButton value="Register" type="submit" />
+            </h:form>
+        </div>
+    </ui:define>
+
+</ui:composition>
