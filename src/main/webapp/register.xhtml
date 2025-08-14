@@ -6,25 +6,342 @@
                 xmlns:ui="jakarta.faces.facelets">
 
     <ui:define name="title">Blockk Busterr - Register</ui:define>
-    <ui:define name="main-title">Register</ui:define>
+    <ui:define name="main-title">Create New Account</ui:define>
 
     <ui:define name="content">
         <div class="register-form-container">
-            <h2>Register New User</h2>
-            <h:form class="register-form">
-                <h:outputLabel for="firstName" value="First Name:" />
-                <h:inputText id="firstName" value="" />
-                <h:outputLabel for="lastName" value="Last Name:" />
-                <h:inputText id="lastName" value="" />
-                <h:outputLabel for="email" value="Email:" />
-                <h:inputText id="email" value="" />
-                <h:outputLabel for="username" value="Username:" />
-                <h:inputText id="username" value="" />
-                <h:outputLabel for="password" value="Password:" />
-                <h:inputSecret id="password" value="" />
-                <h:commandButton value="Register" type="submit" />
+            <h2>Join Blockk Busterr</h2>
+            <p class="register-subtitle">Create your account to start renting movies</p>
+            
+            <!-- Display messages -->
+            <h:messages id="messages" styleClass="messages" errorClass="error-message"
+                       infoClass="info-message" warnClass="warn-message" />
+
+            <h:form class="register-form" id="registrationForm">
+                
+                <!-- First Name -->
+                <div class="form-group">
+                    <h:outputLabel for="firstName" value="First Name *" styleClass="form-label" />
+                    <h:inputText id="firstName"
+                               value="#{registrationBean.firstName}"
+                               styleClass="form-input"
+                               required="true"
+                               requiredMessage="First name is required"
+                               validatorMessage="First name must be between 2 and 50 characters">
+                        <f:validateLength minimum="2" maximum="50" />
+                        <f:ajax event="blur" render="firstNameMessage" />
+                    </h:inputText>
+                    <h:message id="firstNameMessage" for="firstName" styleClass="field-error" />
+                </div>
+
+                <!-- Last Name -->
+                <div class="form-group">
+                    <h:outputLabel for="lastName" value="Last Name *" styleClass="form-label" />
+                    <h:inputText id="lastName"
+                               value="#{registrationBean.lastName}"
+                               styleClass="form-input"
+                               required="true"
+                               requiredMessage="Last name is required"
+                               validatorMessage="Last name must be between 2 and 50 characters">
+                        <f:validateLength minimum="2" maximum="50" />
+                        <f:ajax event="blur" render="lastNameMessage" />
+                    </h:inputText>
+                    <h:message id="lastNameMessage" for="lastName" styleClass="field-error" />
+                </div>
+
+                <!-- Email -->
+                <div class="form-group">
+                    <h:outputLabel for="email" value="Email Address *" styleClass="form-label" />
+                    <h:inputText id="email"
+                               value="#{registrationBean.email}"
+                               styleClass="form-input"
+                               required="true"
+                               requiredMessage="Email is required"
+                               validatorMessage="Please enter a valid email address">
+                        <f:validateRegex pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" />
+                        <f:ajax event="blur" render="emailMessage" listener="#{registrationBean.checkEmailAvailability}" />
+                    </h:inputText>
+                    <h:message id="emailMessage" for="email" styleClass="field-error" />
+                </div>
+
+                <!-- Username -->
+                <div class="form-group">
+                    <h:outputLabel for="username" value="Username *" styleClass="form-label" />
+                    <h:inputText id="username"
+                               value="#{registrationBean.username}"
+                               styleClass="form-input"
+                               required="true"
+                               requiredMessage="Username is required"
+                               validatorMessage="Username must be between 3 and 30 characters">
+                        <f:validateLength minimum="3" maximum="30" />
+                        <f:ajax event="blur" render="usernameMessage" listener="#{registrationBean.checkUsernameAvailability}" />
+                    </h:inputText>
+                    <h:message id="usernameMessage" for="username" styleClass="field-error" />
+                </div>
+
+                <!-- Password -->
+                <div class="form-group">
+                    <h:outputLabel for="password" value="Password *" styleClass="form-label" />
+                    <h:inputSecret id="password"
+                                 value="#{registrationBean.password}"
+                                 styleClass="form-input"
+                                 required="true"
+                                 requiredMessage="Password is required"
+                                 validatorMessage="Password must be at least 6 characters">
+                        <f:validateLength minimum="6" />
+                        <f:ajax event="blur" render="passwordMessage" />
+                    </h:inputSecret>
+                    <h:message id="passwordMessage" for="password" styleClass="field-error" />
+                    <div class="password-hint">
+                        Password must be at least 6 characters long
+                    </div>
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="form-group">
+                    <h:outputLabel for="confirmPassword" value="Confirm Password *" styleClass="form-label" />
+                    <h:inputSecret id="confirmPassword"
+                                 value="#{registrationBean.confirmPassword}"
+                                 styleClass="form-input"
+                                 required="true"
+                                 requiredMessage="Please confirm your password">
+                        <f:ajax event="blur" render="confirmPasswordMessage" listener="#{registrationBean.validatePasswordConfirmation}" />
+                    </h:inputSecret>
+                    <h:message id="confirmPasswordMessage" for="confirmPassword" styleClass="field-error" />
+                </div>
+
+                <!-- Terms and Conditions -->
+                <div class="form-group checkbox-group">
+                    <h:selectBooleanCheckbox id="termsAccepted"
+                                           value="#{registrationBean.termsAccepted}"
+                                           styleClass="checkbox-input"
+                                           required="true"
+                                           requiredMessage="You must accept the terms and conditions">
+                        <f:ajax event="change" render="termsMessage registerButton" />
+                    </h:selectBooleanCheckbox>
+                    <h:outputLabel for="termsAccepted" styleClass="checkbox-label">
+                        I agree to the <h:outputLink value="#" styleClass="terms-link">Terms and Conditions</h:outputLink>
+                    </h:outputLabel>
+                    <h:message id="termsMessage" for="termsAccepted" styleClass="field-error" />
+                </div>
+
+                <br/>
+
+                <!-- Register Button -->
+                <h:commandButton id="registerButton"
+                               value="Create Account"
+                               action="#{registrationBean.register}"
+                               styleClass="#{registrationBean.registerButtonClass}"
+                               disabled="#{registrationBean.registerButtonDisabled}">
+                    <f:ajax execute="@form" render="@form :messages" />
+                </h:commandButton>
+                
+                <br/><br/>
+                
+                <!-- Back to Login -->
+                <div class="login-link-container">
+                    <span class="login-text">Already have an account? </span>
+                    <h:commandLink value="Sign In"
+                                 action="#{registrationBean.goToLogin}"
+                                 styleClass="login-link" />
+                </div>
             </h:form>
         </div>
+        
+        <!-- Enhanced CSS styles -->
+        <style type="text/css">
+            .register-form-container {
+                max-width: 500px;
+                margin: 20px auto;
+                padding: 30px;
+                background: var(--darker-gray-bg);
+                border-radius: 15px;
+                box-shadow: 0 5px 20px var(--shadow-dark);
+            }
+            
+            .register-form-container h2 {
+                color: var(--secondary-color);
+                font-size: 2.2em;
+                text-align: center;
+                margin-bottom: 10px;
+                text-shadow: 2px 2px 5px var(--shadow-dark);
+            }
+            
+            .register-subtitle {
+                color: var(--light-text);
+                text-align: center;
+                margin-bottom: 30px;
+                font-size: 1.1em;
+            }
+            
+            .form-group {
+                margin-bottom: 20px;
+                text-align: left;
+            }
+            
+            .form-label {
+                display: block;
+                color: var(--light-text);
+                font-size: 1em;
+                margin-bottom: 6px;
+                font-weight: bold;
+            }
+            
+            .form-input {
+                width: 100%;
+                padding: 12px 16px;
+                border: 2px solid var(--secondary-color);
+                border-radius: 8px;
+                background: var(--darker-gray-bg);
+                color: var(--light-text);
+                font-size: 1em;
+                transition: all 0.3s ease;
+                box-sizing: border-box;
+            }
+            
+            .form-input:focus {
+                outline: none;
+                border-color: var(--hover-blue);
+                box-shadow: 0 0 10px var(--shadow-blue);
+            }
+            
+            .form-input:invalid {
+                border-color: #ff4444;
+            }
+            
+            .checkbox-group {
+                display: flex;
+                align-items: flex-start;
+                gap: 10px;
+                margin: 20px 0;
+            }
+            
+            .checkbox-input {
+                transform: scale(1.2);
+                margin-top: 2px;
+            }
+            
+            .checkbox-label {
+                color: var(--light-text);
+                font-size: 0.95em;
+                margin: 0;
+                line-height: 1.4;
+            }
+            
+            .terms-link {
+                color: var(--secondary-color);
+                text-decoration: underline;
+            }
+            
+            .terms-link:hover {
+                color: var(--hover-blue);
+            }
+            
+            .password-hint {
+                color: #999;
+                font-size: 0.85em;
+                margin-top: 5px;
+                font-style: italic;
+            }
+            
+            .register-button.enabled {
+                background: linear-gradient(to bottom, var(--secondary-color), var(--primary-color));
+                border: 2px solid var(--secondary-color);
+                color: var(--light-text);
+                padding: 14px 40px;
+                border-radius: 8px;
+                font-size: 1.1em;
+                font-weight: bold;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                width: 100%;
+            }
+            
+            .register-button.enabled:hover {
+                transform: scale(1.02);
+                box-shadow: 0 0 15px var(--shadow-blue);
+            }
+            
+            .register-button.disabled {
+                background: #666;
+                border: 2px solid #666;
+                color: #999;
+                padding: 14px 40px;
+                border-radius: 8px;
+                font-size: 1.1em;
+                font-weight: bold;
+                cursor: not-allowed;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                width: 100%;
+            }
+            
+            .login-link-container {
+                text-align: center;
+                margin-top: 20px;
+            }
+            
+            .login-text {
+                color: var(--light-text);
+                font-size: 0.95em;
+            }
+            
+            .login-link {
+                color: var(--secondary-color);
+                text-decoration: none;
+                font-weight: bold;
+                font-size: 0.95em;
+                transition: color 0.3s ease;
+            }
+            
+            .login-link:hover {
+                color: var(--hover-blue);
+                text-decoration: underline;
+            }
+            
+            .messages {
+                margin-bottom: 20px;
+            }
+            
+            .error-message {
+                color: #ff4444;
+                background: rgba(255, 68, 68, 0.1);
+                border: 1px solid #ff4444;
+                padding: 10px;
+                border-radius: 5px;
+                margin: 5px 0;
+                display: block;
+            }
+            
+            .info-message {
+                color: #4CAF50;
+                background: rgba(76, 175, 80, 0.1);
+                border: 1px solid #4CAF50;
+                padding: 10px;
+                border-radius: 5px;
+                margin: 5px 0;
+                display: block;
+            }
+            
+            .warn-message {
+                color: #ff9800;
+                background: rgba(255, 152, 0, 0.1);
+                border: 1px solid #ff9800;
+                padding: 10px;
+                border-radius: 5px;
+                margin: 5px 0;
+                display: block;
+            }
+            
+            .field-error {
+                color: #ff4444;
+                font-size: 0.85em;
+                margin-top: 5px;
+                display: block;
+            }
+        </style>
     </ui:define>
 
 </ui:composition>

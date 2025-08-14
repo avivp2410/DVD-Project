@@ -12,12 +12,22 @@
 <body>
     <div class="header-bar">
         <div class="header-left">
-            <h:form> <ui:insert name="header-left-content">
-                    <h:outputText value="username" styleClass="username-display" />
+            <h:form>
+                <ui:insert name="header-left-content">
+                    <!-- Default header content -->
+                    <h:panelGroup rendered="#{sessionBean.authenticated}">
+                        <span class="welcome-text">Welcome, </span>
+                        <h:outputText value="#{sessionBean.currentUserDisplayName}" styleClass="username-display" />
+                        <span class="user-role">(#{sessionBean.currentUserRole})</span>
+                        
+                        <h:commandLink value="Profile" action="profile.xhtml?faces-redirect=true" styleClass="nav-link" />
+                        <h:commandLink value="Logout" action="#{authBean.logout}" styleClass="logout-link" />
+                    </h:panelGroup>
                     
-                    <h:commandLink value="filter" styleClass="filter-text" action="#" />
-                    
-                    <h:inputText value="" styleClass="search-input" placeholder="search" />
+                    <h:panelGroup rendered="#{not sessionBean.authenticated}">
+                        <h:commandLink value="Login" action="login.xhtml?faces-redirect=true" styleClass="login-link" />
+                        <h:commandLink value="Register" action="register.xhtml?faces-redirect=true" styleClass="register-link" />
+                    </h:panelGroup>
                 </ui:insert>
             </h:form>
         </div>

@@ -8,32 +8,353 @@
     <ui:define name="title">Blockk Busterr - Main Page</ui:define>
     <ui:define name="main-title">Main Page</ui:define>
 
+    <ui:define name="header-left-content">
+        <h:form>
+            <h:outputText value="Welcome" styleClass="username-display" />
+            
+            <!-- Filter Controls -->
+            <h:selectOneMenu value="#{movieListBean.selectedGenre}" onchange="submit()" styleClass="filter-select">
+                <f:selectItem itemValue="" itemLabel="All Genres" />
+                <f:selectItems value="#{movieListBean.availableGenres}" var="genre" itemValue="#{genre}" itemLabel="#{genre}" />
+                <f:ajax execute="@form" render="movieGrid movieCount" />
+            </h:selectOneMenu>
+            
+            <h:selectBooleanCheckbox value="#{movieListBean.showAvailableOnly}" onchange="submit()" styleClass="availability-filter">
+                <f:ajax execute="@form" render="movieGrid movieCount" listener="#{movieListBean.toggleAvailabilityFilter}" />
+            </h:selectBooleanCheckbox>
+            <h:outputLabel value="Available Only" styleClass="filter-label" />
+            
+            <!-- Search Input -->
+            <h:inputText value="#{movieListBean.searchTerm}" styleClass="search-input" placeholder="Search movies...">
+                <f:ajax event="keyup" execute="@this" render="movieGrid movieCount" listener="#{movieListBean.searchMovies}" />
+            </h:inputText>
+            
+            <h:commandButton value="Clear" action="#{movieListBean.clearFilters}" styleClass="clear-filter-btn">
+                <f:ajax execute="@form" render="movieGrid movieCount" />
+            </h:commandButton>
+        </h:form>
+    </ui:define>
+
     <ui:define name="content">
         <div class="movies-grid-container">
-            <h2>Movies</h2>
-            <div class="movies-grid">
-                <h:panelGroup layout="block" styleClass="movie-item">movie 1</h:panelGroup>
-                <h:panelGroup layout="block" styleClass="movie-item">movie 2</h:panelGroup>
-                <h:panelGroup layout="block" styleClass="movie-item">movie 3</h:panelGroup>
-                <h:panelGroup layout="block" styleClass="movie-item">movie 4</h:panelGroup>
-                <h:panelGroup layout="block" styleClass="movie-item">movie 5</h:panelGroup>
-                <h:panelGroup layout="block" styleClass="movie-item">movie 6</h:panelGroup>
-                <h:panelGroup layout="block" styleClass="movie-item">movie 7</h:panelGroup>
-                <h:panelGroup layout="block" styleClass="movie-item">movie 8</h:panelGroup>
-                <h:panelGroup layout="block" styleClass="movie-item">movie 9</h:panelGroup>
-                <h:panelGroup layout="block" styleClass="movie-item">movie 10</h:panelGroup>
-                <h:panelGroup layout="block" styleClass="movie-item">movie 11</h:panelGroup>
-                <h:panelGroup layout="block" styleClass="movie-item">movie 12</h:panelGroup>
-                <h:panelGroup layout="block" styleClass="movie-item">movie 13</h:panelGroup>
-                <h:panelGroup layout="block" styleClass="movie-item">movie 14</h:panelGroup>
-                <h:panelGroup layout="block" styleClass="movie-item">movie 15</h:panelGroup>
-                <h:panelGroup layout="block" styleClass="movie-item">movie 16</h:panelGroup>
-                <h:panelGroup layout="block" styleClass="movie-item">movie 17</h:panelGroup>
-                <h:panelGroup layout="block" styleClass="movie-item">movie 18</h:panelGroup>
-                <h:panelGroup layout="block" styleClass="movie-item">movie 19</h:panelGroup>
-                <h:panelGroup layout="block" styleClass="movie-item">movie 20</h:panelGroup>
+            <div class="movies-header">
+                <h2>Movies</h2>
+                <h:panelGroup id="movieCount">
+                    <span class="movie-count">
+                        Showing #{movieListBean.movieCount} of #{movieListBean.totalMovieCount} movies
+                    </span>
+                </h:panelGroup>
             </div>
+            
+            <h:panelGroup id="movieGrid">
+                <div class="movies-grid">
+                    <ui:repeat value="#{movieListBean.filteredMovies}" var="movie">
+                        <div class="movie-item #{movieListBean.getAvailabilityClass(movie)}">
+                            <h:form>
+                                <div class="movie-content">
+                                    <div class="movie-image">
+                                        <h:graphicImage value="#{movie.imageUrl != null ? movie.imageUrl : '/resources/img/movie-placeholder.jpg'}"
+                                                      alt="#{movie.title}" styleClass="movie-poster" />
+                                    </div>
+                                    
+                                    <div class="movie-info">
+                                        <h3 class="movie-title">#{movie.title}</h3>
+                                        <p class="movie-genre">#{movie.genre}</p>
+                                        <p class="movie-year">#{movie.releaseYear}</p>
+                                        <p class="movie-duration">#{movie.durationFormatted}</p>
+                                        
+                                        <div class="movie-availability">
+                                            <span class="availability-status #{movieListBean.getAvailabilityClass(movie)}">
+                                                #{movieListBean.getAvailabilityStatus(movie)}
+                                            </span>
+                                        </div>
+                                        
+                                        <div class="movie-description">
+                                            <h:outputText value="#{movie.description}" escape="false"
+                                                        rendered="#{movie.description != null and movie.description.length() > 0}">
+                                                <f:converter converterId="jakarta.faces.converter.TextConverter" />
+                                            </h:outputText>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="movie-actions">
+                                        <h:commandButton value="View Details"
+                                                       action="#{movieListBean.viewMovieDetails(movie.movieId)}"
+                                                       styleClass="btn btn-primary" />
+                                        
+                                        <h:commandButton value="Rent Movie"
+                                                       action="loan.xhtml?movieId=#{movie.movieId}&amp;faces-redirect=true"
+                                                       styleClass="btn btn-success"
+                                                       disabled="#{!movieListBean.isMovieAvailable(movie)}" />
+                                    </div>
+                                </div>
+                            </h:form>
+                        </div>
+                    </ui:repeat>
+                    
+                    <!-- No movies message -->
+                    <h:panelGroup rendered="#{empty movieListBean.filteredMovies}" styleClass="no-movies-message">
+                        <div class="alert alert-info">
+                            <h:outputText value="No movies found matching your criteria." />
+                            <br/>
+                            <h:commandLink value="Clear filters" action="#{movieListBean.clearFilters}" styleClass="link">
+                                <f:ajax execute="@form" render="movieGrid movieCount" />
+                            </h:commandLink>
+                        </div>
+                    </h:panelGroup>
+                </div>
+            </h:panelGroup>
         </div>
+        
+        <!-- Movie Grid Styles -->
+        <style type="text/css">
+            .movies-grid-container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+            
+            .movies-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+            }
+            
+            .movies-header h2 {
+                color: var(--secondary-color);
+                font-size: 2.5em;
+                margin: 0;
+                text-shadow: 2px 2px 5px var(--shadow-dark);
+            }
+            
+            .movie-count {
+                color: var(--light-text);
+                font-size: 1.1em;
+                background: var(--darker-gray-bg);
+                padding: 8px 16px;
+                border-radius: 20px;
+                border: 1px solid var(--secondary-color);
+            }
+            
+            .movies-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                gap: 20px;
+                justify-content: center;
+            }
+            
+            .movie-item {
+                background: var(--darker-gray-bg);
+                border-radius: 12px;
+                padding: 15px;
+                box-shadow: 0 4px 15px var(--shadow-dark);
+                transition: all 0.3s ease;
+                border: 2px solid transparent;
+                min-height: 400px;
+                display: flex;
+                flex-direction: column;
+            }
+            
+            .movie-item:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 25px var(--shadow-blue);
+                border-color: var(--secondary-color);
+            }
+            
+            .movie-item.out-of-stock {
+                opacity: 0.6;
+                border-color: #dc3545;
+            }
+            
+            .movie-item.limited-stock {
+                border-color: #ffc107;
+            }
+            
+            .movie-item.in-stock {
+                border-color: #28a745;
+            }
+            
+            .movie-content {
+                display: flex;
+                flex-direction: column;
+                height: 100%;
+            }
+            
+            .movie-image {
+                text-align: center;
+                margin-bottom: 15px;
+            }
+            
+            .movie-poster {
+                width: 100%;
+                height: 200px;
+                object-fit: cover;
+                border-radius: 8px;
+                border: 2px solid var(--secondary-color);
+            }
+            
+            .movie-info {
+                flex-grow: 1;
+                margin-bottom: 15px;
+            }
+            
+            .movie-title {
+                color: var(--secondary-color);
+                font-size: 1.4em;
+                margin: 0 0 8px 0;
+                font-weight: bold;
+                text-align: center;
+            }
+            
+            .movie-genre, .movie-year, .movie-duration {
+                color: var(--light-text);
+                margin: 4px 0;
+                font-size: 0.95em;
+                text-align: center;
+            }
+            
+            .movie-description {
+                color: var(--light-text);
+                font-size: 0.9em;
+                margin-top: 10px;
+                max-height: 60px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            
+            .movie-availability {
+                text-align: center;
+                margin: 10px 0;
+            }
+            
+            .availability-status {
+                padding: 4px 12px;
+                border-radius: 15px;
+                font-size: 0.85em;
+                font-weight: bold;
+            }
+            
+            .availability-status.in-stock {
+                background: #28a745;
+                color: white;
+            }
+            
+            .availability-status.limited-stock {
+                background: #ffc107;
+                color: #212529;
+            }
+            
+            .availability-status.out-of-stock {
+                background: #dc3545;
+                color: white;
+            }
+            
+            .movie-actions {
+                display: flex;
+                gap: 8px;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            .btn {
+                padding: 8px 16px;
+                border: none;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 0.9em;
+                font-weight: bold;
+                transition: all 0.2s ease;
+                text-decoration: none;
+                display: inline-block;
+            }
+            
+            .btn-primary {
+                background: var(--primary-color);
+                color: white;
+            }
+            
+            .btn-primary:hover {
+                background: var(--hover-blue);
+                transform: scale(1.05);
+            }
+            
+            .btn-success {
+                background: #28a745;
+                color: white;
+            }
+            
+            .btn-success:hover:not(:disabled) {
+                background: #218838;
+                transform: scale(1.05);
+            }
+            
+            .btn:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+            
+            .no-movies-message {
+                grid-column: 1 / -1;
+                text-align: center;
+                padding: 40px;
+            }
+            
+            .alert {
+                padding: 20px;
+                border-radius: 8px;
+                font-size: 1.1em;
+            }
+            
+            .alert-info {
+                background: var(--darker-gray-bg);
+                border: 2px solid var(--secondary-color);
+                color: var(--light-text);
+            }
+            
+            .link {
+                color: var(--secondary-color);
+                text-decoration: underline;
+            }
+            
+            .link:hover {
+                color: var(--hover-blue);
+            }
+            
+            /* Filter Controls in Header */
+            .filter-select, .search-input {
+                padding: 6px 12px;
+                border: 1px solid var(--secondary-color);
+                border-radius: 4px;
+                background: var(--darker-gray-bg);
+                color: var(--light-text);
+                margin: 0 8px;
+            }
+            
+            .filter-label {
+                color: var(--light-text);
+                margin-left: 5px;
+                margin-right: 10px;
+            }
+            
+            .availability-filter {
+                margin: 0 5px;
+            }
+            
+            .clear-filter-btn {
+                background: var(--secondary-color);
+                color: white;
+                border: none;
+                padding: 6px 12px;
+                border-radius: 4px;
+                cursor: pointer;
+                margin-left: 8px;
+            }
+            
+            .clear-filter-btn:hover {
+                background: var(--hover-blue);
+            }
+        </style>
     </ui:define>
 
 </ui:composition>

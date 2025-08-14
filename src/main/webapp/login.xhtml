@@ -5,6 +5,7 @@
 <h:head>
     <title>Blockk Busterr Login</title>
     <h:outputStylesheet name="style.css" library="css"/>
+    <f:event type="preRenderView" listener="#{authBean.checkAlreadyLoggedIn}" />
 </h:head>
 <h:body styleClass="login-page">
     <div class="logo-container">
@@ -13,21 +14,252 @@
     
     <div class="login-container">
         <h1 class="title">Blockk Busterr</h1>
+        
+        <!-- Display messages -->
+        <h:messages id="messages" styleClass="messages" errorClass="error-message"
+                   infoClass="info-message" warnClass="warn-message" />
 
-        <h:form class="login-form">
-            <h:outputLabel for="username" value="Enter username" />
-            <h:inputText id="username" value="" />
+        <h:form class="login-form" id="loginForm">
+            <!-- Username field -->
+            <div class="form-group">
+                <h:outputLabel for="username" value="Enter username" styleClass="form-label" />
+                <h:inputText id="username"
+                           value="#{authBean.username}"
+                           styleClass="form-input"
+                           required="true"
+                           requiredMessage="Username is required"
+                           validatorMessage="Username must be between 3 and 30 characters">
+                    <f:validateLength minimum="3" maximum="30" />
+                    <f:ajax event="blur" render="usernameMessage" />
+                </h:inputText>
+                <h:message id="usernameMessage" for="username" styleClass="field-error" />
+            </div>
 
-            <h:outputLabel for="password" value="Enter password" />
-            <h:inputSecret id="password" value="" />
+            <!-- Password field -->
+            <div class="form-group">
+                <h:outputLabel for="password" value="Enter password" styleClass="form-label" />
+                <h:inputSecret id="password"
+                             value="#{authBean.password}"
+                             styleClass="form-input"
+                             required="true"
+                             requiredMessage="Password is required"
+                             validatorMessage="Password must be at least 6 characters">
+                    <f:validateLength minimum="6" />
+                    <f:ajax event="blur" render="passwordMessage" />
+                </h:inputSecret>
+                <h:message id="passwordMessage" for="password" styleClass="field-error" />
+            </div>
 
+            <!-- Remember me option -->
+            <div class="form-group checkbox-group">
+                <h:selectBooleanCheckbox id="rememberMe"
+                                       value="#{authBean.rememberMe}"
+                                       styleClass="checkbox-input" />
+                <h:outputLabel for="rememberMe" value="Remember me" styleClass="checkbox-label" />
+            </div>
+
+            <br/>
+
+            <!-- Login button -->
+            <h:commandButton value="Log In"
+                           action="#{authBean.login}"
+                           styleClass="#{authBean.loginButtonClass}"
+                           disabled="#{authBean.loginButtonDisabled}">
+                <f:ajax execute="@form" render="@form :messages" />
+            </h:commandButton>
+            
             <br/><br/>
-
-            <h:commandButton value="log in" styleClass="login-button" />
-            <br/><br/>
-            <h:commandButton value="sign up" styleClass="login-button" />
+            
+            <!-- Sign up button -->
+            <h:commandButton value="Sign Up"
+                           action="#{authBean.goToRegistration}"
+                           styleClass="signup-button"
+                           immediate="true" />
+            
+            <!-- Browse as guest link -->
+            <div class="guest-access">
+                <h:commandLink value="Browse as Guest"
+                             action="#{authBean.goToMainPage}"
+                             styleClass="guest-link" />
+            </div>
+            
+            <!-- Forgot password link -->
+            <div class="forgot-password">
+                <h:commandLink value="Forgot Password?"
+                             action="#{authBean.forgotPassword}"
+                             styleClass="forgot-link">
+                    <f:ajax execute="@this" render="@form :messages" />
+                </h:commandLink>
+            </div>
         </h:form>
     </div>
+    
+    <!-- Enhanced CSS styles -->
+    <style type="text/css">
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .form-label {
+            display: block;
+            color: var(--light-text);
+            font-size: 1.1em;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--secondary-color);
+            border-radius: 8px;
+            background: var(--darker-gray-bg);
+            color: var(--light-text);
+            font-size: 1em;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--hover-blue);
+            box-shadow: 0 0 10px var(--shadow-blue);
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .checkbox-input {
+            transform: scale(1.2);
+        }
+        
+        .checkbox-label {
+            color: var(--light-text);
+            font-size: 0.95em;
+            margin: 0;
+        }
+        
+        .login-button.enabled {
+            background: linear-gradient(to bottom, var(--primary-color), var(--hover-blue));
+            border: 2px solid var(--hover-blue);
+            color: var(--light-text);
+            padding: 12px 40px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            width: 200px;
+        }
+        
+        .login-button.enabled:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px var(--shadow-blue);
+        }
+        
+        .login-button.disabled {
+            background: #666;
+            border: 2px solid #666;
+            color: #999;
+            padding: 12px 40px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: not-allowed;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            width: 200px;
+        }
+        
+        .signup-button {
+            background: linear-gradient(to bottom, var(--secondary-color), var(--primary-color));
+            border: 2px solid var(--secondary-color);
+            color: var(--light-text);
+            padding: 12px 40px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            width: 200px;
+        }
+        
+        .signup-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px var(--shadow-dark);
+        }
+        
+        .guest-access, .forgot-password {
+            margin-top: 15px;
+            text-align: center;
+        }
+        
+        .guest-link, .forgot-link {
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-size: 0.95em;
+            transition: color 0.3s ease;
+        }
+        
+        .guest-link:hover, .forgot-link:hover {
+            color: var(--hover-blue);
+            text-decoration: underline;
+        }
+        
+        .messages {
+            margin-bottom: 20px;
+        }
+        
+        .error-message {
+            color: #ff4444;
+            background: rgba(255, 68, 68, 0.1);
+            border: 1px solid #ff4444;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 5px 0;
+            display: block;
+        }
+        
+        .info-message {
+            color: #4CAF50;
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid #4CAF50;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 5px 0;
+            display: block;
+        }
+        
+        .warn-message {
+            color: #ff9800;
+            background: rgba(255, 152, 0, 0.1);
+            border: 1px solid #ff9800;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 5px 0;
+            display: block;
+        }
+        
+        .field-error {
+            color: #ff4444;
+            font-size: 0.85em;
+            margin-top: 5px;
+            display: block;
+        }
+        
+        .login-container {
+            max-width: 400px;
+        }
+    </style>
 
 </h:body>
 </html>
