@@ -151,8 +151,8 @@ public class ReviewService {
     /**
      * Get recent reviews with limit
      */
-    public List<Review> getRecentReviews(int limit) {
-        return reviewRepository.findRecentReviews(limit);
+    public List<Review> getRecentReviewsLimited(int limit) {
+        return reviewRepository.findRecentReviewsLimited(limit);
     }
     
     /**

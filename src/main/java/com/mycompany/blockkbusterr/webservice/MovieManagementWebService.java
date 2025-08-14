@@ -11,7 +11,6 @@ import jakarta.jws.WebMethod;
 import jakarta.jws.WebParam;
 import jakarta.jws.WebResult;
 import jakarta.jws.WebService;
-import jakarta.xml.ws.soap.SOAPBinding;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
@@ -23,7 +22,6 @@ import java.util.stream.Collectors;
     serviceName = "MovieManagementService",
     targetNamespace = "http://webservice.blockkbusterr.mycompany.com/"
 )
-@SOAPBinding(style = SOAPBinding.Style.DOCUMENT, use = SOAPBinding.Use.LITERAL)
 @Stateless
 public class MovieManagementWebService {
     

@@ -11,7 +11,6 @@ import jakarta.jws.WebMethod;
 import jakarta.jws.WebParam;
 import jakarta.jws.WebResult;
 import jakarta.jws.WebService;
-import jakarta.xml.ws.soap.SOAPBinding;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -21,7 +20,6 @@ import java.util.stream.Collectors;
     serviceName = "UserManagementService",
     targetNamespace = "http://webservice.blockkbusterr.mycompany.com/"
 )
-@SOAPBinding(style = SOAPBinding.Style.DOCUMENT, use = SOAPBinding.Use.LITERAL)
 @Stateless
 public class UserManagementWebService {
     

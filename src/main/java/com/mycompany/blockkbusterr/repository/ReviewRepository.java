@@ -123,7 +123,7 @@ public class ReviewRepository extends BaseRepository<Review, Long> {
     /**
      * Find recent reviews with limit
      */
-    public List<Review> findRecentReviews(int limit) {
+    public List<Review> findRecentReviewsLimited(int limit) {
         String jpql = "SELECT r FROM Review r WHERE r.active = true ORDER BY r.reviewDate DESC";
         TypedQuery<Review> query = entityManager.createQuery(jpql, Review.class);
         query.setMaxResults(limit);
