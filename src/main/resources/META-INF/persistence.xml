@@ -2,8 +2,7 @@
 <persistence version="3.0" xmlns="https://jakarta.ee/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd">
     <!-- Define Persistence Unit -->
     <persistence-unit name="blockkbusterr_pu" transaction-type="JTA">
-        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
-        <jta-data-source>java:app/jdbc/BlockkBusterrDS</jta-data-source>
+        <!-- Let TomEE use its default JPA provider (EclipseLink) -->
         
         <!-- Entity Classes -->
         <class>com.mycompany.blockkbusterr.entity.User</class>
@@ -14,26 +13,15 @@
         <exclude-unlisted-classes>false</exclude-unlisted-classes>
         
         <properties>
-            <!-- Database connection properties (placeholder values) -->
+            <!-- Database connection properties -->
             <property name="jakarta.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
             <property name="jakarta.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/blockkbusterr?useSSL=false&amp;serverTimezone=UTC"/>
-            <property name="jakarta.persistence.jdbc.user" value="your_username"/>
-            <property name="jakarta.persistence.jdbc.password" value="your_password"/>
+            <property name="jakarta.persistence.jdbc.user" value="root"/>
+            <property name="jakarta.persistence.jdbc.password" value="12345678"/>
             
-            <!-- Hibernate properties -->
-            <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>
-            <property name="hibernate.hbm2ddl.auto" value="update"/>
-            <property name="hibernate.show_sql" value="true"/>
-            <property name="hibernate.format_sql" value="true"/>
-            <property name="hibernate.use_sql_comments" value="true"/>
-            
-            <!-- Connection pool settings -->
-            <property name="hibernate.connection.pool_size" value="10"/>
-            <property name="hibernate.connection.autocommit" value="false"/>
-            
-            <!-- Enable second level cache -->
-            <property name="hibernate.cache.use_second_level_cache" value="false"/>
-            <property name="hibernate.cache.use_query_cache" value="false"/>
+            <!-- EclipseLink properties -->
+            <property name="eclipselink.ddl-generation" value="create-or-extend-tables"/>
+            <property name="eclipselink.logging.level" value="INFO"/>
         </properties>
     </persistence-unit>
 </persistence>
