@@ -5,6 +5,7 @@ import com.mycompany.blockkbusterr.service.UserService;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
+import jakarta.faces.event.AjaxBehaviorEvent;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.validation.constraints.Email;
@@ -118,8 +119,8 @@ public class UserRegistrationBean implements Serializable {
     /**
      * Check username availability via AJAX
      */
-    public void checkUsernameAvailability() {
-        if (username != null && !username.trim().isEmpty()) {
+    public void checkUsernameAvailability(AjaxBehaviorEvent event) {
+        if (username != null && !username.trim().isEmpty() && username.length() >= 3) {
             try {
                 boolean available = userService.isUsernameAvailable(username.trim());
                 if (!available) {
@@ -134,8 +135,9 @@ public class UserRegistrationBean implements Serializable {
     /**
      * Check email availability via AJAX
      */
-    public void checkEmailAvailability() {
-        if (email != null && !email.trim().isEmpty()) {
+    public void checkEmailAvailability(AjaxBehaviorEvent event) {
+        if (email != null && !email.trim().isEmpty() &&
+            email.matches("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}")) {
             try {
                 boolean available = userService.isEmailAvailable(email.trim());
                 if (!available) {
@@ -150,7 +152,7 @@ public class UserRegistrationBean implements Serializable {
     /**
      * Validate password confirmation via AJAX
      */
-    public void validatePasswordConfirmation() {
+    public void validatePasswordConfirmation(AjaxBehaviorEvent event) {
         if (password != null && confirmPassword != null && 
             !password.equals(confirmPassword)) {
             addFieldError("confirmPassword", "Passwords do not match");
@@ -291,7 +293,7 @@ public class UserRegistrationBean implements Serializable {
      * Add field-specific error message
      */
     private void addFieldError(String fieldId, String message) {
-        FacesContext.getCurrentInstance().addMessage(fieldId, 
+        FacesContext.getCurrentInstance().addMessage("registrationForm:" + fieldId,
             new FacesMessage(FacesMessage.SEVERITY_ERROR, message, null));
     }
     

@@ -29,7 +29,7 @@
                                requiredMessage="First name is required"
                                validatorMessage="First name must be between 2 and 50 characters">
                         <f:validateLength minimum="2" maximum="50" />
-                        <f:ajax event="blur" render="firstNameMessage" />
+                        <f:ajax event="blur" render="firstNameMessage registerButton" />
                     </h:inputText>
                     <h:message id="firstNameMessage" for="firstName" styleClass="field-error" />
                 </div>
@@ -44,7 +44,7 @@
                                requiredMessage="Last name is required"
                                validatorMessage="Last name must be between 2 and 50 characters">
                         <f:validateLength minimum="2" maximum="50" />
-                        <f:ajax event="blur" render="lastNameMessage" />
+                        <f:ajax event="blur" render="lastNameMessage registerButton" />
                     </h:inputText>
                     <h:message id="lastNameMessage" for="lastName" styleClass="field-error" />
                 </div>
@@ -59,7 +59,8 @@
                                requiredMessage="Email is required"
                                validatorMessage="Please enter a valid email address">
                         <f:validateRegex pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" />
-                        <f:ajax event="blur" render="emailMessage" />
+                        <f:ajax event="blur" render="emailMessage registerButton"
+                                listener="#{registrationBean.checkEmailAvailability}" />
                     </h:inputText>
                     <h:message id="emailMessage" for="email" styleClass="field-error" />
                 </div>
@@ -74,7 +75,8 @@
                                requiredMessage="Username is required"
                                validatorMessage="Username must be between 3 and 30 characters">
                         <f:validateLength minimum="3" maximum="30" />
-                        <f:ajax event="blur" render="usernameMessage" />
+                        <f:ajax event="blur" render="usernameMessage registerButton"
+                                listener="#{registrationBean.checkUsernameAvailability}" />
                     </h:inputText>
                     <h:message id="usernameMessage" for="username" styleClass="field-error" />
                 </div>
@@ -89,7 +91,7 @@
                                  requiredMessage="Password is required"
                                  validatorMessage="Password must be at least 6 characters">
                         <f:validateLength minimum="6" />
-                        <f:ajax event="blur" render="passwordMessage" />
+                        <f:ajax event="blur" render="passwordMessage registerButton" />
                     </h:inputSecret>
                     <h:message id="passwordMessage" for="password" styleClass="field-error" />
                     <div class="password-hint">
@@ -105,7 +107,8 @@
                                  styleClass="form-input"
                                  required="true"
                                  requiredMessage="Please confirm your password">
-                        <f:ajax event="blur" render="confirmPasswordMessage" />
+                        <f:ajax event="blur" render="confirmPasswordMessage registerButton"
+                                listener="#{registrationBean.validatePasswordConfirmation}" />
                     </h:inputSecret>
                     <h:message id="confirmPasswordMessage" for="confirmPassword" styleClass="field-error" />
                 </div>
