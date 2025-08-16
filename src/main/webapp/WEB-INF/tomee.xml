@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tomee>
+    <!-- MySQL DataSource Configuration -->
+    <Resource id="blockkbusterrDS" type="DataSource">
+        JdbcDriver = com.mysql.cj.jdbc.Driver
+        JdbcUrl = jdbc:mysql://localhost:3306/blockkbusterr?useSSL=false&serverTimezone=UTC&createDatabaseIfNotExist=true
+        UserName = root
+        Password = 12345678
+        JtaManaged = true
+        InitialSize = 5
+        MaxActive = 20
+        MaxIdle = 10
+        MinIdle = 5
+        MaxWait = 10000
+        ValidationQuery = SELECT 1
+        TestOnBorrow = true
+        TestOnReturn = false
+        TestWhileIdle = true
+        TimeBetweenEvictionRunsMillis = 30000
+        MinEvictableIdleTimeMillis = 60000
+    </Resource>
+</tomee>

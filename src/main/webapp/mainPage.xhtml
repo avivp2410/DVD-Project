@@ -71,9 +71,7 @@
                                         
                                         <div class="movie-description">
                                             <h:outputText value="#{movie.description}" escape="false"
-                                                        rendered="#{movie.description != null and movie.description.length() > 0}">
-                                                <f:converter converterId="jakarta.faces.converter.TextConverter" />
-                                            </h:outputText>
+                                                        rendered="#{movie.description != null and movie.description.length() > 0}" />
                                         </div>
                                     </div>
                                     
@@ -83,7 +81,7 @@
                                                        styleClass="btn btn-primary" />
                                         
                                         <h:commandButton value="Rent Movie"
-                                                       action="loan.xhtml?movieId=#{movie.movieId}&amp;faces-redirect=true"
+                                                       outcome="loan.xhtml?movieId=#{movie.movieId}&amp;faces-redirect=true"
                                                        styleClass="btn btn-success"
                                                        disabled="#{!movieListBean.isMovieAvailable(movie)}" />
                                     </div>

@@ -89,13 +89,14 @@
                                  styleClass="form-input"
                                  required="true"
                                  requiredMessage="Password is required"
-                                 validatorMessage="Password must be at least 6 characters">
+                                 validatorMessage="Password must be at least 6 characters and contain both letters and numbers">
                         <f:validateLength minimum="6" />
+                        <f:validateRegex pattern="^(?=.*[a-zA-Z])(?=.*\d).{6,}$" />
                         <f:ajax event="blur" render="passwordMessage registerButton" />
                     </h:inputSecret>
                     <h:message id="passwordMessage" for="password" styleClass="field-error" />
                     <div class="password-hint">
-                        Password must be at least 6 characters long
+                        Password must be at least 6 characters long and contain both letters and numbers
                     </div>
                 </div>
 

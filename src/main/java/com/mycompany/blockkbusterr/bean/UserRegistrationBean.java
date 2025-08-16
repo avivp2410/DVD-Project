@@ -2,7 +2,8 @@ package com.mycompany.blockkbusterr.bean;
 
 import com.mycompany.blockkbusterr.entity.User;
 import com.mycompany.blockkbusterr.service.UserService;
-import jakarta.enterprise.context.RequestScoped;
+import com.mycompany.blockkbusterr.util.PasswordUtil;
+import jakarta.faces.view.ViewScoped;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.event.AjaxBehaviorEvent;
@@ -18,7 +19,7 @@ import java.util.logging.Logger;
  * Request-scoped bean for handling user registration
  */
 @Named("registrationBean")
-@RequestScoped
+@ViewScoped
 public class UserRegistrationBean implements Serializable {
     
     private static final long serialVersionUID = 1L;
@@ -60,7 +61,12 @@ public class UserRegistrationBean implements Serializable {
      * Handle user registration
      */
     public String register() {
+        logger.info("=== REGISTRATION DEBUG: register() method called ===");
+        logger.info("Form valid check: " + isFormValid());
+        logger.info("Registration in progress: " + registrationInProgress);
+        
         if (registrationInProgress) {
+            logger.warning("Registration already in progress - preventing double submission");
             return null; // Prevent double submission
         }
         
@@ -224,8 +230,8 @@ public class UserRegistrationBean implements Serializable {
             valid = false;
         }
         
-        if (password != null && password.length() < 6) {
-            addErrorMessage("Password must be at least 6 characters");
+        if (password != null && !PasswordUtil.isValidPassword(password)) {
+            addErrorMessage("Password must be at least 6 characters and contain both letters and numbers");
             valid = false;
         }
         
@@ -236,14 +242,32 @@ public class UserRegistrationBean implements Serializable {
      * Check if the registration form is valid
      */
     public boolean isFormValid() {
-        return firstName != null && !firstName.trim().isEmpty() &&
-               lastName != null && !lastName.trim().isEmpty() &&
-               email != null && !email.trim().isEmpty() &&
-               username != null && !username.trim().isEmpty() &&
-               password != null && !password.trim().isEmpty() &&
-               confirmPassword != null && !confirmPassword.trim().isEmpty() &&
-               password.equals(confirmPassword) &&
-               termsAccepted;
+        boolean firstNameValid = firstName != null && !firstName.trim().isEmpty();
+        boolean lastNameValid = lastName != null && !lastName.trim().isEmpty();
+        boolean emailValid = email != null && !email.trim().isEmpty();
+        boolean usernameValid = username != null && !username.trim().isEmpty();
+        boolean passwordValid = password != null && !password.trim().isEmpty();
+        boolean passwordUtilValid = passwordValid && PasswordUtil.isValidPassword(password);
+        boolean confirmPasswordValid = confirmPassword != null && !confirmPassword.trim().isEmpty();
+        boolean passwordsMatch = passwordValid && confirmPasswordValid && password.equals(confirmPassword);
+        
+        logger.info("=== FORM VALIDATION DEBUG ===");
+        logger.info("First name valid: " + firstNameValid + " (value: '" + firstName + "')");
+        logger.info("Last name valid: " + lastNameValid + " (value: '" + lastName + "')");
+        logger.info("Email valid: " + emailValid + " (value: '" + email + "')");
+        logger.info("Username valid: " + usernameValid + " (value: '" + username + "')");
+        logger.info("Password valid: " + passwordValid + " (value: '" + (password != null ? "[" + password.length() + " chars]" : "null") + "')");
+        logger.info("Password util valid: " + passwordUtilValid);
+        logger.info("Confirm password valid: " + confirmPasswordValid + " (value: '" + (confirmPassword != null ? "[" + confirmPassword.length() + " chars]" : "null") + "')");
+        logger.info("Passwords match: " + passwordsMatch);
+        logger.info("Terms accepted: " + termsAccepted);
+        
+        boolean isValid = firstNameValid && lastNameValid && emailValid && usernameValid &&
+                         passwordValid && passwordUtilValid && confirmPasswordValid &&
+                         passwordsMatch && termsAccepted;
+        
+        logger.info("Overall form valid: " + isValid);
+        return isValid;
     }
     
     /**
@@ -257,7 +281,13 @@ public class UserRegistrationBean implements Serializable {
      * Check if register button should be disabled
      */
     public boolean isRegisterButtonDisabled() {
-        return !isFormValid() || registrationInProgress;
+        boolean formValid = isFormValid();
+        boolean disabled = !formValid || registrationInProgress;
+        logger.info("=== BUTTON STATE DEBUG ===");
+        logger.info("Form valid: " + formValid);
+        logger.info("Registration in progress: " + registrationInProgress);
+        logger.info("Button disabled: " + disabled);
+        return disabled;
     }
     
     /**

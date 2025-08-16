@@ -211,9 +211,12 @@ public class AuthenticationBean implements Serializable {
     
     /**
      * Check if login button should be disabled
+     * Only disable during login processing, not for empty fields
      */
     public boolean isLoginButtonDisabled() {
-        return !isFormValid() || loginInProgress;
+        // Only disable when login is in progress
+        // Form validation will be handled in the login() method itself
+        return loginInProgress;
     }
     
     // Getters and Setters
