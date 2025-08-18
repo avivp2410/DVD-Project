@@ -9,50 +9,143 @@
     <ui:define name="main-title">Movie Details</ui:define>
 
     <ui:define name="content">
-        <div class="movie-details-container">
-            <h2>Movie Title</h2>
-            <div class="movie-details">
-                <div class="movie-image">
-                    <h:graphicImage library="img" name="movie-placeholder.jpg" alt="Movie Poster" />
+        <h:panelGroup rendered="#{not movieDetailsBean.movieLoaded}">
+            <div class="error-message">
+                <h:outputText value="Movie not found or an error occurred loading movie details." />
+                <br/>
+                <h:link value="← Back to Movies" outcome="mainPage" />
+            </div>
+        </h:panelGroup>
+        
+        <h:panelGroup rendered="#{movieDetailsBean.movieLoaded}">
+            <div class="movie-details-container">
+                <h2>#{movieDetailsBean.movie.title}</h2>
+                <div class="movie-details">
+                    <div class="movie-image">
+                        <h:graphicImage value="#{movieDetailsBean.movieImageUrl}"
+                                      alt="#{movieDetailsBean.movie.title} Poster"
+                                      styleClass="movie-poster" />
+                    </div>
+                    <div class="movie-info">
+                        <h:panelGroup layout="block" styleClass="info-item">
+                            <span class="info-label">Released Year:</span> #{movieDetailsBean.movie.releaseYear}
+                        </h:panelGroup>
+                        <h:panelGroup layout="block" styleClass="info-item">
+                            <span class="info-label">Duration:</span> #{movieDetailsBean.movie.durationFormatted}
+                        </h:panelGroup>
+                        <h:panelGroup layout="block" styleClass="info-item">
+                            <span class="info-label">Genre:</span> #{movieDetailsBean.movie.genre}
+                        </h:panelGroup>
+                        <h:panelGroup layout="block" styleClass="info-item">
+                            <span class="info-label">Available Copies:</span> #{movieDetailsBean.movie.quantity}
+                        </h:panelGroup>
+                        <h:panelGroup layout="block" styleClass="info-item">
+                            <span class="info-label">Average Rating:</span> #{movieDetailsBean.averageRatingFormatted}
+                        </h:panelGroup>
+                        <h:panelGroup layout="block" styleClass="description" rendered="#{not empty movieDetailsBean.movie.description}">
+                            <span class="info-label">Description:</span> #{movieDetailsBean.movie.description}
+                        </h:panelGroup>
+                    </div>
                 </div>
-                <div class="movie-info">
-                    <h:panelGroup layout="block" styleClass="info-item">
-                        <span class="info-label">Released Year:</span> 2023
+                
+                <!-- Rental Section -->
+                <div class="rental-section">
+                    <h:form class="loan-form">
+                        <h:commandButton value="Rent This Movie"
+                                       action="#{movieDetailsBean.rentMovie()}"
+                                       styleClass="loan-button primary-button"
+                                       rendered="#{movieDetailsBean.movieAvailable and sessionBean.authenticated}" />
+                        
+                        <h:outputText value="This movie is currently out of stock"
+                                    styleClass="out-of-stock-message"
+                                    rendered="#{not movieDetailsBean.movieAvailable}" />
+                        
+                        <h:commandButton value="Login to Rent"
+                                       action="login"
+                                       styleClass="login-button"
+                                       rendered="#{not sessionBean.authenticated}" />
+                    </h:form>
+                </div>
+                
+                <!-- Reviews Section -->
+                <div class="review-section">
+                    <h3>User Reviews (#{movieDetailsBean.movieReviews.size()} reviews)</h3>
+                    
+                    <!-- Existing Reviews -->
+                    <div class="reviews-list">
+                        <h:panelGroup rendered="#{not movieDetailsBean.hasReviews}">
+                            <p class="no-reviews">No reviews yet. Be the first to review this movie!</p>
+                        </h:panelGroup>
+                        
+                        <ui:repeat value="#{movieDetailsBean.movieReviews}" var="review">
+                            <div class="review-item">
+                                <div class="review-header">
+                                    <span class="review-author">#{review.user.firstName} #{review.user.lastName}</span>
+                                    <span class="review-rating">#{movieDetailsBean.getRatingStarsDisplay(review.rating)}</span>
+                                    <span class="review-date">#{review.reviewDate}</span>
+                                </div>
+                                <div class="review-content" rendered="#{review.hasComment}">
+                                    #{review.comment}
+                                </div>
+                            </div>
+                        </ui:repeat>
+                    </div>
+                    
+                    <!-- Add Review Form -->
+                    <h:panelGroup rendered="#{sessionBean.authenticated and not movieDetailsBean.userHasReviewed}">
+                        <h:form class="review-form">
+                            <h3>Write Your Review</h3>
+                            
+                            <div class="form-group">
+                                <h:outputLabel for="rating" value="Rating:" styleClass="form-label" />
+                                <h:selectOneMenu id="rating" value="#{movieDetailsBean.newReviewRating}"
+                                               styleClass="form-control rating-select" required="true"
+                                               requiredMessage="Please select a rating">
+                                    <f:selectItem itemValue="" itemLabel="Select a rating..." />
+                                    <f:selectItem itemValue="1" itemLabel="★☆☆☆☆ (1 star)" />
+                                    <f:selectItem itemValue="2" itemLabel="★★☆☆☆ (2 stars)" />
+                                    <f:selectItem itemValue="3" itemLabel="★★★☆☆ (3 stars)" />
+                                    <f:selectItem itemValue="4" itemLabel="★★★★☆ (4 stars)" />
+                                    <f:selectItem itemValue="5" itemLabel="★★★★★ (5 stars)" />
+                                </h:selectOneMenu>
+                                <h:message for="rating" styleClass="error-message" />
+                            </div>
+                            
+                            <div class="form-group">
+                                <h:outputLabel for="reviewInput" value="Your Review:" styleClass="form-label" />
+                                <h:inputTextarea id="reviewInput"
+                                               value="#{movieDetailsBean.newReviewComment}"
+                                               rows="4" cols="50"
+                                               styleClass="form-control review-textarea"
+                                               placeholder="Share your thoughts about this movie..."
+                                               required="true"
+                                               requiredMessage="Please enter your review" />
+                                <h:message for="reviewInput" styleClass="error-message" />
+                            </div>
+                            
+                            <div class="form-actions">
+                                <h:commandButton value="Submit Review"
+                                               action="#{movieDetailsBean.submitReview()}"
+                                               styleClass="submit-button primary-button" />
+                            </div>
+                        </h:form>
                     </h:panelGroup>
-                    <h:panelGroup layout="block" styleClass="info-item">
-                        <span class="info-label">Duration:</span> 120 min
+                    
+                    <!-- Messages for review restrictions -->
+                    <h:panelGroup rendered="#{not sessionBean.authenticated}">
+                        <div class="login-prompt">
+                            <p>Please <h:link value="log in" outcome="login" /> to write a review.</p>
+                        </div>
                     </h:panelGroup>
-                    <h:panelGroup layout="block" styleClass="info-item">
-                        <span class="info-label">Genre:</span> Action, Drama
-                    </h:panelGroup>
-                    <h:panelGroup layout="block" styleClass="description">
-                        <span class="info-label">Description:</span> This is a placeholder description for the movie. It tells the story of an epic adventure with thrilling action sequences and deep emotional moments.
+                    
+                    <h:panelGroup rendered="#{sessionBean.authenticated and movieDetailsBean.userHasReviewed}">
+                        <div class="already-reviewed">
+                            <p>You have already reviewed this movie. Thank you for your feedback!</p>
+                        </div>
                     </h:panelGroup>
                 </div>
             </div>
-            
-            <div class="review-section">
-                <h3>User Reviews</h3>
-                <div class="reviews-list">
-                    <h:panelGroup layout="block" styleClass="review-item">
-                        <span class="review-author">User1:</span> Great movie, really enjoyed the plot twists!
-                    </h:panelGroup>
-                    <h:panelGroup layout="block" styleClass="review-item">
-                        <span class="review-author">User2:</span> Amazing visuals, but the ending was predictable.
-                    </h:panelGroup>
-                </div>
-                <h:form class="review-form">
-                    <h:outputLabel for="reviewInput" value="Write your review:" />
-                    <h:inputTextarea id="reviewInput" value="" rows="3" cols="50" />
-                    <br/>
-                    <h:commandButton value="Post Review" styleClass="review-button" />
-                </h:form>
-            </div>
-            
-            <h:form class="loan-form">
-                <h:commandButton value="Loan Review" styleClass="loan-button" />
-            </h:form>
-        </div>
+        </h:panelGroup>
     </ui:define>
 
 </ui:composition>

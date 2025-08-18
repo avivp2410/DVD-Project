@@ -5,26 +5,451 @@
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
 
-    <ui:define name="title">Blockk Busterr - Loan Movie</ui:define>
-    <ui:define name="main-title">Loan Movie</ui:define>
+    <ui:define name="title">Blockk Busterr - Rent Movie</ui:define>
+    <ui:define name="main-title">Rent Movie</ui:define>
 
     <ui:define name="content">
-        <div class="register-form-container">
-            <h2>Loan a Movie</h2>
-            <h:form class="register-form">
-                <h:outputLabel for="username" value="Username:" />
-                <h:inputText id="username" value="" />
-                <h:outputLabel for="currentDate" value="Current Date:" />
-                <h:inputText id="currentDate" value="" />
-                <h:outputLabel for="returnDate" value="Return Date:" />
-                <h:inputText id="returnDate" value="" />
-                <h:outputLabel for="phoneNumber" value="Phone Number:" />
-                <h:inputText id="phoneNumber" value="" />
-                <h:outputLabel value="Movie Image:" />
-                <h:graphicImage library="img" name="movie-placeholder.jpg" alt="Movie Image" styleClass="movie-img" />
-                <h:commandButton value="Add" type="submit" />
-            </h:form>
+        <div class="rental-container">
+            <!-- Authentication check -->
+            <h:panelGroup rendered="#{not sessionBean.authenticated}">
+                <div class="auth-required">
+                    <h2>Login Required</h2>
+                    <p>You must be logged in to rent movies.</p>
+                    <h:form>
+                        <h:commandButton value="Login" action="login.xhtml?faces-redirect=true" styleClass="btn btn-primary" />
+                        <h:commandButton value="Register" action="register.xhtml?faces-redirect=true" styleClass="btn btn-secondary" />
+                    </h:form>
+                </div>
+            </h:panelGroup>
+
+            <!-- Rental form for authenticated users -->
+            <h:panelGroup rendered="#{sessionBean.authenticated}">
+                <!-- Movie not found message -->
+                <h:panelGroup rendered="#{rentalBean.selectedMovie == null}">
+                    <div class="error-container">
+                        <h2>Movie Not Found</h2>
+                        <p>The selected movie could not be found or is no longer available.</p>
+                        <h:form>
+                            <h:commandButton value="Browse Movies" action="mainPage.xhtml?faces-redirect=true" styleClass="btn btn-primary" />
+                        </h:form>
+                    </div>
+                </h:panelGroup>
+
+                <!-- Rental form -->
+                <h:panelGroup rendered="#{rentalBean.selectedMovie != null}">
+                    <div class="rental-form-container">
+                        <h2>Rent: #{rentalBean.selectedMovie.title}</h2>
+                        
+                        <!-- Display messages -->
+                        <h:messages id="messages" styleClass="messages" errorClass="error-message"
+                                   infoClass="info-message" warnClass="warn-message" />
+
+                        <!-- Movie information -->
+                        <div class="movie-info-section">
+                            <div class="movie-image">
+                                <h:graphicImage value="#{rentalBean.selectedMovie.imageUrl != null ? rentalBean.selectedMovie.imageUrl : '/resources/img/movie-placeholder.jpg'}"
+                                              alt="#{rentalBean.selectedMovie.title}" styleClass="movie-poster" />
+                            </div>
+                            <div class="movie-details">
+                                <h3>#{rentalBean.selectedMovie.title}</h3>
+                                <p><strong>Genre:</strong> #{rentalBean.selectedMovie.genre}</p>
+                                <p><strong>Year:</strong> #{rentalBean.selectedMovie.releaseYear}</p>
+                                <p><strong>Duration:</strong> #{rentalBean.selectedMovie.durationFormatted}</p>
+                                <p><strong>Available:</strong> #{rentalBean.selectedMovie.quantity} copies</p>
+                                <div class="availability-status #{rentalBean.selectedMovie.available ? 'available' : 'unavailable'}">
+                                    #{rentalBean.selectedMovie.available ? 'Available for rental' : 'Currently out of stock'}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Rental form -->
+                        <h:form class="rental-form" rendered="#{rentalBean.canRentSelectedMovie()}">
+                            <div class="form-section">
+                                <h3>Rental Details</h3>
+                                
+                                <!-- Return date -->
+                                <div class="form-group">
+                                    <h:outputLabel for="returnDate" value="Return Date:" styleClass="form-label" />
+                                    <h:inputText id="returnDate"
+                                               value="#{rentalBean.returnDate}"
+                                               styleClass="form-input"
+                                               required="true"
+                                               requiredMessage="Return date is required">
+                                        <f:convertDateTime pattern="yyyy-MM-dd" />
+                                        <f:ajax event="blur" render="returnDateMessage" />
+                                    </h:inputText>
+                                    <h:message id="returnDateMessage" for="returnDate" styleClass="field-error" />
+                                    <div class="help-text">Maximum rental period: 4 weeks</div>
+                                </div>
+
+                                <!-- Phone number -->
+                                <div class="form-group">
+                                    <h:outputLabel for="phoneNumber" value="Phone Number:" styleClass="form-label" />
+                                    <h:inputText id="phoneNumber"
+                                               value="#{rentalBean.phoneNumber}"
+                                               styleClass="form-input"
+                                               required="true"
+                                               requiredMessage="Phone number is required">
+                                        <f:ajax event="blur" render="phoneMessage" />
+                                    </h:inputText>
+                                    <h:message id="phoneMessage" for="phoneNumber" styleClass="field-error" />
+                                    <div class="help-text">Contact number for rental notifications</div>
+                                </div>
+
+                                <!-- Notes -->
+                                <div class="form-group">
+                                    <h:outputLabel for="notes" value="Notes (Optional):" styleClass="form-label" />
+                                    <h:inputTextarea id="notes"
+                                                   value="#{rentalBean.notes}"
+                                                   styleClass="form-textarea"
+                                                   rows="3"
+                                                   cols="50" />
+                                    <div class="help-text">Any additional notes or special requests</div>
+                                </div>
+                            </div>
+
+                            <!-- Rental summary -->
+                            <div class="rental-summary">
+                                <h3>Rental Summary</h3>
+                                <div class="summary-item">
+                                    <span class="label">Movie:</span>
+                                    <span class="value">#{rentalBean.selectedMovie.title}</span>
+                                </div>
+                                <div class="summary-item">
+                                    <span class="label">Renter:</span>
+                                    <span class="value">#{sessionBean.currentUserDisplayName}</span>
+                                </div>
+                                <div class="summary-item">
+                                    <span class="label">Return Date:</span>
+                                    <span class="value">#{rentalBean.formattedReturnDate}</span>
+                                </div>
+                                <div class="summary-item">
+                                    <span class="label">Rental Period:</span>
+                                    <span class="value">#{rentalBean.rentalPeriod}</span>
+                                </div>
+                            </div>
+
+                            <!-- Action buttons -->
+                            <div class="form-actions">
+                                <h:commandButton value="Confirm Rental"
+                                               action="#{rentalBean.createRental()}"
+                                               styleClass="btn btn-primary btn-large">
+                                    <f:ajax execute="@form" render="@form :messages" />
+                                </h:commandButton>
+                                
+                                <h:commandButton value="Cancel"
+                                               action="mainPage.xhtml?faces-redirect=true"
+                                               styleClass="btn btn-secondary btn-large"
+                                               immediate="true" />
+                            </div>
+                        </h:form>
+
+                        <!-- Cannot rent message -->
+                        <h:panelGroup rendered="#{not rentalBean.canRentSelectedMovie()}">
+                            <div class="cannot-rent">
+                                <h3>Cannot Rent This Movie</h3>
+                                <p>You cannot rent this movie because:</p>
+                                <ul>
+                                    <li h:rendered="#{not rentalBean.selectedMovie.available}">Movie is currently out of stock</li>
+                                    <li>You may already have an active rental for this movie</li>
+                                    <li>You may have reached the maximum number of active rentals (5)</li>
+                                </ul>
+                                <h:form>
+                                    <h:commandButton value="Browse Other Movies"
+                                                   action="mainPage.xhtml?faces-redirect=true"
+                                                   styleClass="btn btn-primary" />
+                                    <h:commandButton value="View My Rentals"
+                                                   action="profile.xhtml?faces-redirect=true"
+                                                   styleClass="btn btn-secondary" />
+                                </h:form>
+                            </div>
+                        </h:panelGroup>
+                    </div>
+                </h:panelGroup>
+            </h:panelGroup>
         </div>
+
+        <!-- CSS Styles -->
+        <style type="text/css">
+            .rental-container {
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+
+            .auth-required, .error-container {
+                text-align: center;
+                background: var(--darker-gray-bg);
+                padding: 40px;
+                border-radius: 12px;
+                box-shadow: 0 4px 15px var(--shadow-dark);
+                border: 2px solid var(--secondary-color);
+            }
+
+            .rental-form-container {
+                background: var(--darker-gray-bg);
+                padding: 30px;
+                border-radius: 12px;
+                box-shadow: 0 4px 15px var(--shadow-dark);
+                border: 2px solid var(--secondary-color);
+            }
+
+            .movie-info-section {
+                display: flex;
+                gap: 30px;
+                margin-bottom: 30px;
+                padding-bottom: 20px;
+                border-bottom: 1px solid var(--secondary-color);
+            }
+
+            .movie-image {
+                flex-shrink: 0;
+            }
+
+            .movie-poster {
+                width: 150px;
+                height: 200px;
+                object-fit: cover;
+                border-radius: 8px;
+                border: 2px solid var(--secondary-color);
+            }
+
+            .movie-details {
+                flex: 1;
+            }
+
+            .movie-details h3 {
+                color: var(--secondary-color);
+                font-size: 1.5em;
+                margin-bottom: 15px;
+            }
+
+            .movie-details p {
+                color: var(--light-text);
+                margin: 8px 0;
+                font-size: 1.1em;
+            }
+
+            .availability-status {
+                padding: 8px 16px;
+                border-radius: 20px;
+                font-weight: bold;
+                margin-top: 15px;
+                display: inline-block;
+            }
+
+            .availability-status.available {
+                background: #28a745;
+                color: white;
+            }
+
+            .availability-status.unavailable {
+                background: #dc3545;
+                color: white;
+            }
+
+            .form-section {
+                margin-bottom: 30px;
+            }
+
+            .form-section h3 {
+                color: var(--secondary-color);
+                margin-bottom: 20px;
+                font-size: 1.3em;
+            }
+
+            .form-group {
+                margin-bottom: 20px;
+            }
+
+            .form-label {
+                display: block;
+                color: var(--light-text);
+                font-weight: bold;
+                margin-bottom: 8px;
+                font-size: 1.1em;
+            }
+
+            .form-input, .form-textarea {
+                width: 100%;
+                padding: 12px 16px;
+                border: 2px solid var(--secondary-color);
+                border-radius: 8px;
+                background: var(--darker-gray-bg);
+                color: var(--light-text);
+                font-size: 1em;
+                transition: all 0.3s ease;
+                box-sizing: border-box;
+            }
+
+            .form-input:focus, .form-textarea:focus {
+                outline: none;
+                border-color: var(--hover-blue);
+                box-shadow: 0 0 10px var(--shadow-blue);
+            }
+
+            .help-text {
+                font-size: 0.9em;
+                color: #ccc;
+                margin-top: 5px;
+                font-style: italic;
+            }
+
+            .field-error {
+                color: #ff4444;
+                font-size: 0.85em;
+                margin-top: 5px;
+                display: block;
+            }
+
+            .rental-summary {
+                background: rgba(0, 86, 179, 0.1);
+                padding: 20px;
+                border-radius: 8px;
+                border: 1px solid var(--secondary-color);
+                margin-bottom: 30px;
+            }
+
+            .rental-summary h3 {
+                color: var(--secondary-color);
+                margin-bottom: 15px;
+            }
+
+            .summary-item {
+                display: flex;
+                justify-content: space-between;
+                margin: 10px 0;
+                padding: 8px 0;
+                border-bottom: 1px solid rgba(0, 86, 179, 0.2);
+            }
+
+            .summary-item:last-child {
+                border-bottom: none;
+            }
+
+            .summary-item .label {
+                font-weight: bold;
+                color: var(--light-text);
+            }
+
+            .summary-item .value {
+                color: var(--secondary-color);
+                font-weight: bold;
+            }
+
+            .form-actions {
+                display: flex;
+                gap: 15px;
+                justify-content: center;
+                margin-top: 30px;
+            }
+
+            .btn {
+                padding: 12px 30px;
+                border: none;
+                border-radius: 8px;
+                font-size: 1.1em;
+                font-weight: bold;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                text-decoration: none;
+                display: inline-block;
+                text-align: center;
+            }
+
+            .btn-large {
+                padding: 15px 40px;
+                font-size: 1.2em;
+            }
+
+            .btn-primary {
+                background: linear-gradient(to bottom, var(--primary-color), var(--hover-blue));
+                color: white;
+                border: 2px solid var(--hover-blue);
+            }
+
+            .btn-primary:hover {
+                transform: scale(1.05);
+                box-shadow: 0 0 15px var(--shadow-blue);
+            }
+
+            .btn-secondary {
+                background: #6c757d;
+                color: white;
+                border: 2px solid #6c757d;
+            }
+
+            .btn-secondary:hover {
+                background: #5a6268;
+                border-color: #5a6268;
+                transform: scale(1.05);
+            }
+
+            .cannot-rent {
+                text-align: center;
+                background: rgba(220, 53, 69, 0.1);
+                padding: 30px;
+                border-radius: 8px;
+                border: 1px solid #dc3545;
+            }
+
+            .cannot-rent h3 {
+                color: #dc3545;
+                margin-bottom: 15px;
+            }
+
+            .cannot-rent ul {
+                text-align: left;
+                color: var(--light-text);
+                margin: 15px 0;
+            }
+
+            .messages {
+                margin-bottom: 20px;
+            }
+
+            .error-message {
+                color: #ff4444;
+                background: rgba(255, 68, 68, 0.1);
+                border: 1px solid #ff4444;
+                padding: 10px;
+                border-radius: 5px;
+                margin: 5px 0;
+            }
+
+            .info-message {
+                color: #4CAF50;
+                background: rgba(76, 175, 80, 0.1);
+                border: 1px solid #4CAF50;
+                padding: 10px;
+                border-radius: 5px;
+                margin: 5px 0;
+            }
+
+            .warn-message {
+                color: #ff9800;
+                background: rgba(255, 152, 0, 0.1);
+                border: 1px solid #ff9800;
+                padding: 10px;
+                border-radius: 5px;
+                margin: 5px 0;
+            }
+
+            @media (max-width: 768px) {
+                .movie-info-section {
+                    flex-direction: column;
+                    text-align: center;
+                }
+
+                .form-actions {
+                    flex-direction: column;
+                }
+
+                .btn {
+                    width: 100%;
+                }
+            }
+        </style>
     </ui:define>
 
 </ui:composition>

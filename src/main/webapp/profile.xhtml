@@ -9,74 +9,234 @@
     <ui:define name="main-title">User Profile</ui:define>
 
     <ui:define name="content">
-        <div class="profile-container">
-            <!-- Last Orders Section -->
-            <div class="profile-section">
-                <h2>Last Orders</h2>
-                <div class="scroll-container">
-                    <div class="order-list">
-                        <div class="order-box">
-                            <h:panelGroup layout="block" styleClass="order-detail">
-                                <span class="info-label">Order #1</span>
-                                <h:outputText value="Client: John Doe" />
-                                <h:outputText value="Movie: Movie A" />
-                                <h:outputText value="Borrow Date: 2025-05-15" />
-                                <h:outputText value="Return Date: 2025-05-22" />
-                            </h:panelGroup>
+        <h:panelGroup rendered="#{not sessionBean.authenticated}">
+            <div class="login-required">
+                <h2>Login Required</h2>
+                <p>Please <h:link value="log in" outcome="login" /> to view your profile.</p>
+            </div>
+        </h:panelGroup>
+        
+        <h:panelGroup rendered="#{sessionBean.authenticated and profileBean.profileLoaded}">
+            <div class="profile-container">
+                <!-- Profile Header -->
+                <div class="profile-header">
+                    <h1>Welcome, #{profileBean.currentUser.firstName}!</h1>
+                    <div class="profile-stats">
+                        <div class="stat-item">
+                            <span class="stat-number">#{profileBean.totalRentals}</span>
+                            <span class="stat-label">Total Rentals</span>
                         </div>
-                        <div class="order-box">
-                            <h:panelGroup layout="block" styleClass="order-detail">
-                                <span class="info-label">Order #2</span>
-                                <h:outputText value="Client: John Doe" />
-                                <h:outputText value="Movie: Movie B" />
-                                <h:outputText value="Borrow Date: 2025-04-10" />
-                                <h:outputText value="Return Date: 2025-04-17" />
-                            </h:panelGroup>
+                        <div class="stat-item">
+                            <span class="stat-number">#{profileBean.activeRentals}</span>
+                            <span class="stat-label">Active Rentals</span>
                         </div>
-                        <div class="order-box">
-                            <h:panelGroup layout="block" styleClass="order-detail">
-                                <span class="info-label">Order #3</span>
-                                <h:outputText value="Client: John Doe" />
-                                <h:outputText value="Movie: Movie C" />
-                                <h:outputText value="Borrow Date: 2025-03-05" />
-                                <h:outputText value="Return Date: 2025-03-12" />
-                            </h:panelGroup>
+                        <div class="stat-item">
+                            <span class="stat-number">#{profileBean.totalReviews}</span>
+                            <span class="stat-label">Reviews Written</span>
                         </div>
-                        <div class="order-box">
-                            <h:panelGroup layout="block" styleClass="order-detail">
-                                <span class="info-label">Order #4</span>
-                                <h:outputText value="Client: John Doe" />
-                                <h:outputText value="Movie: Movie D" />
-                                <h:outputText value="Borrow Date: 2025-02-01" />
-                                <h:outputText value="Return Date: 2025-02-08" />
-                            </h:panelGroup>
+                        <div class="stat-item">
+                            <span class="stat-number">#{profileBean.memberSince}</span>
+                            <span class="stat-label">Member Since</span>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Client Details Section -->
-            <div class="profile-section">
-                <h2>Client Details</h2>
-                <div class="details-box">
-                    <h:panelGroup layout="block" styleClass="info-item">
-                        <span class="info-label">First Name:</span> John
+                <!-- Rental History Section -->
+                <div class="profile-section">
+                    <h2>Recent Rentals</h2>
+                    
+                    <h:panelGroup rendered="#{not profileBean.hasRentals}">
+                        <div class="no-data">
+                            <p>No rental history found. <h:link value="Browse movies" outcome="mainPage" /> to start renting!</p>
+                        </div>
                     </h:panelGroup>
-                    <h:panelGroup layout="block" styleClass="info-item">
-                        <span class="info-label">Last Name:</span> Doe
-                    </h:panelGroup>
-                    <h:panelGroup layout="block" styleClass="info-item">
-                        <span class="info-label">Email:</span> john.doe@example.com
-                    </h:panelGroup>
-                    <h:panelGroup layout="block" styleClass="info-item">
-                        <span class="info-label">Username:</span> johndoe
-                    </h:panelGroup>
-                    <h:panelGroup layout="block" styleClass="info-item">
-                        <span class="info-label">Password:</span> ********
+                    
+                    <h:panelGroup rendered="#{profileBean.hasRentals}">
+                        <div class="scroll-container">
+                            <div class="order-list">
+                                <ui:repeat value="#{profileBean.userRentals}" var="rental" varStatus="status">
+                                    <h:panelGroup rendered="#{status.index lt 5}">
+                                        <div class="order-box">
+                                            <div class="order-detail">
+                                                <div class="order-header">
+                                                    <span class="info-label">Rental ##{rental.rentalId}</span>
+                                                    <span class="rental-status #{rental.returned ? 'returned' : 'active'}">
+                                                        #{rental.returned ? 'Returned' : 'Active'}
+                                                    </span>
+                                                </div>
+                                                <div class="order-info">
+                                                    <h:outputText value="Movie: #{rental.movie.title}" />
+                                                    <h:outputText value="Rented: #{rental.rentalDate}" />
+                                                    <h:outputText value="Due: #{rental.dueDate}" />
+                                                    <h:outputText value="Returned: #{rental.returnDate}"
+                                                                rendered="#{rental.returned}" />
+                                                    <h:panelGroup rendered="#{rental.overdue and not rental.returned}">
+                                                        <span class="overdue-notice">OVERDUE!</span>
+                                                    </h:panelGroup>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </h:panelGroup>
+                                </ui:repeat>
+                            </div>
+                        </div>
+                        
+                        <div class="view-all-link">
+                            <h:link value="View All Rental History" outcome="rentalHistory" />
+                        </div>
                     </h:panelGroup>
                 </div>
+
+                <!-- User Details Section -->
+                <div class="profile-section">
+                    <div class="section-header">
+                        <h2>Profile Information</h2>
+                        <h:form styleClass="edit-toggle-form">
+                            <h:commandButton value="Edit Profile"
+                                           action="#{profileBean.toggleEditMode()}"
+                                           styleClass="edit-button"
+                                           rendered="#{not profileBean.editMode}" />
+                            <h:commandButton value="Cancel"
+                                           action="#{profileBean.cancelEdit()}"
+                                           styleClass="edit-button"
+                                           rendered="#{profileBean.editMode}" />
+                        </h:form>
+                    </div>
+                    
+                    <!-- View Mode -->
+                    <h:panelGroup rendered="#{not profileBean.editMode}">
+                        <div class="details-box">
+                            <h:panelGroup layout="block" styleClass="info-item">
+                                <span class="info-label">First Name:</span> #{profileBean.currentUser.firstName}
+                            </h:panelGroup>
+                            <h:panelGroup layout="block" styleClass="info-item">
+                                <span class="info-label">Last Name:</span> #{profileBean.currentUser.lastName}
+                            </h:panelGroup>
+                            <h:panelGroup layout="block" styleClass="info-item">
+                                <span class="info-label">Email:</span> #{profileBean.currentUser.email}
+                            </h:panelGroup>
+                            <h:panelGroup layout="block" styleClass="info-item">
+                                <span class="info-label">Username:</span> #{profileBean.currentUser.username}
+                            </h:panelGroup>
+                            <h:panelGroup layout="block" styleClass="info-item">
+                                <span class="info-label">Member Since:</span> #{profileBean.currentUser.createdAt}
+                            </h:panelGroup>
+                            <h:panelGroup layout="block" styleClass="info-item">
+                                <span class="info-label">Account Status:</span>
+                                <span class="status #{profileBean.currentUser.active ? 'active' : 'inactive'}">
+                                    #{profileBean.currentUser.active ? 'Active' : 'Inactive'}
+                                </span>
+                            </h:panelGroup>
+                        </div>
+                    </h:panelGroup>
+                    
+                    <!-- Edit Mode -->
+                    <h:panelGroup rendered="#{profileBean.editMode}">
+                        <h:form class="edit-profile-form">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <h:outputLabel for="editFirstName" value="First Name:" styleClass="form-label" />
+                                    <h:inputText id="editFirstName"
+                                               value="#{profileBean.editFirstName}"
+                                               styleClass="form-control"
+                                               required="true"
+                                               requiredMessage="First name is required" />
+                                    <h:message for="editFirstName" styleClass="error-message" />
+                                </div>
+                                
+                                <div class="form-group">
+                                    <h:outputLabel for="editLastName" value="Last Name:" styleClass="form-label" />
+                                    <h:inputText id="editLastName"
+                                               value="#{profileBean.editLastName}"
+                                               styleClass="form-control"
+                                               required="true"
+                                               requiredMessage="Last name is required" />
+                                    <h:message for="editLastName" styleClass="error-message" />
+                                </div>
+                                
+                                <div class="form-group full-width">
+                                    <h:outputLabel for="editEmail" value="Email:" styleClass="form-label" />
+                                    <h:inputText id="editEmail"
+                                               value="#{profileBean.editEmail}"
+                                               styleClass="form-control"
+                                               required="true"
+                                               requiredMessage="Email is required" />
+                                    <h:message for="editEmail" styleClass="error-message" />
+                                </div>
+                                
+                                <div class="form-section">
+                                    <h3>Change Password (Optional)</h3>
+                                    
+                                    <div class="form-group">
+                                        <h:outputLabel for="currentPassword" value="Current Password:" styleClass="form-label" />
+                                        <h:inputSecret id="currentPassword"
+                                                     value="#{profileBean.currentPassword}"
+                                                     styleClass="form-control"
+                                                     autocomplete="current-password" />
+                                        <h:message for="currentPassword" styleClass="error-message" />
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <h:outputLabel for="newPassword" value="New Password:" styleClass="form-label" />
+                                        <h:inputSecret id="newPassword"
+                                                     value="#{profileBean.newPassword}"
+                                                     styleClass="form-control"
+                                                     autocomplete="new-password" />
+                                        <h:message for="newPassword" styleClass="error-message" />
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <h:outputLabel for="confirmPassword" value="Confirm New Password:" styleClass="form-label" />
+                                        <h:inputSecret id="confirmPassword"
+                                                     value="#{profileBean.confirmPassword}"
+                                                     styleClass="form-control"
+                                                     autocomplete="new-password" />
+                                        <h:message for="confirmPassword" styleClass="error-message" />
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <h:commandButton value="Save Changes"
+                                               action="#{profileBean.updateProfile()}"
+                                               styleClass="save-button primary-button" />
+                                <h:commandButton value="Cancel"
+                                               action="#{profileBean.cancelEdit()}"
+                                               styleClass="cancel-button secondary-button"
+                                               immediate="true" />
+                            </div>
+                        </h:form>
+                    </h:panelGroup>
+                </div>
+                
+                <!-- Recent Reviews Section -->
+                <h:panelGroup rendered="#{profileBean.hasReviews}">
+                    <div class="profile-section">
+                        <h2>Recent Reviews</h2>
+                        <div class="reviews-container">
+                            <ui:repeat value="#{profileBean.userReviews}" var="review" varStatus="status">
+                                <h:panelGroup rendered="#{status.index lt 3}">
+                                    <div class="review-card">
+                                        <div class="review-header">
+                                            <h:link value="#{review.movie.title}" outcome="movie">
+                                                <f:param name="movieId" value="#{review.movie.movieId}" />
+                                            </h:link>
+                                            <span class="review-rating">
+                                                <ui:repeat value="#{review.rating}" var="star">★</ui:repeat>
+                                            </span>
+                                            <span class="review-date">#{review.reviewDate}</span>
+                                        </div>
+                                        <div class="review-content" rendered="#{review.hasComment}">
+                                            #{review.shortComment(100)}
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </ui:repeat>
+                        </div>
+                    </div>
+                </h:panelGroup>
             </div>
-        </div>
+        </h:panelGroup>
 
         <style type="text/css">
             .profile-container {

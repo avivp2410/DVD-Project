@@ -9,193 +9,609 @@
     <ui:define name="main-title">Admin Dashboard</ui:define>
 
     <ui:define name="content">
-        <div class="admin-dashboard">
-            <!-- Recent Orders Section -->
-            <div class="admin-section">
-                <h2>Order View</h2>
-                <div class="scroll-container">
-                    <div class="order-list">
-                        <div class="order-item">
-                            <h:panelGroup layout="block" styleClass="order-detail">
-                                <span class="info-label">Order #1</span><br/>
-                                <h:outputText value="User: John Doe" /><br/>
-                                <h:outputText value="Movie: Movie A" /><br/>
-                                <h:outputText value="Date: 2025-06-25" />
-                            </h:panelGroup>
-                        </div>
-                        <div class="order-item">
-                            <h:panelGroup layout="block" styleClass="order-detail">
-                                <span class="info-label">Order #2</span><br/>
-                                <h:outputText value="User: Jane Smith" /><br/>
-                                <h:outputText value="Movie: Movie B" /><br/>
-                                <h:outputText value="Date: 2025-06-24" />
-                            </h:panelGroup>
-                        </div>
-                        <div class="order-item">
-                            <h:panelGroup layout="block" styleClass="order-detail">
-                                <span class="info-label">Order #3</span><br/>
-                                <h:outputText value="User: Alex Brown" /><br/>
-                                <h:outputText value="Movie: Movie C" /><br/>
-                                <h:outputText value="Date: 2025-06-23" />
-                            </h:panelGroup>
-                        </div>
-                        <div class="order-item">
-                            <h:panelGroup layout="block" styleClass="order-detail">
-                                <span class="info-label">Order #4</span><br/>
-                                <h:outputText value="User: Emily White" /><br/>
-                                <h:outputText value="Movie: Movie D" /><br/>
-                                <h:outputText value="Date: 2025-06-22" />
-                            </h:panelGroup>
-                        </div>
-                        <div class="order-item">
-                            <h:panelGroup layout="block" styleClass="order-detail">
-                                <span class="info-label">Order #5</span><br/>
-                                <h:outputText value="User: Michael Green" /><br/>
-                                <h:outputText value="Movie: Movie E" /><br/>
-                                <h:outputText value="Date: 2025-06-21" />
-                            </h:panelGroup>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- In Stock Movies Section -->
-            <div class="admin-section">
-                <h2>In Stock</h2>
-                <div class="scroll-container">
-                    <div class="movie-stock-list">
-                        <div class="movie-item">
-                            <h:outputText value="MOVIE 1" />
-                            <h:outputText value="Stock: 5" styleClass="stock-count" />
-                        </div>
-                        <div class="movie-item">
-                            <h:outputText value="MOVIE 2" />
-                            <h:outputText value="Stock: 3" styleClass="stock-count" />
-                        </div>
-                        <div class="movie-item">
-                            <h:outputText value="MOVIE 3" />
-                            <h:outputText value="Stock: 8" styleClass="stock-count" />
-                        </div>
-                        <div class="movie-item">
-                            <h:outputText value="MOVIE 4" />
-                            <h:outputText value="Stock: 2" styleClass="stock-count" />
-                        </div>
-                        <div class="movie-item">
-                            <h:outputText value="MOVIE 5" />
-                            <h:outputText value="Stock: 6" styleClass="stock-count" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Users Section -->
-            <div class="admin-section">
-                <h2>Search Users</h2>
-                <h:form class="search-users-form">
-                    <h:inputText value="" styleClass="search-input" placeholder="Search by name..." />
-                    <h:commandButton value="Submit" type="submit" styleClass="search-button" />
+        <!-- Admin access check -->
+        <h:panelGroup rendered="#{not sessionBean.admin}">
+            <div class="access-denied">
+                <h2>Access Denied</h2>
+                <p>You must be an administrator to access this page.</p>
+                <h:form>
+                    <h:commandButton value="Go to Main Page" action="mainPage.xhtml?faces-redirect=true" styleClass="btn btn-primary" />
                 </h:form>
-                <div class="scroll-container">
-                    <div class="user-list">
-                        <div class="user-item">
-                            <h:outputText value="User: John Doe" />
+            </div>
+        </h:panelGroup>
+
+        <!-- Admin dashboard content -->
+        <h:panelGroup rendered="#{sessionBean.admin}">
+            <f:event type="preRenderView" listener="#{adminBean.loadDashboardData}" />
+            
+            <div class="admin-dashboard">
+                <!-- Display messages -->
+                <h:messages id="messages" styleClass="messages" errorClass="error-message"
+                           infoClass="info-message" warnClass="warn-message" />
+
+                <!-- Statistics Overview -->
+                <div class="stats-overview">
+                    <div class="stat-card">
+                        <div class="stat-number">#{adminBean.totalRentals}</div>
+                        <div class="stat-label">Total Rentals</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">#{adminBean.activeRentals}</div>
+                        <div class="stat-label">Active Rentals</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">#{adminBean.overdueRentalCount}</div>
+                        <div class="stat-label">Overdue Rentals</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">#{adminBean.totalMovies}</div>
+                        <div class="stat-label">Total Movies</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">#{adminBean.totalUsers}</div>
+                        <div class="stat-label">Total Users</div>
+                    </div>
+                </div>
+
+                <!-- Recent Rentals Section -->
+                <div class="admin-section">
+                    <div class="section-header">
+                        <h2>Recent Rentals</h2>
+                        <h:form>
+                            <h:commandButton value="Refresh" action="#{adminBean.loadDashboardData}" styleClass="btn btn-secondary btn-small">
+                                <f:ajax execute="@form" render="@form :messages" />
+                            </h:commandButton>
+                        </h:form>
+                    </div>
+                    
+                    <h:panelGroup rendered="#{empty adminBean.recentRentals}">
+                        <div class="no-data">No recent rentals found.</div>
+                    </h:panelGroup>
+                    
+                    <h:panelGroup rendered="#{not empty adminBean.recentRentals}">
+                        <div class="scroll-container">
+                            <div class="rental-list">
+                                <ui:repeat value="#{adminBean.recentRentals}" var="rental" varStatus="status">
+                                    <h:panelGroup rendered="#{status.index lt 10}">
+                                        <div class="rental-item">
+                                            <div class="rental-header">
+                                                <span class="rental-id">Rental ##{rental.rentalId}</span>
+                                                <span class="rental-status #{adminBean.getRentalStatusClass(rental)}">
+                                                    #{rental.status}
+                                                </span>
+                                            </div>
+                                            <div class="rental-details">
+                                                <div class="detail-line">
+                                                    <strong>User:</strong> #{rental.user.fullName}
+                                                </div>
+                                                <div class="detail-line">
+                                                    <strong>Movie:</strong> #{rental.movie.title}
+                                                </div>
+                                                <div class="detail-line">
+                                                    <strong>Date:</strong>
+                                                    <h:outputText value="#{rental.borrowDate}">
+                                                        <f:convertDateTime pattern="MMM dd, yyyy" />
+                                                    </h:outputText>
+                                                </div>
+                                                <div class="detail-line" rendered="#{rental.active}">
+                                                    <strong>Due:</strong>
+                                                    <h:outputText value="#{rental.returnDate}">
+                                                        <f:convertDateTime pattern="MMM dd, yyyy" />
+                                                    </h:outputText>
+                                                </div>
+                                            </div>
+                                            <div class="rental-actions" rendered="#{rental.active}">
+                                                <h:form>
+                                                    <h:commandButton value="Process Return"
+                                                                   action="#{adminBean.processReturn(rental.rentalId)}"
+                                                                   styleClass="btn btn-success btn-small">
+                                                        <f:ajax execute="@form" render="@form :messages" />
+                                                    </h:commandButton>
+                                                </h:form>
+                                            </div>
+                                        </div>
+                                    </h:panelGroup>
+                                </ui:repeat>
+                            </div>
                         </div>
-                        <div class="user-item">
-                            <h:outputText value="User: Jane Smith" />
-                        </div>
-                        <div class="user-item">
-                            <h:outputText value="User: Alex Brown" />
-                        </div>
-                        <div class="user-item">
-                            <h:outputText value="User: Emily White" />
-                        </div>
-                        <div class="user-item">
-                            <h:outputText value="User: Michael Green" />
+                    </h:panelGroup>
+                </div>
+
+                <!-- Overdue Rentals Section -->
+                <div class="admin-section" rendered="#{adminBean.overdueRentalCount > 0}">
+                    <div class="section-header urgent">
+                        <h2>⚠ Overdue Rentals (#{adminBean.overdueRentalCount})</h2>
+                    </div>
+                    
+                    <div class="scroll-container">
+                        <div class="rental-list">
+                            <ui:repeat value="#{adminBean.overdueRentals}" var="rental">
+                                <div class="rental-item overdue">
+                                    <div class="rental-header">
+                                        <span class="rental-id">Rental ##{rental.rentalId}</span>
+                                        <span class="overdue-days">#{adminBean.getOverdueDays(rental)} days overdue</span>
+                                    </div>
+                                    <div class="rental-details">
+                                        <div class="detail-line">
+                                            <strong>User:</strong> #{rental.user.fullName}
+                                        </div>
+                                        <div class="detail-line">
+                                            <strong>Movie:</strong> #{rental.movie.title}
+                                        </div>
+                                        <div class="detail-line">
+                                            <strong>Due Date:</strong>
+                                            <h:outputText value="#{rental.returnDate}">
+                                                <f:convertDateTime pattern="MMM dd, yyyy" />
+                                            </h:outputText>
+                                        </div>
+                                        <div class="detail-line" rendered="#{rental.phoneNumber != null}">
+                                            <strong>Phone:</strong> #{rental.phoneNumber}
+                                        </div>
+                                    </div>
+                                    <div class="rental-actions">
+                                        <h:form>
+                                            <h:commandButton value="Process Return"
+                                                           action="#{adminBean.processReturn(rental.rentalId)}"
+                                                           styleClass="btn btn-danger btn-small">
+                                                <f:ajax execute="@form" render="@form :messages" />
+                                            </h:commandButton>
+                                        </h:form>
+                                    </div>
+                                </div>
+                            </ui:repeat>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
+                <!-- Low Stock Movies Section -->
+                <div class="admin-section">
+                    <div class="section-header">
+                        <h2>Low Stock Movies</h2>
+                        <h:form>
+                            <h:commandButton value="Add Movie" action="#{adminBean.addMovie}" styleClass="btn btn-primary btn-small" />
+                        </h:form>
+                    </div>
+                    
+                    <h:panelGroup rendered="#{empty adminBean.lowStockMovies}">
+                        <div class="no-data">All movies are well stocked!</div>
+                    </h:panelGroup>
+                    
+                    <h:panelGroup rendered="#{not empty adminBean.lowStockMovies}">
+                        <div class="scroll-container">
+                            <div class="movie-stock-list">
+                                <ui:repeat value="#{adminBean.lowStockMovies}" var="movie">
+                                    <div class="movie-item #{adminBean.getStockLevelClass(movie)}">
+                                        <div class="movie-header">
+                                            <h4 class="movie-title">#{movie.title}</h4>
+                                            <span class="stock-count">Stock: #{movie.quantity}</span>
+                                        </div>
+                                        <div class="movie-details">
+                                            <div class="detail-line">
+                                                <strong>Genre:</strong> #{movie.genre}
+                                            </div>
+                                            <div class="detail-line">
+                                                <strong>Year:</strong> #{movie.releaseYear}
+                                            </div>
+                                        </div>
+                                        <div class="movie-actions">
+                                            <h:form>
+                                                <h:commandButton value="Edit"
+                                                               action="#{adminBean.editMovie(movie.movieId)}"
+                                                               styleClass="btn btn-primary btn-small" />
+                                            </h:form>
+                                        </div>
+                                    </div>
+                                </ui:repeat>
+                            </div>
+                        </div>
+                    </h:panelGroup>
+                </div>
+
+                <!-- User Management Section -->
+                <div class="admin-section">
+                    <div class="section-header">
+                        <h2>User Management</h2>
+                        <h:form class="search-form">
+                            <h:inputText value="#{adminBean.userSearchTerm}"
+                                       styleClass="search-input"
+                                       placeholder="Search users by name...">
+                                <f:ajax event="keyup" execute="@this" render="userList" listener="#{adminBean.searchUsers}" />
+                            </h:inputText>
+                            <h:commandButton value="Search"
+                                           action="#{adminBean.searchUsers}"
+                                           styleClass="btn btn-secondary btn-small">
+                                <f:ajax execute="@form" render="userList" />
+                            </h:commandButton>
+                        </h:form>
+                    </div>
+                    
+                    <h:panelGroup id="userList">
+                        <h:panelGroup rendered="#{empty adminBean.filteredUsers}">
+                            <div class="no-data">No users found matching search criteria.</div>
+                        </h:panelGroup>
+                        
+                        <h:panelGroup rendered="#{not empty adminBean.filteredUsers}">
+                            <div class="scroll-container">
+                                <div class="user-list">
+                                    <ui:repeat value="#{adminBean.filteredUsers}" var="user" varStatus="status">
+                                        <h:panelGroup rendered="#{status.index lt 20}">
+                                            <div class="user-item #{adminBean.getUserStatusClass(user)}">
+                                                <div class="user-header">
+                                                    <h4 class="user-name">#{user.fullName}</h4>
+                                                    <span class="user-status">#{user.active ? 'Active' : 'Inactive'}</span>
+                                                </div>
+                                                <div class="user-details">
+                                                    <div class="detail-line">
+                                                        <strong>Username:</strong> #{user.username}
+                                                    </div>
+                                                    <div class="detail-line">
+                                                        <strong>Email:</strong> #{user.email}
+                                                    </div>
+                                                    <div class="detail-line">
+                                                        <strong>Role:</strong> #{user.role}
+                                                    </div>
+                                                    <div class="detail-line">
+                                                        <strong>Rentals:</strong> #{adminBean.getUserRentalHistory(user.userId).size()}
+                                                    </div>
+                                                </div>
+                                                <div class="user-actions">
+                                                    <h:form>
+                                                        <h:commandButton value="#{user.active ? 'Deactivate' : 'Activate'}"
+                                                                       action="#{adminBean.toggleUserStatus(user.userId)}"
+                                                                       styleClass="btn btn-warning btn-small">
+                                                            <f:ajax execute="@form" render="@form :messages" />
+                                                        </h:commandButton>
+                                                    </h:form>
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+                                    </ui:repeat>
+                                </div>
+                            </div>
+                        </h:panelGroup>
+                    </h:panelGroup>
+                </div>
+            </div>
+        </h:panelGroup>
+
+        <!-- Enhanced CSS Styles -->
         <style type="text/css">
             .admin-dashboard {
-                max-width: 1200px;
+                max-width: 1400px;
                 margin: 0 auto;
+                padding: 20px;
             }
-            .admin-section {
+
+            .access-denied {
+                text-align: center;
+                background: var(--darker-gray-bg);
+                padding: 60px;
+                border-radius: 12px;
+                box-shadow: 0 4px 15px var(--shadow-dark);
+                border: 2px solid #dc3545;
+                max-width: 600px;
+                margin: 50px auto;
+            }
+
+            .stats-overview {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 20px;
                 margin-bottom: 40px;
             }
-            .admin-section h2 {
-                color: var(--secondary-color);
-                font-size: 2em;
-                margin-bottom: 20px;
-                text-shadow: 2px 2px 5px var(--shadow-dark);
+
+            .stat-card {
+                background: linear-gradient(135deg, var(--primary-color), var(--hover-blue));
+                padding: 30px;
+                border-radius: 12px;
+                text-align: center;
+                box-shadow: 0 4px 15px var(--shadow-dark);
+                border: 2px solid var(--secondary-color);
+                transition: transform 0.3s ease;
             }
+
+            .stat-card:hover {
+                transform: translateY(-5px);
+            }
+
+            .stat-number {
+                font-size: 3em;
+                font-weight: bold;
+                color: white;
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            }
+
+            .stat-label {
+                font-size: 1.1em;
+                color: #e0e0e0;
+                margin-top: 10px;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+
+            .admin-section {
+                background: var(--darker-gray-bg);
+                border-radius: 12px;
+                box-shadow: 0 4px 15px var(--shadow-dark);
+                border: 2px solid var(--secondary-color);
+                margin-bottom: 30px;
+                overflow: hidden;
+            }
+
+            .section-header {
+                background: rgba(0, 86, 179, 0.1);
+                padding: 20px 30px;
+                border-bottom: 1px solid var(--secondary-color);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+
+            .section-header.urgent {
+                background: rgba(220, 53, 69, 0.1);
+                border-bottom-color: #dc3545;
+            }
+
+            .section-header h2 {
+                color: var(--secondary-color);
+                margin: 0;
+                font-size: 1.8em;
+                text-shadow: 1px 1px 3px var(--shadow-dark);
+            }
+
+            .section-header.urgent h2 {
+                color: #dc3545;
+            }
+
             .scroll-container {
                 overflow-x: auto;
-                white-space: nowrap;
-                padding: 10px 0;
+                padding: 20px;
             }
-            .order-list, .movie-stock-list, .user-list {
+
+            .rental-list, .movie-stock-list, .user-list {
                 display: flex;
                 gap: 20px;
+                min-width: max-content;
             }
-            .order-item, .movie-item, .user-item {
-                background-color: var(--darker-gray-bg);
-                padding: 15px;
+
+            .rental-item, .movie-item, .user-item {
+                background: rgba(0, 86, 179, 0.05);
+                border: 1px solid var(--secondary-color);
                 border-radius: 8px;
-                box-shadow: 0 3px 10px var(--shadow-dark);
-                min-width: 200px;
-                text-align: center;
-                display: inline-block;
+                padding: 15px;
+                min-width: 280px;
+                transition: all 0.3s ease;
             }
-            .order-detail {
+
+            .rental-item:hover, .movie-item:hover, .user-item:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 5px 20px var(--shadow-blue);
+                border-color: var(--hover-blue);
+            }
+
+            .rental-item.overdue {
+                border-color: #dc3545;
+                background: rgba(220, 53, 69, 0.1);
+            }
+
+            .rental-header, .movie-header, .user-header {
                 display: flex;
-                flex-direction: column;
+                justify-content: space-between;
                 align-items: center;
-                gap: 5px;
+                margin-bottom: 15px;
+                padding-bottom: 10px;
+                border-bottom: 1px solid rgba(0, 86, 179, 0.2);
+            }
+
+            .rental-id, .movie-title, .user-name {
+                font-weight: bold;
+                color: var(--secondary-color);
                 font-size: 1.1em;
-                color: var(--light-text);
             }
-            .movie-item:hover::after {
-                content: 'Edit Movie';
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                width: 100%;
-                padding: 10px 0;
-                background: rgba(0, 86, 179, 0.7);
-                color: var(--light-text);
-                font-size: 1em;
-                text-align: center;
-                opacity: 1;
-                transition: opacity 0.3s ease;
+
+            .rental-status, .stock-count, .user-status {
+                padding: 4px 8px;
+                border-radius: 12px;
+                font-size: 0.8em;
+                font-weight: bold;
+                text-transform: uppercase;
             }
-            .stock-count {
-                display: block;
-                margin-top: 10px;
+
+            .status-active {
+                background: #28a745;
+                color: white;
+            }
+
+            .status-overdue {
+                background: #dc3545;
+                color: white;
+            }
+
+            .status-returned {
+                background: #6c757d;
+                color: white;
+            }
+
+            .overdue-days {
+                background: #dc3545;
+                color: white;
+                padding: 4px 8px;
+                border-radius: 12px;
+                font-size: 0.8em;
+                font-weight: bold;
+            }
+
+            .stock-out {
+                border-color: #dc3545;
+                background: rgba(220, 53, 69, 0.1);
+            }
+
+            .stock-low {
+                border-color: #ffc107;
+                background: rgba(255, 193, 7, 0.1);
+            }
+
+            .stock-medium {
+                border-color: #17a2b8;
+                background: rgba(23, 162, 184, 0.1);
+            }
+
+            .stock-good {
+                border-color: #28a745;
+                background: rgba(40, 167, 69, 0.1);
+            }
+
+            .user-inactive {
+                opacity: 0.6;
+                border-color: #6c757d;
+            }
+
+            .detail-line {
+                margin: 8px 0;
+                color: var(--light-text);
                 font-size: 0.9em;
-                color: var(--light-text);
             }
-            .search-users-form {
+
+            .rental-actions, .movie-actions, .user-actions {
+                margin-top: 15px;
+                padding-top: 10px;
+                border-top: 1px solid rgba(0, 86, 179, 0.2);
+            }
+
+            .search-form {
                 display: flex;
                 gap: 10px;
-                margin-bottom: 20px;
-                justify-content: center;
+                align-items: center;
             }
-            .search-button {
-                background: linear-gradient(to bottom, var(--primary-color), var(--hover-blue));
-                border: 1px solid var(--hover-blue);
-                border-radius: 5px;
+
+            .search-input {
+                padding: 8px 12px;
+                border: 1px solid var(--secondary-color);
+                border-radius: 4px;
+                background: var(--darker-gray-bg);
                 color: var(--light-text);
-                padding: 8px 15px;
-                cursor: pointer;
-                font-size: 1em;
-                transition: all 0.2s ease;
+                min-width: 250px;
             }
-            .search-button:hover {
+
+            .btn {
+                padding: 8px 16px;
+                border: none;
+                border-radius: 6px;
+                font-size: 0.9em;
+                font-weight: bold;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                text-decoration: none;
+                display: inline-block;
+                text-align: center;
+            }
+
+            .btn-small {
+                padding: 6px 12px;
+                font-size: 0.8em;
+            }
+
+            .btn-primary {
+                background: linear-gradient(to bottom, var(--primary-color), var(--hover-blue));
+                color: white;
+                border: 1px solid var(--hover-blue);
+            }
+
+            .btn-secondary {
+                background: #6c757d;
+                color: white;
+                border: 1px solid #6c757d;
+            }
+
+            .btn-success {
+                background: #28a745;
+                color: white;
+                border: 1px solid #28a745;
+            }
+
+            .btn-danger {
+                background: #dc3545;
+                color: white;
+                border: 1px solid #dc3545;
+            }
+
+            .btn-warning {
+                background: #ffc107;
+                color: #212529;
+                border: 1px solid #ffc107;
+            }
+
+            .btn:hover {
                 transform: scale(1.05);
-                box-shadow: 0 0 10px var(--shadow-blue);
+                opacity: 0.9;
+            }
+
+            .no-data {
+                text-align: center;
+                color: #ccc;
+                font-style: italic;
+                padding: 40px;
+                font-size: 1.1em;
+            }
+
+            .messages {
+                margin-bottom: 20px;
+            }
+
+            .error-message, .info-message, .warn-message {
+                padding: 12px;
+                border-radius: 6px;
+                margin: 10px 0;
+                border: 1px solid;
+            }
+
+            .error-message {
+                color: #ff4444;
+                background: rgba(255, 68, 68, 0.1);
+                border-color: #ff4444;
+            }
+
+            .info-message {
+                color: #4CAF50;
+                background: rgba(76, 175, 80, 0.1);
+                border-color: #4CAF50;
+            }
+
+            .warn-message {
+                color: #ff9800;
+                background: rgba(255, 152, 0, 0.1);
+                border-color: #ff9800;
+            }
+
+            @media (max-width: 768px) {
+                .stats-overview {
+                    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                }
+
+                .section-header {
+                    flex-direction: column;
+                    align-items: stretch;
+                }
+
+                .search-form {
+                    flex-direction: column;
+                    align-items: stretch;
+                }
+
+                .search-input {
+                    min-width: auto;
+                    width: 100%;
+                }
+
+                .rental-list, .movie-stock-list, .user-list {
+                    flex-direction: column;
+                }
+
+                .rental-item, .movie-item, .user-item {
+                    min-width: auto;
+                }
             }
         </style>
     </ui:define>

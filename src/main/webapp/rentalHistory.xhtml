@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<ui:composition template="/templates/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <ui:define name="title">Blockk Busterr - My Rental History</ui:define>
+    <ui:define name="main-title">My Rental History</ui:define>
+
+    <ui:define name="content">
+        <div class="rental-history-container">
+            <!-- Authentication check -->
+            <h:panelGroup rendered="#{not sessionBean.authenticated}">
+                <div class="auth-required">
+                    <h2>Login Required</h2>
+                    <p>You must be logged in to view your rental history.</p>
+                    <h:form>
+                        <h:commandButton value="Login" action="login.xhtml?faces-redirect=true" styleClass="btn btn-primary" />
+                    </h:form>
+                </div>
+            </h:panelGroup>
+
+            <!-- Rental history for authenticated users -->
+            <h:panelGroup rendered="#{sessionBean.authenticated}">
+                <f:event type="preRenderView" listener="#{rentalBean.loadUserRentals}" />
+                
+                <!-- Header section -->
+                <div class="history-header">
+                    <h2>Rental History for #{sessionBean.currentUserDisplayName}</h2>
+                    <div class="stats">
+                        <div class="stat-item">
+                            <span class="stat-number">#{rentalBean.userRentalCount}</span>
+                            <span class="stat-label">Total Rentals</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">#{rentalBean.activeRentalCount}</span>
+                            <span class="stat-label">Active Rentals</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter section -->
+                <div class="filter-section">
+                    <h:form>
+                        <h:outputLabel for="statusFilter" value="Filter by Status:" styleClass="filter-label" />
+                        <h:selectOneMenu id="statusFilter" value="#{rentalBean.statusFilter}" styleClass="filter-select">
+                            <f:selectItem itemValue="ALL" itemLabel="All Rentals" />
+                            <f:selectItem itemValue="ACTIVE" itemLabel="Active" />
+                            <f:selectItem itemValue="RETURNED" itemLabel="Returned" />
+                            <f:selectItem itemValue="OVERDUE" itemLabel="Overdue" />
+                            <f:selectItem itemValue="CANCELLED" itemLabel="Cancelled" />
+                            <f:ajax execute="@this" render="rentalList" listener="#{rentalBean.filterRentals}" />
+                        </h:selectOneMenu>
+                    </h:form>
+                </div>
+
+                <!-- Display messages -->
+                <h:messages id="messages" styleClass="messages" errorClass="error-message"
+                           infoClass="info-message" warnClass="warn-message" />
+
+                <!-- Rental list -->
+                <h:panelGroup id="rentalList">
+                    <h:panelGroup rendered="#{empty rentalBean.filteredRentals}">
+                        <div class="no-rentals">
+                            <h3>No Rentals Found</h3>
+                            <p>You don't have any rentals matching the selected criteria.</p>
+                            <h:form>
+                                <h:commandButton value="Browse Movies" 
+                                               action="mainPage.xhtml?faces-redirect=true" 
+                                               styleClass="btn btn-primary" />
+                            </h:form>
+                        </div>
+                    </h:panelGroup>
+
+                    <h:panelGroup rendered="#{not empty rentalBean.filteredRentals}">
+                        <div class="rental-list">
+                            <ui:repeat value="#{rentalBean.filteredRentals}" var="rental">
+                                <div class="rental-item">
+                                    <div class="rental-header">
+                                        <div class="rental-info">
+                                            <h3 class="movie-title">#{rental.movie.title}</h3>
+                                            <span class="rental-id">Rental ##{rental.rentalId}</span>
+                                        </div>
+                                        <div class="status-badge #{rentalBean.getStatusClass(rental)}">
+                                            #{rental.status}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="rental-details">
+                                        <div class="detail-row">
+                                            <div class="detail-item">
+                                                <span class="label">Genre:</span>
+                                                <span class="value">#{rental.movie.genre}</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="label">Year:</span>
+                                                <span class="value">#{rental.movie.releaseYear}</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="label">Duration:</span>
+                                                <span class="value">#{rental.movie.durationFormatted}</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="detail-row">
+                                            <div class="detail-item">
+                                                <span class="label">Borrowed:</span>
+                                                <span class="value">
+                                                    <h:outputText value="#{rental.borrowDate}">
+                                                        <f:convertDateTime pattern="MMM dd, yyyy" />
+                                                    </h:outputText>
+                                                </span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="label">Due Date:</span>
+                                                <span class="value">
+                                                    <h:outputText value="#{rental.returnDate}">
+                                                        <f:convertDateTime pattern="MMM dd, yyyy" />
+                                                    </h:outputText>
+                                                </span>
+                                            </div>
+                                            <div class="detail-item" rendered="#{rental.actualReturnDate != null}">
+                                                <span class="label">Returned:</span>
+                                                <span class="value">
+                                                    <h:outputText value="#{rental.actualReturnDate}">
+                                                        <f:convertDateTime pattern="MMM dd, yyyy" />
+                                                    </h:outputText>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="detail-row" rendered="#{rental.phoneNumber != null or rental.notes != null}">
+                                            <div class="detail-item" rendered="#{rental.phoneNumber != null}">
+                                                <span class="label">Phone:</span>
+                                                <span class="value">#{rental.phoneNumber}</span>
+                                            </div>
+                                            <div class="detail-item full-width" rendered="#{rental.notes != null}">
+                                                <span class="label">Notes:</span>
+                                                <span class="value">#{rental.notes}</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Overdue warning -->
+                                        <div class="overdue-warning" rendered="#{rental.overdue}">
+                                            <i class="warning-icon">⚠</i>
+                                            This rental is overdue by #{rental.daysOverdue} day(s). 
+                                            Please return the movie as soon as possible.
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Action buttons -->
+                                    <div class="rental-actions" rendered="#{rental.active}">
+                                        <h:form>
+                                            <h:commandButton value="Extend Rental"
+                                                           action="#{rentalBean.extendRental(rental.rentalId)}"
+                                                           styleClass="btn btn-secondary btn-small"
+                                                           rendered="#{not rental.overdue}">
+                                                <f:ajax execute="@form" render="@form :messages" />
+                                            </h:commandButton>
+                                            
+                                            <h:commandButton value="View Movie Details"
+                                                           action="movie.xhtml?faces-redirect=true&amp;movieId=#{rental.movie.movieId}"
+                                                           styleClass="btn btn-primary btn-small" />
+                                        </h:form>
+                                    </div>
+                                </div>
+                            </ui:repeat>
+                        </div>
+                    </h:panelGroup>
+                </h:panelGroup>
+            </h:panelGroup>
+        </div>
+
+        <!-- CSS Styles -->
+        <style type="text/css">
+            .rental-history-container {
+                max-width: 1000px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+
+            .auth-required {
+                text-align: center;
+                background: var(--darker-gray-bg);
+                padding: 40px;
+                border-radius: 12px;
+                box-shadow: 0 4px 15px var(--shadow-dark);
+                border: 2px solid var(--secondary-color);
+            }
+
+            .history-header {
+                background: var(--darker-gray-bg);
+                padding: 30px;
+                border-radius: 12px;
+                box-shadow: 0 4px 15px var(--shadow-dark);
+                border: 2px solid var(--secondary-color);
+                margin-bottom: 20px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .history-header h2 {
+                color: var(--secondary-color);
+                margin: 0;
+                font-size: 1.8em;
+            }
+
+            .stats {
+                display: flex;
+                gap: 30px;
+            }
+
+            .stat-item {
+                text-align: center;
+            }
+
+            .stat-number {
+                display: block;
+                font-size: 2em;
+                font-weight: bold;
+                color: var(--secondary-color);
+            }
+
+            .stat-label {
+                font-size: 0.9em;
+                color: var(--light-text);
+            }
+
+            .filter-section {
+                background: var(--darker-gray-bg);
+                padding: 20px;
+                border-radius: 8px;
+                margin-bottom: 20px;
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .filter-label {
+                color: var(--light-text);
+                font-weight: bold;
+            }
+
+            .filter-select {
+                padding: 8px 12px;
+                border: 1px solid var(--secondary-color);
+                border-radius: 4px;
+                background: var(--darker-gray-bg);
+                color: var(--light-text);
+            }
+
+            .no-rentals {
+                text-align: center;
+                background: var(--darker-gray-bg);
+                padding: 40px;
+                border-radius: 12px;
+                box-shadow: 0 4px 15px var(--shadow-dark);
+                border: 2px solid var(--secondary-color);
+            }
+
+            .rental-list {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .rental-item {
+                background: var(--darker-gray-bg);
+                border-radius: 12px;
+                box-shadow: 0 4px 15px var(--shadow-dark);
+                border: 2px solid var(--secondary-color);
+                overflow: hidden;
+                transition: all 0.3s ease;
+            }
+
+            .rental-item:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px var(--shadow-blue);
+            }
+
+            .rental-header {
+                background: rgba(0, 86, 179, 0.1);
+                padding: 20px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-bottom: 1px solid var(--secondary-color);
+            }
+
+            .movie-title {
+                color: var(--secondary-color);
+                margin: 0 0 5px 0;
+                font-size: 1.3em;
+            }
+
+            .rental-id {
+                color: #ccc;
+                font-size: 0.9em;
+            }
+
+            .status-badge {
+                padding: 6px 12px;
+                border-radius: 15px;
+                font-size: 0.85em;
+                font-weight: bold;
+                text-transform: uppercase;
+            }
+
+            .status-active {
+                background: #28a745;
+                color: white;
+            }
+
+            .status-overdue {
+                background: #dc3545;
+                color: white;
+            }
+
+            .status-returned {
+                background: #6c757d;
+                color: white;
+            }
+
+            .status-cancelled {
+                background: #ffc107;
+                color: #212529;
+            }
+
+            .rental-details {
+                padding: 20px;
+            }
+
+            .detail-row {
+                display: flex;
+                gap: 30px;
+                margin-bottom: 15px;
+                flex-wrap: wrap;
+            }
+
+            .detail-item {
+                flex: 1;
+                min-width: 200px;
+            }
+
+            .detail-item.full-width {
+                flex: 100%;
+            }
+
+            .detail-item .label {
+                color: #ccc;
+                font-weight: bold;
+                margin-right: 8px;
+            }
+
+            .detail-item .value {
+                color: var(--light-text);
+            }
+
+            .overdue-warning {
+                background: rgba(220, 53, 69, 0.2);
+                border: 1px solid #dc3545;
+                padding: 10px;
+                border-radius: 5px;
+                color: #dc3545;
+                margin-top: 15px;
+                font-weight: bold;
+            }
+
+            .warning-icon {
+                margin-right: 8px;
+                font-size: 1.2em;
+            }
+
+            .rental-actions {
+                padding: 20px;
+                border-top: 1px solid rgba(0, 86, 179, 0.2);
+                background: rgba(0, 86, 179, 0.05);
+                display: flex;
+                gap: 10px;
+                justify-content: flex-end;
+            }
+
+            .btn {
+                padding: 8px 16px;
+                border: none;
+                border-radius: 6px;
+                font-size: 0.9em;
+                font-weight: bold;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                text-decoration: none;
+                display: inline-block;
+                text-align: center;
+            }
+
+            .btn-small {
+                padding: 6px 12px;
+                font-size: 0.85em;
+            }
+
+            .btn-primary {
+                background: linear-gradient(to bottom, var(--primary-color), var(--hover-blue));
+                color: white;
+                border: 2px solid var(--hover-blue);
+            }
+
+            .btn-primary:hover {
+                transform: scale(1.05);
+                box-shadow: 0 0 10px var(--shadow-blue);
+            }
+
+            .btn-secondary {
+                background: #6c757d;
+                color: white;
+                border: 2px solid #6c757d;
+            }
+
+            .btn-secondary:hover {
+                background: #5a6268;
+                border-color: #5a6268;
+                transform: scale(1.05);
+            }
+
+            .messages {
+                margin-bottom: 20px;
+            }
+
+            .error-message {
+                color: #ff4444;
+                background: rgba(255, 68, 68, 0.1);
+                border: 1px solid #ff4444;
+                padding: 10px;
+                border-radius: 5px;
+                margin: 5px 0;
+            }
+
+            .info-message {
+                color: #4CAF50;
+                background: rgba(76, 175, 80, 0.1);
+                border: 1px solid #4CAF50;
+                padding: 10px;
+                border-radius: 5px;
+                margin: 5px 0;
+            }
+
+            .warn-message {
+                color: #ff9800;
+                background: rgba(255, 152, 0, 0.1);
+                border: 1px solid #ff9800;
+                padding: 10px;
+                border-radius: 5px;
+                margin: 5px 0;
+            }
+
+            @media (max-width: 768px) {
+                .history-header {
+                    flex-direction: column;
+                    gap: 20px;
+                    text-align: center;
+                }
+
+                .stats {
+                    gap: 20px;
+                }
+
+                .filter-section {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: 10px;
+                }
+
+                .detail-row {
+                    flex-direction: column;
+                    gap: 10px;
+                }
+
+                .detail-item {
+                    min-width: auto;
+                }
+
+                .rental-actions {
+                    flex-direction: column;
+                }
+
+                .btn {
+                    width: 100%;
+                }
+            }
+        </style>
+    </ui:define>
+
+</ui:composition>

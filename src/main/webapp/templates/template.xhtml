@@ -17,7 +17,9 @@
                     <!-- Default header content -->
                     <h:panelGroup rendered="#{sessionBean.authenticated}">
                         <span class="welcome-text">Welcome, </span>
-                        <h:outputText value="#{sessionBean.currentUserDisplayName}" styleClass="username-display" />
+                        <h:commandLink action="profile.xhtml?faces-redirect=true" styleClass="username-display clickable">
+                            <h:outputText value="#{sessionBean.currentUserDisplayName}" />
+                        </h:commandLink>
                         <span class="user-role">(#{sessionBean.currentUserRole})</span>
                         
                         <h:commandLink value="Profile" action="profile.xhtml?faces-redirect=true" styleClass="nav-link" />
@@ -35,7 +37,12 @@
             <ui:insert name="main-title">Main Page</ui:insert>
         </div>
         <div class="header-right">
-            <h:graphicImage library="img" name="blockkbusterr.jpg" styleClass="logo-img" /> 
+            <h:form>
+                <h:commandLink action="mainPage.xhtml?faces-redirect=true">
+                    <h:graphicImage library="img" name="blockkbusterr.jpg" styleClass="logo-img"
+                                   title="Go to Main Page" alt="Blockk Busterr Logo" />
+                </h:commandLink>
+            </h:form>
         </div>
     </div>
 

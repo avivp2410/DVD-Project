@@ -151,7 +151,7 @@ public class AuthenticationBean implements Serializable {
      * Validate login form
      */
     public boolean isFormValid() {
-        return username != null && !username.trim().isEmpty() && 
+        return username != null && !username.trim().isEmpty() &&
                password != null && !password.trim().isEmpty();
     }
     
@@ -206,7 +206,9 @@ public class AuthenticationBean implements Serializable {
      * Get CSS class for login button based on form validity
      */
     public String getLoginButtonClass() {
-        return isFormValid() ? "login-button enabled" : "login-button disabled";
+        // Always show button as enabled unless login is in progress
+        // Form validation will be handled when user clicks submit
+        return loginInProgress ? "login-button disabled" : "login-button enabled";
     }
     
     /**
