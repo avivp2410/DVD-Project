@@ -23,7 +23,7 @@ public class MovieService {
     /**
      * Add a new movie
      */
-    public Movie addMovie(String title, LocalDate releaseDate, Integer duration, String genre, Integer quantity, String description, String imageUrl) {
+    public Movie addMovie(String title, LocalDate releaseDate, Integer duration, String genre, Integer quantity, String description) {
         // Validate input
         if (title == null || title.trim().isEmpty()) {
             throw new IllegalArgumentException("Title is required");
@@ -49,7 +49,6 @@ public class MovieService {
         movie.setGenre(genre.trim());
         movie.setQuantity(quantity);
         movie.setDescription(description != null ? description.trim() : null);
-        movie.setImageUrl(imageUrl != null ? imageUrl.trim() : null);
         movie.setActive(true);
         
         return movieRepository.save(movie);
@@ -58,7 +57,7 @@ public class MovieService {
     /**
      * Update an existing movie
      */
-    public Movie updateMovie(Long movieId, String title, LocalDate releaseDate, Integer duration, String genre, Integer quantity, String description, String imageUrl) {
+    public Movie updateMovie(Long movieId, String title, LocalDate releaseDate, Integer duration, String genre, Integer quantity, String description) {
         Optional<Movie> movieOpt = movieRepository.findById(movieId);
         if (movieOpt.isEmpty()) {
             throw new IllegalArgumentException("Movie not found");
@@ -90,7 +89,6 @@ public class MovieService {
         movie.setGenre(genre.trim());
         movie.setQuantity(quantity);
         movie.setDescription(description != null ? description.trim() : null);
-        movie.setImageUrl(imageUrl != null ? imageUrl.trim() : null);
         
         return movieRepository.update(movie);
     }

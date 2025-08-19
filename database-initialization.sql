@@ -2,6 +2,10 @@
 -- This script creates default admin user and sample movies
 -- Alternative to the Java-based initialization system
 
+-- Drop image_url column from movies table if it exists
+-- This removes the movie image functionality
+ALTER TABLE movies DROP COLUMN IF EXISTS image_url;
+
 -- Use the blockkbusterr database
 USE blockkbusterr;
 
@@ -28,7 +32,7 @@ VALUES (
 -- ============================================
 
 -- Insert sample movies only if the table is empty
-INSERT INTO movies (title, release_date, duration, genre, quantity, description, image_url, created_at, active)
+INSERT INTO movies (title, release_date, duration, genre, quantity, description, created_at, active)
 SELECT * FROM (
     SELECT 
         'The Shawshank Redemption' as title,
@@ -37,7 +41,6 @@ SELECT * FROM (
         'Drama' as genre,
         3 as quantity,
         'Two imprisoned friends bond over a number of years, finding solace and eventual redemption through acts of common decency.' as description,
-        'https://example.com/shawshank.jpg' as image_url,
         NOW() as created_at,
         TRUE as active
     UNION ALL
@@ -48,7 +51,6 @@ SELECT * FROM (
         'Crime',
         2,
         'An organized crime dynasty\'s aging patriarch transfers control of his clandestine empire to his reluctant son.',
-        'https://example.com/godfather.jpg',
         NOW(),
         TRUE
     UNION ALL
@@ -59,7 +61,6 @@ SELECT * FROM (
         'Action',
         4,
         'When the menace known as the Joker wreaks havoc on Gotham City, Batman must face his greatest challenge.',
-        'https://example.com/darkknight.jpg',
         NOW(),
         TRUE
     UNION ALL
@@ -70,7 +71,6 @@ SELECT * FROM (
         'Crime',
         2,
         'The lives of two mob hitmen, a boxer, a gangster and his wife intertwine in four tales of violence and redemption.',
-        'https://example.com/pulpfiction.jpg',
         NOW(),
         TRUE
     UNION ALL
@@ -81,7 +81,6 @@ SELECT * FROM (
         'Drama',
         3,
         'The presidencies of Kennedy and Johnson through the eyes of an Alabama man with an IQ of 75.',
-        'https://example.com/forrestgump.jpg',
         NOW(),
         TRUE
     UNION ALL
@@ -92,7 +91,6 @@ SELECT * FROM (
         'Sci-Fi',
         3,
         'A thief who steals corporate secrets through dream-sharing technology is given the inverse task of planting an idea.',
-        'https://example.com/inception.jpg',
         NOW(),
         TRUE
     UNION ALL
@@ -103,7 +101,6 @@ SELECT * FROM (
         'Sci-Fi',
         2,
         'A computer programmer discovers that reality as he knows it is a simulation and must fight to free humanity.',
-        'https://example.com/matrix.jpg',
         NOW(),
         TRUE
     UNION ALL
@@ -114,7 +111,6 @@ SELECT * FROM (
         'Crime',
         2,
         'The story of Henry Hill and his life in the mob, covering his relationship with his wife and partners.',
-        'https://example.com/goodfellas.jpg',
         NOW(),
         TRUE
     UNION ALL
@@ -125,7 +121,6 @@ SELECT * FROM (
         'Fantasy',
         2,
         'A meek Hobbit and eight companions set out on a journey to destroy the powerful One Ring.',
-        'https://example.com/lotr1.jpg',
         NOW(),
         TRUE
     UNION ALL
@@ -136,7 +131,6 @@ SELECT * FROM (
         'Sci-Fi',
         3,
         'Luke Skywalker joins forces with a Jedi Knight to rescue Princess Leia and save the galaxy.',
-        'https://example.com/starwars.jpg',
         NOW(),
         TRUE
     UNION ALL
@@ -147,7 +141,6 @@ SELECT * FROM (
         'Thriller',
         2,
         'A young FBI cadet must receive help from Dr. Hannibal Lecter to catch another serial killer.',
-        'https://example.com/silencelambs.jpg',
         NOW(),
         TRUE
     UNION ALL
@@ -158,7 +151,6 @@ SELECT * FROM (
         'War',
         2,
         'Following the Normandy Landings, a group of soldiers go behind enemy lines to retrieve a paratrooper.',
-        'https://example.com/privateryan.jpg',
         NOW(),
         TRUE
     UNION ALL
@@ -169,7 +161,6 @@ SELECT * FROM (
         'Sci-Fi',
         3,
         'A team of explorers travel through a wormhole in space in an attempt to ensure humanity\'s survival.',
-        'https://example.com/interstellar.jpg',
         NOW(),
         TRUE
     UNION ALL
@@ -180,7 +171,6 @@ SELECT * FROM (
         'Crime',
         2,
         'An undercover cop and a police informant play a cat-and-mouse game in the Boston underworld.',
-        'https://example.com/departed.jpg',
         NOW(),
         TRUE
     UNION ALL
@@ -191,7 +181,6 @@ SELECT * FROM (
         'Action',
         2,
         'A former Roman General seeks vengeance against the corrupt emperor who murdered his family.',
-        'https://example.com/gladiator.jpg',
         NOW(),
         TRUE
 ) AS new_movies

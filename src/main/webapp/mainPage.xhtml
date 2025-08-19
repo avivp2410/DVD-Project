@@ -32,11 +32,11 @@
             <h:selectOneMenu value="#{movieListBean.selectedGenre}" styleClass="filter-select">
                 <f:selectItem itemValue="" itemLabel="All Genres" />
                 <f:selectItems value="#{movieListBean.availableGenres}" var="genre" itemValue="#{genre}" itemLabel="#{genre}" />
-                <f:ajax execute="@form" render="movieGrid movieCount" listener="#{movieListBean.onGenreChange}" />
+                <f:ajax execute="@this" render="movieGrid movieCount" listener="#{movieListBean.onGenreChange}" />
             </h:selectOneMenu>
             
             <h:selectBooleanCheckbox value="#{movieListBean.showAvailableOnly}" styleClass="availability-filter">
-                <f:ajax execute="@form" render="movieGrid movieCount" listener="#{movieListBean.toggleAvailabilityFilter}" />
+                <f:ajax execute="@this" render="movieGrid movieCount" listener="#{movieListBean.toggleAvailabilityFilter}" />
             </h:selectBooleanCheckbox>
             <h:outputLabel value="Available Only" styleClass="filter-label" />
             
@@ -64,10 +64,6 @@
                         <div class="movie-item #{movieListBean.getAvailabilityClass(movie)}">
                             <h:form>
                                 <div class="movie-content">
-                                    <div class="movie-image">
-                                        <h:graphicImage value="#{movie.imageUrl != null ? movie.imageUrl : '/resources/img/movie-placeholder.jpg'}"
-                                                      alt="#{movie.title}" styleClass="movie-poster" />
-                                    </div>
                                     
                                     <div class="movie-info">
                                         <h3 class="movie-title">#{movie.title}</h3>
@@ -195,13 +191,6 @@
                 margin-bottom: 15px;
             }
             
-            .movie-poster {
-                width: 100%;
-                height: 200px;
-                object-fit: cover;
-                border-radius: 8px;
-                border: 2px solid var(--secondary-color);
-            }
             
             .movie-info {
                 flex-grow: 1;

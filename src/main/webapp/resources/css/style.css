@@ -302,8 +302,6 @@ body.login-page {
     overflow: hidden;
     position: relative;
     padding-bottom: 10px;
-    background-image: url('../img/movie-placeholder.jpg');
-    background-size: cover;
     background-position: center;
 }
 
@@ -333,23 +331,6 @@ body.login-page {
     flex-wrap: wrap;
 }
 
-.movie-image {
-    flex: 1;
-    min-width: 200px;
-    max-width: 300px;
-}
-
-.movie-image img {
-    width: 100%;
-    height: auto;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px var(--shadow-dark);
-    transition: transform 0.3s ease;
-}
-
-.movie-image img:hover {
-    transform: scale(1.03);
-}
 
 .movie-info {
     flex: 2;

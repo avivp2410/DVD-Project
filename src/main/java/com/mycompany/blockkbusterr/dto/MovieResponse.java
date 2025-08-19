@@ -31,8 +31,6 @@ public class MovieResponse {
     @XmlElement
     private String description;
     
-    @XmlElement
-    private String imageUrl;
     
     @XmlElement
     private Boolean active;
@@ -71,7 +69,6 @@ public class MovieResponse {
             this.genre = movie.getGenre();
             this.quantity = movie.getQuantity();
             this.description = movie.getDescription();
-            this.imageUrl = movie.getImageUrl();
             this.active = movie.getActive();
             this.createdAt = movie.getCreatedAt() != null ? movie.getCreatedAt().toString() : null;
         }
@@ -147,13 +144,6 @@ public class MovieResponse {
         this.description = description;
     }
     
-    public String getImageUrl() {
-        return imageUrl;
-    }
-    
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
     
     public Boolean getActive() {
         return active;

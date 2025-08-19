@@ -58,8 +58,7 @@ public class MovieManagementWebService {
                 request.getDuration(),
                 request.getGenre(),
                 request.getQuantity(),
-                request.getDescription(),
-                request.getImageUrl()
+                request.getDescription()
             );
             
             return MovieResponse.success(movie, "Movie added successfully");
@@ -104,8 +103,7 @@ public class MovieManagementWebService {
                 request.getDuration(),
                 request.getGenre(),
                 request.getQuantity(),
-                request.getDescription(),
-                request.getImageUrl()
+                request.getDescription()
             );
             
             return MovieResponse.success(movie, "Movie updated successfully");

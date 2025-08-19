@@ -3,8 +3,8 @@ package com.mycompany.blockkbusterr.bean;
 import com.mycompany.blockkbusterr.entity.Movie;
 import com.mycompany.blockkbusterr.service.MovieService;
 import jakarta.annotation.PostConstruct;
-import jakarta.enterprise.context.RequestScoped;
 import jakarta.faces.event.AjaxBehaviorEvent;
+import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.Serializable;
@@ -16,7 +16,7 @@ import java.util.logging.Logger;
  * JSF Managed Bean for movie listing and search functionality on the main page
  */
 @Named("movieListBean")
-@RequestScoped
+@ViewScoped
 public class MovieListBean implements Serializable {
     
     private static final long serialVersionUID = 1L;
@@ -71,11 +71,14 @@ public class MovieListBean implements Serializable {
      */
     public void searchMovies() {
         try {
+            logger.info("Starting search with searchTerm='" + searchTerm + "', selectedGenre='" + selectedGenre + "', showAvailableOnly=" + showAvailableOnly);
             filteredMovies = new ArrayList<>();
             
             // Start with all movies or available movies only
-            List<Movie> sourceMovies = showAvailableOnly ? 
+            List<Movie> sourceMovies = showAvailableOnly ?
                 movieService.getAvailableMovies() : movieService.getAllMovies();
+            
+            logger.info("Source movies count: " + sourceMovies.size());
             
             for (Movie movie : sourceMovies) {
                 boolean matches = true;
@@ -84,14 +87,17 @@ public class MovieListBean implements Serializable {
                 if (searchTerm != null && !searchTerm.trim().isEmpty()) {
                     String search = searchTerm.toLowerCase().trim();
                     boolean titleMatch = movie.getTitle().toLowerCase().contains(search);
-                    boolean descMatch = movie.getDescription() != null && 
+                    boolean descMatch = movie.getDescription() != null &&
                                       movie.getDescription().toLowerCase().contains(search);
                     matches = titleMatch || descMatch;
+                    logger.info("Movie '" + movie.getTitle() + "' search filter: " + matches);
                 }
                 
                 // Filter by genre
                 if (matches && selectedGenre != null && !selectedGenre.trim().isEmpty()) {
-                    matches = movie.getGenre().equalsIgnoreCase(selectedGenre.trim());
+                    boolean genreMatch = movie.getGenre().equalsIgnoreCase(selectedGenre.trim());
+                    matches = genreMatch;
+                    logger.info("Movie '" + movie.getTitle() + "' (genre: '" + movie.getGenre() + "') vs selected '" + selectedGenre + "': " + matches);
                 }
                 
                 if (matches) {
@@ -142,6 +148,7 @@ public class MovieListBean implements Serializable {
      * AJAX listener method for genre filter
      */
     public void onGenreChange(AjaxBehaviorEvent event) {
+        logger.info("Genre changed to: " + selectedGenre);
         searchMovies();
     }
     
@@ -217,6 +224,11 @@ public class MovieListBean implements Serializable {
     }
     
     public List<Movie> getFilteredMovies() {
+        logger.info("getFilteredMovies() called, returning " + (filteredMovies != null ? filteredMovies.size() : "null") + " movies");
+        if (filteredMovies == null || filteredMovies.isEmpty()) {
+            logger.info("filteredMovies is null or empty, calling searchMovies()");
+            searchMovies();
+        }
         return filteredMovies;
     }
     
@@ -229,10 +241,12 @@ public class MovieListBean implements Serializable {
     }
     
     public String getSelectedGenre() {
+        logger.info("getSelectedGenre() called, returning: '" + selectedGenre + "'");
         return selectedGenre;
     }
     
     public void setSelectedGenre(String selectedGenre) {
+        logger.info("setSelectedGenre() called with: '" + selectedGenre + "'");
         this.selectedGenre = selectedGenre;
     }
     

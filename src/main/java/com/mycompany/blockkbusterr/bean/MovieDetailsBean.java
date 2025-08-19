@@ -299,12 +299,6 @@ public class MovieDetailsBean implements Serializable {
         return movieReviews != null && !movieReviews.isEmpty();
     }
     
-    public String getMovieImageUrl() {
-        if (movie != null && movie.getImageUrl() != null && !movie.getImageUrl().trim().isEmpty()) {
-            return movie.getImageUrl();
-        }
-        return "resources/img/movie-placeholder.jpg";
-    }
     
     public String getAverageRatingFormatted() {
         if (movie == null) return "No ratings";

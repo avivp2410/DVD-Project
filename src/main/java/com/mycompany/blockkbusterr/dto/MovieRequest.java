@@ -27,8 +27,6 @@ public class MovieRequest {
     @XmlElement
     private String description;
     
-    @XmlElement
-    private String imageUrl;
     
     // Default constructor for JAXB
     public MovieRequest() {}
@@ -41,10 +39,9 @@ public class MovieRequest {
         this.quantity = quantity;
     }
     
-    public MovieRequest(String title, String releaseDate, Integer duration, String genre, Integer quantity, String description, String imageUrl) {
+    public MovieRequest(String title, String releaseDate, Integer duration, String genre, Integer quantity, String description) {
         this(title, releaseDate, duration, genre, quantity);
         this.description = description;
-        this.imageUrl = imageUrl;
     }
     
     // Getters and Setters
@@ -96,11 +93,4 @@ public class MovieRequest {
         this.description = description;
     }
     
-    public String getImageUrl() {
-        return imageUrl;
-    }
-    
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
 }

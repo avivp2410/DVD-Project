@@ -57,8 +57,6 @@ public class Movie implements Serializable {
     @Column(name = "description", length = 1000)
     private String description;
     
-    @Column(name = "image_url", length = 255)
-    private String imageUrl;
     
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
@@ -152,13 +150,6 @@ public class Movie implements Serializable {
         this.description = description;
     }
     
-    public String getImageUrl() {
-        return imageUrl;
-    }
-    
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
     
     public LocalDateTime getCreatedAt() {
         return createdAt;

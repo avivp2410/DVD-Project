@@ -102,65 +102,35 @@ public class DatabaseInitializationService {
         logger.info("Creating sample movie dataset...");
         
         Movie[] sampleMovies = {
-            createMovie("The Shawshank Redemption", "1994-09-23", 142, "Drama", 3,
-                "Two imprisoned friends bond over a number of years, finding solace and eventual redemption through acts of common decency.",
-                "https://example.com/shawshank.jpg"),
+            createMovie("The Shawshank Redemption", "1994-09-23", 142, "Drama", 3, "Two imprisoned friends bond over a number of years, finding solace and eventual redemption through acts of common decency."),
                 
-            createMovie("The Godfather", "1972-03-24", 175, "Crime", 2,
-                "An organized crime dynasty's aging patriarch transfers control of his clandestine empire to his reluctant son.",
-                "https://example.com/godfather.jpg"),
+            createMovie("The Godfather", "1972-03-24", 175, "Crime", 2, "An organized crime dynasty's aging patriarch transfers control of his clandestine empire to his reluctant son."),
                 
-            createMovie("The Dark Knight", "2008-07-18", 152, "Action", 4,
-                "When the menace known as the Joker wreaks havoc on Gotham City, Batman must face his greatest challenge.",
-                "https://example.com/darkknight.jpg"),
+            createMovie("The Dark Knight", "2008-07-18", 152, "Action", 4, "When the menace known as the Joker wreaks havoc on Gotham City, Batman must face his greatest challenge."),
                 
-            createMovie("Pulp Fiction", "1994-10-14", 154, "Crime", 2,
-                "The lives of two mob hitmen, a boxer, a gangster and his wife intertwine in four tales of violence and redemption.",
-                "https://example.com/pulpfiction.jpg"),
+            createMovie("Pulp Fiction", "1994-10-14", 154, "Crime", 2, "The lives of two mob hitmen, a boxer, a gangster and his wife intertwine in four tales of violence and redemption."),
                 
-            createMovie("Forrest Gump", "1994-07-06", 142, "Drama", 3,
-                "The presidencies of Kennedy and Johnson through the eyes of an Alabama man with an IQ of 75.",
-                "https://example.com/forrestgump.jpg"),
+            createMovie("Forrest Gump", "1994-07-06", 142, "Drama", 3, "The presidencies of Kennedy and Johnson through the eyes of an Alabama man with an IQ of 75."),
                 
-            createMovie("Inception", "2010-07-16", 148, "Sci-Fi", 3,
-                "A thief who steals corporate secrets through dream-sharing technology is given the inverse task of planting an idea.",
-                "https://example.com/inception.jpg"),
+            createMovie("Inception", "2010-07-16", 148, "Sci-Fi", 3, "A thief who steals corporate secrets through dream-sharing technology is given the inverse task of planting an idea."),
                 
-            createMovie("The Matrix", "1999-03-31", 136, "Sci-Fi", 2,
-                "A computer programmer discovers that reality as he knows it is a simulation and must fight to free humanity.",
-                "https://example.com/matrix.jpg"),
+            createMovie("The Matrix", "1999-03-31", 136, "Sci-Fi", 2, "A computer programmer discovers that reality as he knows it is a simulation and must fight to free humanity."),
                 
-            createMovie("Goodfellas", "1990-09-21", 146, "Crime", 2,
-                "The story of Henry Hill and his life in the mob, covering his relationship with his wife and partners.",
-                "https://example.com/goodfellas.jpg"),
+            createMovie("Goodfellas", "1990-09-21", 146, "Crime", 2, "The story of Henry Hill and his life in the mob, covering his relationship with his wife and partners."),
                 
-            createMovie("The Lord of the Rings: The Fellowship of the Ring", "2001-12-19", 178, "Fantasy", 2,
-                "A meek Hobbit and eight companions set out on a journey to destroy the powerful One Ring.",
-                "https://example.com/lotr1.jpg"),
+            createMovie("The Lord of the Rings: The Fellowship of the Ring", "2001-12-19", 178, "Fantasy", 2, "A meek Hobbit and eight companions set out on a journey to destroy the powerful One Ring."),
                 
-            createMovie("Star Wars: Episode IV - A New Hope", "1977-05-25", 121, "Sci-Fi", 3,
-                "Luke Skywalker joins forces with a Jedi Knight to rescue Princess Leia and save the galaxy.",
-                "https://example.com/starwars.jpg"),
+            createMovie("Star Wars: Episode IV - A New Hope", "1977-05-25", 121, "Sci-Fi", 3, "Luke Skywalker joins forces with a Jedi Knight to rescue Princess Leia and save the galaxy."),
                 
-            createMovie("The Silence of the Lambs", "1991-02-14", 118, "Thriller", 2,
-                "A young FBI cadet must receive help from Dr. Hannibal Lecter to catch another serial killer.",
-                "https://example.com/silencelambs.jpg"),
+            createMovie("The Silence of the Lambs", "1991-02-14", 118, "Thriller", 2, "A young FBI cadet must receive help from Dr. Hannibal Lecter to catch another serial killer."),
                 
-            createMovie("Saving Private Ryan", "1998-07-24", 169, "War", 2,
-                "Following the Normandy Landings, a group of soldiers go behind enemy lines to retrieve a paratrooper.",
-                "https://example.com/privateryan.jpg"),
+            createMovie("Saving Private Ryan", "1998-07-24", 169, "War", 2, "Following the Normandy Landings, a group of soldiers go behind enemy lines to retrieve a paratrooper."),
                 
-            createMovie("Interstellar", "2014-11-07", 169, "Sci-Fi", 3,
-                "A team of explorers travel through a wormhole in space in an attempt to ensure humanity's survival.",
-                "https://example.com/interstellar.jpg"),
+            createMovie("Interstellar", "2014-11-07", 169, "Sci-Fi", 3, "A team of explorers travel through a wormhole in space in an attempt to ensure humanity's survival."),
                 
-            createMovie("The Departed", "2006-10-06", 151, "Crime", 2,
-                "An undercover cop and a police informant play a cat-and-mouse game in the Boston underworld.",
-                "https://example.com/departed.jpg"),
+            createMovie("The Departed", "2006-10-06", 151, "Crime", 2, "An undercover cop and a police informant play a cat-and-mouse game in the Boston underworld."),
                 
-            createMovie("Gladiator", "2000-05-05", 155, "Action", 2,
-                "A former Roman General seeks vengeance against the corrupt emperor who murdered his family.",
-                "https://example.com/gladiator.jpg")
+            createMovie("Gladiator", "2000-05-05", 155, "Action", 2, "A former Roman General seeks vengeance against the corrupt emperor who murdered his family.")
         };
         
         int successCount = 0;
@@ -180,7 +150,7 @@ public class DatabaseInitializationService {
     /**
      * Helper method to create movie objects
      */
-    private Movie createMovie(String title, String releaseDateStr, int duration, String genre, int quantity, String description, String imageUrl) {
+    private Movie createMovie(String title, String releaseDateStr, int duration, String genre, int quantity, String description) {
         Movie movie = new Movie();
         movie.setTitle(title);
         movie.setReleaseDate(LocalDate.parse(releaseDateStr));
@@ -188,7 +158,6 @@ public class DatabaseInitializationService {
         movie.setGenre(genre);
         movie.setQuantity(quantity);
         movie.setDescription(description);
-        movie.setImageUrl(imageUrl);
         movie.setActive(true);
         movie.setCreatedAt(LocalDateTime.now());
         return movie;
