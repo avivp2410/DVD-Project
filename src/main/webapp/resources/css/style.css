@@ -299,39 +299,12 @@ body.login-page {
     font-weight: bold;
     border-radius: 12px;
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
-    cursor: pointer;
-    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
     overflow: hidden;
     position: relative;
     padding-bottom: 10px;
     background-image: url('../img/movie-placeholder.jpg');
     background-size: cover;
     background-position: center;
-}
-
-.movie-item:hover {
-    transform: translateY(-8px) scale(1.03);
-    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.6), 0 0 20px var(--shadow-blue);
-    background-color: var(--hover-blue);
-}
-
-.movie-item:hover::after {
-    content: 'View Details';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    padding: 10px 0;
-    background: rgba(0, 86, 179, 0.7);
-    color: var(--light-text);
-    font-size: 1em;
-    text-align: center;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.movie-item:hover::after {
-    opacity: 1;
 }
 
 /* Movie Details Page Styling (movie.xhtml) */
@@ -537,20 +510,6 @@ body.login-page {
     gap: 5px;
     font-size: 1.1em;
     color: var(--light-text);
-}
-.movie-item:hover::after {
-    content: 'Edit Movie';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    padding: 10px 0;
-    background: rgba(0, 86, 179, 0.7);
-    color: var(--light-text);
-    font-size: 1em;
-    text-align: center;
-    opacity: 1;
-    transition: opacity 0.3s ease;
 }
 .stock-count {
     display: block;

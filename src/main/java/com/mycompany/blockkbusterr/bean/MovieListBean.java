@@ -4,6 +4,7 @@ import com.mycompany.blockkbusterr.entity.Movie;
 import com.mycompany.blockkbusterr.service.MovieService;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.RequestScoped;
+import jakarta.faces.event.AjaxBehaviorEvent;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.Serializable;
@@ -89,9 +90,8 @@ public class MovieListBean implements Serializable {
                 }
                 
                 // Filter by genre
-                if (matches && selectedGenre != null && !selectedGenre.trim().isEmpty() && 
-                    !selectedGenre.equals("all")) {
-                    matches = movie.getGenre().toLowerCase().contains(selectedGenre.toLowerCase());
+                if (matches && selectedGenre != null && !selectedGenre.trim().isEmpty()) {
+                    matches = movie.getGenre().equalsIgnoreCase(selectedGenre.trim());
                 }
                 
                 if (matches) {
@@ -128,6 +128,20 @@ public class MovieListBean implements Serializable {
      * Toggle availability filter
      */
     public void toggleAvailabilityFilter() {
+        searchMovies();
+    }
+    
+    /**
+     * AJAX listener method for search input
+     */
+    public void onSearchKeyup(AjaxBehaviorEvent event) {
+        searchMovies();
+    }
+    
+    /**
+     * AJAX listener method for genre filter
+     */
+    public void onGenreChange(AjaxBehaviorEvent event) {
         searchMovies();
     }
     

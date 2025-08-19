@@ -50,9 +50,6 @@ public class Rental implements Serializable {
     @Column(name = "status", nullable = false)
     private RentalStatus status = RentalStatus.ACTIVE;
     
-    @Column(name = "phone_number", length = 20)
-    private String phoneNumber;
-    
     @Column(name = "notes", length = 500)
     private String notes;
     
@@ -75,10 +72,6 @@ public class Rental implements Serializable {
         this.returnDate = returnDate;
     }
     
-    public Rental(User user, Movie movie, LocalDate returnDate, String phoneNumber) {
-        this(user, movie, returnDate);
-        this.phoneNumber = phoneNumber;
-    }
     
     // Lifecycle callbacks
     @PreUpdate
@@ -141,14 +134,6 @@ public class Rental implements Serializable {
     
     public void setStatus(RentalStatus status) {
         this.status = status;
-    }
-    
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-    
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
     }
     
     public String getNotes() {

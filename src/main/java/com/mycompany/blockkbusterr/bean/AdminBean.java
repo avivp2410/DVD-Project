@@ -471,4 +471,11 @@ public class AdminBean implements Serializable {
     public int getLowStockMovieCount() {
         return lowStockMovies != null ? lowStockMovies.size() : 0;
     }
+    
+    /**
+     * Navigate to main page
+     */
+    public String goToMainPage() {
+        return "mainPage.xhtml?faces-redirect=true";
+    }
 }

@@ -9,6 +9,19 @@
     <ui:define name="main-title">Edit Movie</ui:define>
 
     <ui:define name="content">
+        <!-- Admin access check -->
+        <h:panelGroup rendered="#{not sessionBean.admin}">
+            <div class="access-denied">
+                <h2>Access Denied</h2>
+                <p>You must be an administrator to edit movies.</p>
+                <h:form>
+                    <h:commandButton value="Go to Main Page" action="#{sessionBean.goToMainPage}" styleClass="btn btn-primary" />
+                </h:form>
+            </div>
+        </h:panelGroup>
+
+        <!-- Admin content -->
+        <h:panelGroup rendered="#{sessionBean.admin}">
         <div class="register-form-container">
             <h2>Edit Movie Details</h2>
             <h:form class="register-form">
@@ -29,6 +42,27 @@
                 <h:commandButton value="Update Movie" type="submit" />
             </h:form>
         </div>
+        </h:panelGroup>
+        
+        <!-- Add access denied styling -->
+        <style type="text/css">
+            .access-denied {
+                text-align: center;
+                background: var(--darker-gray-bg);
+                padding: 60px;
+                border-radius: 12px;
+                box-shadow: 0 4px 15px var(--shadow-dark);
+                border: 2px solid #dc3545;
+                max-width: 600px;
+                margin: 50px auto;
+                color: var(--light-text);
+            }
+            
+            .access-denied h2 {
+                color: #dc3545;
+                margin-bottom: 20px;
+            }
+        </style>
     </ui:define>
 
 </ui:composition>

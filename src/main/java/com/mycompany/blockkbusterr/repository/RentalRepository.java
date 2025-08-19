@@ -8,6 +8,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.TypedQuery;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @ApplicationScoped
 public class RentalRepository extends BaseRepository<Rental, Long> {
@@ -31,10 +32,13 @@ public class RentalRepository extends BaseRepository<Rental, Long> {
     }
     
     /**
-     * Find rentals by user ID
+     * Find rentals by user ID with movie and user details eagerly loaded
      */
     public List<Rental> findByUserId(Long userId) {
-        String jpql = "SELECT r FROM Rental r WHERE r.user.userId = :userId ORDER BY r.borrowDate DESC";
+        String jpql = "SELECT r FROM Rental r " +
+                     "LEFT JOIN FETCH r.user " +
+                     "LEFT JOIN FETCH r.movie " +
+                     "WHERE r.user.userId = :userId ORDER BY r.borrowDate DESC";
         TypedQuery<Rental> query = entityManager.createQuery(jpql, Rental.class);
         query.setParameter("userId", userId);
         return query.getResultList();
@@ -247,5 +251,26 @@ public class RentalRepository extends BaseRepository<Rental, Long> {
         query.setParameter("movieId", movieId);
         query.setMaxResults(limit);
         return query.getResultList();
+    }
+    
+    /**
+     * Find rental by ID with user and movie eagerly loaded
+     */
+    public Optional<Rental> findByIdWithDetails(Long rentalId) {
+        try {
+            String jpql = "SELECT r FROM Rental r " +
+                         "LEFT JOIN FETCH r.user " +
+                         "LEFT JOIN FETCH r.movie " +
+                         "WHERE r.rentalId = :rentalId";
+            
+            List<Rental> results = entityManager.createQuery(jpql, Rental.class)
+                .setParameter("rentalId", rentalId)
+                .getResultList();
+                
+            return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
+        } catch (Exception e) {
+            // Fallback to regular findById if FETCH query fails
+            return findById(rentalId);
+        }
     }
 }

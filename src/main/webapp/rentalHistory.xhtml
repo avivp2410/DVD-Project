@@ -16,7 +16,7 @@
                     <h2>Login Required</h2>
                     <p>You must be logged in to view your rental history.</p>
                     <h:form>
-                        <h:commandButton value="Login" action="login.xhtml?faces-redirect=true" styleClass="btn btn-primary" />
+                        <h:commandButton value="Login" action="#{sessionBean.goToLogin}" styleClass="btn btn-primary" />
                     </h:form>
                 </div>
             </h:panelGroup>
@@ -26,34 +26,22 @@
                 <f:event type="preRenderView" listener="#{rentalBean.loadUserRentals}" />
                 
                 <!-- Header section -->
-                <div class="history-header">
-                    <h2>Rental History for #{sessionBean.currentUserDisplayName}</h2>
-                    <div class="stats">
-                        <div class="stat-item">
-                            <span class="stat-number">#{rentalBean.userRentalCount}</span>
-                            <span class="stat-label">Total Rentals</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-number">#{rentalBean.activeRentalCount}</span>
-                            <span class="stat-label">Active Rentals</span>
+                <h:panelGroup id="headerStats">
+                    <div class="history-header">
+                        <h2>Rental History for #{sessionBean.currentUserDisplayName}</h2>
+                        <div class="stats">
+                            <div class="stat-item">
+                                <span class="stat-number">#{rentalBean.userRentalCount}</span>
+                                <span class="stat-label">Total Rentals</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">#{rentalBean.activeRentalCount}</span>
+                                <span class="stat-label">Active Rentals</span>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </h:panelGroup>
 
-                <!-- Filter section -->
-                <div class="filter-section">
-                    <h:form>
-                        <h:outputLabel for="statusFilter" value="Filter by Status:" styleClass="filter-label" />
-                        <h:selectOneMenu id="statusFilter" value="#{rentalBean.statusFilter}" styleClass="filter-select">
-                            <f:selectItem itemValue="ALL" itemLabel="All Rentals" />
-                            <f:selectItem itemValue="ACTIVE" itemLabel="Active" />
-                            <f:selectItem itemValue="RETURNED" itemLabel="Returned" />
-                            <f:selectItem itemValue="OVERDUE" itemLabel="Overdue" />
-                            <f:selectItem itemValue="CANCELLED" itemLabel="Cancelled" />
-                            <f:ajax execute="@this" render="rentalList" listener="#{rentalBean.filterRentals}" />
-                        </h:selectOneMenu>
-                    </h:form>
-                </div>
 
                 <!-- Display messages -->
                 <h:messages id="messages" styleClass="messages" errorClass="error-message"
@@ -66,8 +54,8 @@
                             <h3>No Rentals Found</h3>
                             <p>You don't have any rentals matching the selected criteria.</p>
                             <h:form>
-                                <h:commandButton value="Browse Movies" 
-                                               action="mainPage.xhtml?faces-redirect=true" 
+                                <h:commandButton value="Browse Movies"
+                                               action="#{sessionBean.goToMainPage}"
                                                styleClass="btn btn-primary" />
                             </h:form>
                         </div>
@@ -108,7 +96,7 @@
                                                 <span class="label">Borrowed:</span>
                                                 <span class="value">
                                                     <h:outputText value="#{rental.borrowDate}">
-                                                        <f:convertDateTime pattern="MMM dd, yyyy" />
+                                                        <f:convertDateTime pattern="MMM dd, yyyy" type="localDate" />
                                                     </h:outputText>
                                                 </span>
                                             </div>
@@ -116,7 +104,7 @@
                                                 <span class="label">Due Date:</span>
                                                 <span class="value">
                                                     <h:outputText value="#{rental.returnDate}">
-                                                        <f:convertDateTime pattern="MMM dd, yyyy" />
+                                                        <f:convertDateTime pattern="MMM dd, yyyy" type="localDate" />
                                                     </h:outputText>
                                                 </span>
                                             </div>
@@ -124,44 +112,34 @@
                                                 <span class="label">Returned:</span>
                                                 <span class="value">
                                                     <h:outputText value="#{rental.actualReturnDate}">
-                                                        <f:convertDateTime pattern="MMM dd, yyyy" />
+                                                        <f:convertDateTime pattern="MMM dd, yyyy" type="localDate" />
                                                     </h:outputText>
                                                 </span>
                                             </div>
                                         </div>
                                         
-                                        <div class="detail-row" rendered="#{rental.phoneNumber != null or rental.notes != null}">
-                                            <div class="detail-item" rendered="#{rental.phoneNumber != null}">
-                                                <span class="label">Phone:</span>
-                                                <span class="value">#{rental.phoneNumber}</span>
-                                            </div>
+                                        <div class="detail-row" rendered="#{rental.notes != null}">
                                             <div class="detail-item full-width" rendered="#{rental.notes != null}">
                                                 <span class="label">Notes:</span>
                                                 <span class="value">#{rental.notes}</span>
                                             </div>
                                         </div>
                                         
-                                        <!-- Overdue warning -->
-                                        <div class="overdue-warning" rendered="#{rental.overdue}">
-                                            <i class="warning-icon">⚠</i>
-                                            This rental is overdue by #{rental.daysOverdue} day(s). 
-                                            Please return the movie as soon as possible.
-                                        </div>
                                     </div>
                                     
                                     <!-- Action buttons -->
-                                    <div class="rental-actions" rendered="#{rental.active}">
+                                    <div class="rental-actions">
                                         <h:form>
-                                            <h:commandButton value="Extend Rental"
-                                                           action="#{rentalBean.extendRental(rental.rentalId)}"
-                                                           styleClass="btn btn-secondary btn-small"
-                                                           rendered="#{not rental.overdue}">
-                                                <f:ajax execute="@form" render="@form :messages" />
+                                            <h:commandButton value="Return Movie"
+                                                           action="#{rentalBean.userReturnMovie(rental.rentalId)}"
+                                                           styleClass="btn btn-danger btn-small"
+                                                           rendered="#{rental.active}"
+                                                           disabled="#{not rental.active}">
+                                                <f:ajax execute="@form" render=":rentalList :headerStats :messages" />
                                             </h:commandButton>
-                                            
-                                            <h:commandButton value="View Movie Details"
-                                                           action="movie.xhtml?faces-redirect=true&amp;movieId=#{rental.movie.movieId}"
-                                                           styleClass="btn btn-primary btn-small" />
+                                            <h:outputText value="Movie Returned"
+                                                        styleClass="btn btn-secondary btn-small"
+                                                        rendered="#{not rental.active and rental.status eq 'RETURNED'}" />
                                         </h:form>
                                     </div>
                                 </div>
@@ -228,28 +206,6 @@
                 color: var(--light-text);
             }
 
-            .filter-section {
-                background: var(--darker-gray-bg);
-                padding: 20px;
-                border-radius: 8px;
-                margin-bottom: 20px;
-                display: flex;
-                align-items: center;
-                gap: 15px;
-            }
-
-            .filter-label {
-                color: var(--light-text);
-                font-weight: bold;
-            }
-
-            .filter-select {
-                padding: 8px 12px;
-                border: 1px solid var(--secondary-color);
-                border-radius: 4px;
-                background: var(--darker-gray-bg);
-                color: var(--light-text);
-            }
 
             .no-rentals {
                 text-align: center;
@@ -423,6 +379,18 @@
                 transform: scale(1.05);
             }
 
+            .btn-danger {
+                background: #dc3545;
+                color: white;
+                border: 2px solid #dc3545;
+            }
+
+            .btn-danger:hover {
+                background: #c82333;
+                border-color: #bd2130;
+                transform: scale(1.05);
+            }
+
             .messages {
                 margin-bottom: 20px;
             }
@@ -465,11 +433,6 @@
                     gap: 20px;
                 }
 
-                .filter-section {
-                    flex-direction: column;
-                    align-items: flex-start;
-                    gap: 10px;
-                }
 
                 .detail-row {
                     flex-direction: column;

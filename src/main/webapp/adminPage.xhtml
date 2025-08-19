@@ -15,7 +15,7 @@
                 <h2>Access Denied</h2>
                 <p>You must be an administrator to access this page.</p>
                 <h:form>
-                    <h:commandButton value="Go to Main Page" action="mainPage.xhtml?faces-redirect=true" styleClass="btn btn-primary" />
+                    <h:commandButton value="Go to Main Page" action="#{adminBean.goToMainPage}" styleClass="btn btn-primary" />
                 </h:form>
             </div>
         </h:panelGroup>
@@ -143,9 +143,6 @@
                                             <h:outputText value="#{rental.returnDate}">
                                                 <f:convertDateTime pattern="MMM dd, yyyy" />
                                             </h:outputText>
-                                        </div>
-                                        <div class="detail-line" rendered="#{rental.phoneNumber != null}">
-                                            <strong>Phone:</strong> #{rental.phoneNumber}
                                         </div>
                                     </div>
                                     <div class="rental-actions">

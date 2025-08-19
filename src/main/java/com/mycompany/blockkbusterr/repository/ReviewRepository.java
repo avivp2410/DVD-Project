@@ -164,11 +164,21 @@ public class ReviewRepository extends BaseRepository<Review, Long> {
      * Get average rating for a movie
      */
     public Double getAverageRatingForMovie(Long movieId) {
-        String jpql = "SELECT AVG(CAST(r.rating AS double)) FROM Review r WHERE r.movie.movieId = :movieId AND r.active = true";
-        TypedQuery<Double> query = entityManager.createQuery(jpql, Double.class);
+        String jpql = "SELECT AVG(r.rating) FROM Review r WHERE r.movie.movieId = :movieId AND r.active = true";
+        TypedQuery<Object> query = entityManager.createQuery(jpql, Object.class);
         query.setParameter("movieId", movieId);
-        Double result = query.getSingleResult();
-        return result != null ? result : 0.0;
+        Object result = query.getSingleResult();
+        
+        if (result == null) {
+            return 0.0;
+        }
+        
+        // Handle both Integer and Double return types from OpenJPA
+        if (result instanceof Number) {
+            return ((Number) result).doubleValue();
+        }
+        
+        return 0.0;
     }
     
     /**

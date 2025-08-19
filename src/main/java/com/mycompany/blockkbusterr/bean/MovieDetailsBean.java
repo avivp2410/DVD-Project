@@ -6,8 +6,7 @@ import com.mycompany.blockkbusterr.entity.User;
 import com.mycompany.blockkbusterr.service.MovieService;
 import com.mycompany.blockkbusterr.service.ReviewService;
 import jakarta.annotation.PostConstruct;
-import jakarta.ejb.EJB;
-import jakarta.enterprise.context.RequestScoped;
+import jakarta.faces.view.ViewScoped;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import jakarta.inject.Inject;
@@ -17,25 +16,29 @@ import java.util.List;
 import java.util.Optional;
 
 @Named
-@RequestScoped
+@ViewScoped
 public class MovieDetailsBean implements Serializable {
     
     private static final long serialVersionUID = 1L;
     
-    @EJB
+    @Inject
     private MovieService movieService;
     
-    @EJB
+    @Inject
     private ReviewService reviewService;
     
     @Inject
     private SessionBean sessionBean;
+    
+    @Inject
+    private com.mycompany.blockkbusterr.service.RentalService rentalService;
     
     private Movie movie;
     private List<Review> movieReviews;
     private String newReviewComment;
     private Integer newReviewRating;
     private boolean userHasReviewed;
+    private Long movieId; // Store movieId to preserve it across requests
     
     @PostConstruct
     public void init() {
@@ -47,8 +50,8 @@ public class MovieDetailsBean implements Serializable {
         
         if (movieIdParam != null && !movieIdParam.isEmpty()) {
             try {
-                Long movieId = Long.parseLong(movieIdParam);
-                loadMovieDetails(movieId);
+                this.movieId = Long.parseLong(movieIdParam);
+                loadMovieDetails(this.movieId);
             } catch (NumberFormatException e) {
                 addMessage(FacesMessage.SEVERITY_ERROR, "Invalid movie ID");
                 // Redirect to main page or show error
@@ -59,16 +62,24 @@ public class MovieDetailsBean implements Serializable {
     }
     
     private void loadMovieDetails(Long movieId) {
+        System.out.println("DEBUG: loadMovieDetails() called with movieId: " + movieId);
         try {
+            System.out.println("DEBUG: Calling movieService.findMovieById(" + movieId + ")");
             Optional<Movie> movieOpt = movieService.findMovieById(movieId);
+            
             if (movieOpt.isPresent()) {
                 movie = movieOpt.get();
+                System.out.println("DEBUG: Successfully loaded movie: " + movie.getTitle() + " (ID: " + movie.getMovieId() + ")");
                 movieReviews = reviewService.getReviewsByMovie(movieId);
+                System.out.println("DEBUG: Loaded " + (movieReviews != null ? movieReviews.size() : "null") + " reviews");
                 checkIfUserHasReviewed();
             } else {
+                System.out.println("DEBUG: Movie not found with ID: " + movieId + " - movieService returned empty Optional");
                 addMessage(FacesMessage.SEVERITY_ERROR, "Movie not found");
             }
         } catch (Exception e) {
+            System.out.println("DEBUG: Exception in loadMovieDetails: " + e.getMessage());
+            e.printStackTrace();
             addMessage(FacesMessage.SEVERITY_ERROR, "Error loading movie details: " + e.getMessage());
         }
     }
@@ -81,29 +92,104 @@ public class MovieDetailsBean implements Serializable {
     }
     
     public String rentMovie() {
+        System.out.println("DEBUG: rentMovie() called");
+        System.out.println("DEBUG: movie = " + (movie == null ? "NULL" : movie.getTitle()));
+        System.out.println("DEBUG: movieId = " + movieId);
+        System.out.println("DEBUG: authenticated = " + sessionBean.isAuthenticated());
+        
         if (!sessionBean.isAuthenticated()) {
+            System.out.println("DEBUG: User not authenticated, redirecting to login");
             addMessage(FacesMessage.SEVERITY_WARN, "Please log in to rent movies");
             return "login?faces-redirect=true";
         }
         
-        if (movie == null) {
-            addMessage(FacesMessage.SEVERITY_ERROR, "Movie not found");
-            return null;
+        // Try to reload movie if it's null but we have movieId
+        if (movie == null && movieId != null) {
+            System.out.println("DEBUG: Movie is null but movieId exists, attempting to reload");
+            loadMovieDetails(movieId);
         }
         
-        // Redirect to loan page with movie ID
-        return "loan?faces-redirect=true&movieId=" + movie.getMovieId();
+        if (movie == null) {
+            System.out.println("DEBUG: Movie is still null, cannot proceed with rental");
+            addMessage(FacesMessage.SEVERITY_ERROR, "Movie not found or session expired. Please try again.");
+            return "mainPage?faces-redirect=true";
+        }
+        
+        try {
+            System.out.println("DEBUG: Using quick rental for movieId: " + movie.getMovieId());
+            
+            // Check if movie is available
+            if (!movie.isAvailable()) {
+                addMessage(FacesMessage.SEVERITY_ERROR, "This movie is currently out of stock.");
+                return null;
+            }
+            
+            // Check if user can rent this movie
+            if (!rentalService.canUserRentMovie(sessionBean.getCurrentUserId(), movie.getMovieId())) {
+                addMessage(FacesMessage.SEVERITY_ERROR, "You cannot rent this movie. You may already have an active rental for this movie or have reached the maximum number of rentals.");
+                return null;
+            }
+            
+            // Set return date to 1 week from now
+            java.time.LocalDate oneWeekFromNow = java.time.LocalDate.now().plusWeeks(1);
+            
+            // Create the rental directly using RentalService
+            com.mycompany.blockkbusterr.entity.Rental rental = rentalService.createRental(
+                sessionBean.getCurrentUserId(),
+                movie.getMovieId(),
+                oneWeekFromNow
+            );
+            
+            System.out.println("DEBUG: Quick rental created successfully: " + rental.getRentalId());
+            addMessage(FacesMessage.SEVERITY_INFO, "Movie '" + movie.getTitle() + "' rented successfully for 1 week! Due back on " +
+                     oneWeekFromNow.format(java.time.format.DateTimeFormatter.ofPattern("MMM dd, yyyy")));
+            
+            // Redirect to rental history
+            return "rentalHistory?faces-redirect=true";
+            
+        } catch (IllegalArgumentException e) {
+            System.out.println("DEBUG: Quick rental failed: " + e.getMessage());
+            addMessage(FacesMessage.SEVERITY_ERROR, e.getMessage());
+            return null;
+        } catch (Exception e) {
+            System.out.println("DEBUG: Error during quick rental: " + e.getMessage());
+            e.printStackTrace();
+            addMessage(FacesMessage.SEVERITY_ERROR, "An error occurred while processing your rental. Please try again.");
+            return null;
+        }
     }
     
     public void submitReview() {
+        System.out.println("DEBUG: submitReview() called");
+        System.out.println("DEBUG: movieId = " + movieId);
+        System.out.println("DEBUG: movie = " + (movie == null ? "NULL" : movie.getTitle()));
+        System.out.println("DEBUG: authenticated = " + sessionBean.isAuthenticated());
+        System.out.println("DEBUG: sessionBean = " + sessionBean);
+        System.out.println("DEBUG: movieService = " + movieService);
+        
         if (!sessionBean.isAuthenticated()) {
+            System.out.println("DEBUG: User not authenticated, returning");
             addMessage(FacesMessage.SEVERITY_WARN, "Please log in to submit reviews");
             return;
         }
         
         if (movie == null) {
-            addMessage(FacesMessage.SEVERITY_ERROR, "Movie not found");
-            return;
+            System.out.println("DEBUG: Movie is null, trying to reload with movieId: " + movieId);
+            // Try to reload movie if movieId is available
+            if (movieId != null) {
+                System.out.println("DEBUG: movieId is not null, calling loadMovieDetails");
+                loadMovieDetails(movieId);
+                System.out.println("DEBUG: After reload, movie = " + (movie == null ? "NULL" : movie.getTitle()));
+            } else {
+                System.out.println("DEBUG: movieId is also null, cannot reload");
+            }
+            if (movie == null) {
+                System.out.println("DEBUG: Movie still null after reload attempt - THIS IS THE ERROR LOCATION");
+                System.out.println("DEBUG: Final movieId = " + movieId);
+                System.out.println("DEBUG: Final movieService = " + movieService);
+                addMessage(FacesMessage.SEVERITY_ERROR, "Movie not found or an error occurred loading movie details.");
+                return;
+            }
         }
         
         if (userHasReviewed) {
@@ -125,9 +211,11 @@ public class MovieDetailsBean implements Serializable {
             User currentUser = sessionBean.getCurrentUser();
             Review review = new Review(currentUser, movie, newReviewRating, newReviewComment.trim());
             
+            System.out.println("DEBUG: Submitting review for movie: " + movie.getMovieId() + " by user: " + currentUser.getUserId());
             reviewService.addReview(currentUser.getUserId(), movie.getMovieId(), newReviewRating, newReviewComment.trim());
             
             // Refresh reviews and reset form
+            System.out.println("DEBUG: Refreshing reviews after submission");
             movieReviews = reviewService.getReviewsByMovie(movie.getMovieId());
             userHasReviewed = true;
             newReviewComment = null;
@@ -186,6 +274,14 @@ public class MovieDetailsBean implements Serializable {
         this.userHasReviewed = userHasReviewed;
     }
     
+    public Long getMovieId() {
+        return movieId;
+    }
+    
+    public void setMovieId(Long movieId) {
+        this.movieId = movieId;
+    }
+    
     // Utility methods for the UI
     public boolean isMovieLoaded() {
         return movie != null;
@@ -195,7 +291,11 @@ public class MovieDetailsBean implements Serializable {
         return movie != null && movie.isAvailable();
     }
     
-    public boolean hasReviews() {
+    public boolean isHasReviews() {
+        return movieReviews != null && !movieReviews.isEmpty();
+    }
+    
+    public boolean getHasReviews() {
         return movieReviews != null && !movieReviews.isEmpty();
     }
     
@@ -208,7 +308,15 @@ public class MovieDetailsBean implements Serializable {
     
     public String getAverageRatingFormatted() {
         if (movie == null) return "No ratings";
-        double avgRating = movie.getAverageRating();
+        
+        // Log debugging information
+        System.out.println("DEBUG: getAverageRatingFormatted() called for movie: " + movie.getMovieId());
+        System.out.println("DEBUG: Movie reviews collection size: " + (movie.getReviews() != null ? movie.getReviews().size() : "null"));
+        
+        // Use ReviewService instead of Movie's lazy-loaded collection
+        double avgRating = reviewService.getAverageRatingForMovie(movie.getMovieId());
+        System.out.println("DEBUG: Average rating from ReviewService: " + avgRating);
+        
         if (avgRating == 0.0) return "No ratings";
         return String.format("%.1f/5.0", avgRating);
     }

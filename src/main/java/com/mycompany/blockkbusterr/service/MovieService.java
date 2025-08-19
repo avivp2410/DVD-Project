@@ -99,7 +99,17 @@ public class MovieService {
      * Find movie by ID
      */
     public Optional<Movie> findMovieById(Long movieId) {
-        return movieRepository.findById(movieId);
+        System.out.println("DEBUG: MovieService.findMovieById() called with ID: " + movieId);
+        try {
+            System.out.println("DEBUG: Calling movieRepository.findById(" + movieId + ")");
+            Optional<Movie> result = movieRepository.findById(movieId);
+            System.out.println("DEBUG: Repository returned: " + (result.isPresent() ? "Movie found (" + result.get().getTitle() + ")" : "Movie not found"));
+            return result;
+        } catch (Exception e) {
+            System.out.println("DEBUG: Exception in MovieService.findMovieById: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
     
     /**

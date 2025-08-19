@@ -5,33 +5,45 @@
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
 
+
     <ui:define name="title">Blockk Busterr - Main Page</ui:define>
     <ui:define name="main-title">Main Page</ui:define>
 
     <ui:define name="header-left-content">
         <h:form>
-            <h:outputText value="Welcome" styleClass="username-display" />
+            <!-- User Authentication Section -->
+            <h:panelGroup rendered="#{sessionBean.authenticated}">
+                <span class="welcome-text">Welcome, </span>
+                <h:commandLink action="#{sessionBean.goToProfile}" styleClass="username-display clickable">
+                    <h:outputText value="#{sessionBean.currentUserDisplayName}" />
+                </h:commandLink>
+                
+                <h:commandLink value="Logout" action="#{authBean.logout}" styleClass="logout-link" />
+                <span class="separator">|</span>
+            </h:panelGroup>
+            
+            <h:panelGroup rendered="#{not sessionBean.authenticated}">
+                <h:commandLink value="Login" action="#{sessionBean.goToLogin}" styleClass="login-link" />
+                <h:commandLink value="Register" action="#{sessionBean.goToRegister}" styleClass="register-link" />
+                <span class="separator">|</span>
+            </h:panelGroup>
             
             <!-- Filter Controls -->
-            <h:selectOneMenu value="#{movieListBean.selectedGenre}" onchange="submit()" styleClass="filter-select">
+            <h:selectOneMenu value="#{movieListBean.selectedGenre}" styleClass="filter-select">
                 <f:selectItem itemValue="" itemLabel="All Genres" />
                 <f:selectItems value="#{movieListBean.availableGenres}" var="genre" itemValue="#{genre}" itemLabel="#{genre}" />
-                <f:ajax execute="@form" render="movieGrid movieCount" />
+                <f:ajax execute="@form" render="movieGrid movieCount" listener="#{movieListBean.onGenreChange}" />
             </h:selectOneMenu>
             
-            <h:selectBooleanCheckbox value="#{movieListBean.showAvailableOnly}" onchange="submit()" styleClass="availability-filter">
+            <h:selectBooleanCheckbox value="#{movieListBean.showAvailableOnly}" styleClass="availability-filter">
                 <f:ajax execute="@form" render="movieGrid movieCount" listener="#{movieListBean.toggleAvailabilityFilter}" />
             </h:selectBooleanCheckbox>
             <h:outputLabel value="Available Only" styleClass="filter-label" />
             
             <!-- Search Input -->
             <h:inputText value="#{movieListBean.searchTerm}" styleClass="search-input" placeholder="Search movies...">
-                <f:ajax event="keyup" execute="@this" render="movieGrid movieCount" listener="#{movieListBean.searchMovies}" />
+                <f:ajax event="keyup" execute="@this" render="movieGrid movieCount" listener="#{movieListBean.onSearchKeyup}" />
             </h:inputText>
-            
-            <h:commandButton value="Clear" action="#{movieListBean.clearFilters}" styleClass="clear-filter-btn">
-                <f:ajax execute="@form" render="movieGrid movieCount" />
-            </h:commandButton>
         </h:form>
     </ui:define>
 
@@ -81,9 +93,15 @@
                                                        styleClass="btn btn-primary" />
                                         
                                         <h:commandButton value="Rent Movie"
-                                                       outcome="loan.xhtml?movieId=#{movie.movieId}&amp;faces-redirect=true"
+                                                       action="#{rentalBean.quickRentMovie(movie.movieId)}"
                                                        styleClass="btn btn-success"
                                                        disabled="#{!movieListBean.isMovieAvailable(movie)}" />
+                                        
+                                        <!-- Admin-only Edit Movie button -->
+                                        <h:commandButton value="Edit Movie"
+                                                       action="#{adminBean.editMovie(movie.movieId)}"
+                                                       styleClass="btn btn-warning"
+                                                       rendered="#{sessionBean.admin}" />
                                     </div>
                                 </div>
                             </h:form>
@@ -147,17 +165,10 @@
                 border-radius: 12px;
                 padding: 15px;
                 box-shadow: 0 4px 15px var(--shadow-dark);
-                transition: all 0.3s ease;
                 border: 2px solid transparent;
                 min-height: 400px;
                 display: flex;
                 flex-direction: column;
-            }
-            
-            .movie-item:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 8px 25px var(--shadow-blue);
-                border-color: var(--secondary-color);
             }
             
             .movie-item.out-of-stock {
@@ -292,6 +303,18 @@
                 cursor: not-allowed;
             }
             
+            .btn-warning {
+                background: #ffc107;
+                color: #212529;
+                border: 1px solid #ffc107;
+            }
+            
+            .btn-warning:hover:not(:disabled) {
+                background: #e0a800;
+                color: #1d2124;
+                transform: scale(1.05);
+            }
+            
             .no-movies-message {
                 grid-column: 1 / -1;
                 text-align: center;
@@ -319,6 +342,41 @@
                 color: var(--hover-blue);
             }
             
+            /* Authentication Elements */
+            .welcome-text {
+                color: var(--light-text);
+                margin-right: 5px;
+            }
+            
+            .username-display.clickable {
+                color: var(--secondary-color);
+                text-decoration: none;
+                font-weight: bold;
+                margin-right: 15px;
+            }
+            
+            .username-display.clickable:hover {
+                color: var(--hover-blue);
+                text-decoration: underline;
+            }
+            
+            .logout-link, .login-link, .register-link {
+                color: var(--secondary-color);
+                text-decoration: none;
+                margin: 0 10px;
+                font-weight: bold;
+            }
+            
+            .logout-link:hover, .login-link:hover, .register-link:hover {
+                color: var(--hover-blue);
+                text-decoration: underline;
+            }
+            
+            .separator {
+                color: var(--light-text);
+                margin: 0 10px;
+            }
+            
             /* Filter Controls in Header */
             .filter-select, .search-input {
                 padding: 6px 12px;
@@ -339,19 +397,6 @@
                 margin: 0 5px;
             }
             
-            .clear-filter-btn {
-                background: var(--secondary-color);
-                color: white;
-                border: none;
-                padding: 6px 12px;
-                border-radius: 4px;
-                cursor: pointer;
-                margin-left: 8px;
-            }
-            
-            .clear-filter-btn:hover {
-                background: var(--hover-blue);
-            }
         </style>
     </ui:define>
 

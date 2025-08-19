@@ -8,7 +8,7 @@ import com.mycompany.blockkbusterr.service.ReviewService;
 import com.mycompany.blockkbusterr.service.UserService;
 import jakarta.annotation.PostConstruct;
 import jakarta.ejb.EJB;
-import jakarta.enterprise.context.RequestScoped;
+import jakarta.faces.view.ViewScoped;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import jakarta.inject.Inject;
@@ -18,18 +18,18 @@ import java.util.List;
 import java.util.Optional;
 
 @Named
-@RequestScoped
+@ViewScoped
 public class ProfileBean implements Serializable {
     
     private static final long serialVersionUID = 1L;
     
-    @EJB
+    @Inject
     private RentalService rentalService;
     
-    @EJB
+    @Inject
     private ReviewService reviewService;
     
-    @EJB
+    @Inject
     private UserService userService;
     
     @Inject
@@ -281,8 +281,18 @@ public class ProfileBean implements Serializable {
         return userRentals != null && !userRentals.isEmpty();
     }
     
+    // Alternative getter for EL compatibility
+    public boolean getHasRentals() {
+        return hasRentals();
+    }
+    
     public boolean hasReviews() {
         return userReviews != null && !userReviews.isEmpty();
+    }
+    
+    // Alternative getter for EL compatibility
+    public boolean getHasReviews() {
+        return hasReviews();
     }
     
     public int getTotalRentals() {
@@ -309,5 +319,10 @@ public class ProfileBean implements Serializable {
     
     public boolean isProfileLoaded() {
         return currentUser != null;
+    }
+    
+    // Alternative getter for EL compatibility
+    public boolean getProfileLoaded() {
+        return isProfileLoaded();
     }
 }

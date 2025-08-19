@@ -160,10 +160,19 @@ public class Review implements Serializable {
         return comment != null && !comment.trim().isEmpty();
     }
     
+    public boolean getHasComment() {
+        return hasComment();
+    }
+    
     public String getShortComment(int maxLength) {
         if (!hasComment()) return "";
         if (comment.length() <= maxLength) return comment;
         return comment.substring(0, maxLength) + "...";
+    }
+    
+    // Overloaded method for EL compatibility (EL treats numeric literals as Long)
+    public String shortComment(Long maxLength) {
+        return getShortComment(maxLength.intValue());
     }
     
     // toString, equals, and hashCode

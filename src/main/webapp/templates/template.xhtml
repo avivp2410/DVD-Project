@@ -17,18 +17,16 @@
                     <!-- Default header content -->
                     <h:panelGroup rendered="#{sessionBean.authenticated}">
                         <span class="welcome-text">Welcome, </span>
-                        <h:commandLink action="profile.xhtml?faces-redirect=true" styleClass="username-display clickable">
+                        <h:commandLink action="#{sessionBean.goToProfile}" styleClass="username-display clickable">
                             <h:outputText value="#{sessionBean.currentUserDisplayName}" />
                         </h:commandLink>
-                        <span class="user-role">(#{sessionBean.currentUserRole})</span>
                         
-                        <h:commandLink value="Profile" action="profile.xhtml?faces-redirect=true" styleClass="nav-link" />
                         <h:commandLink value="Logout" action="#{authBean.logout}" styleClass="logout-link" />
                     </h:panelGroup>
                     
                     <h:panelGroup rendered="#{not sessionBean.authenticated}">
-                        <h:commandLink value="Login" action="login.xhtml?faces-redirect=true" styleClass="login-link" />
-                        <h:commandLink value="Register" action="register.xhtml?faces-redirect=true" styleClass="register-link" />
+                        <h:commandLink value="Login" action="#{sessionBean.goToLogin}" styleClass="login-link" />
+                        <h:commandLink value="Register" action="#{sessionBean.goToRegister}" styleClass="register-link" />
                     </h:panelGroup>
                 </ui:insert>
             </h:form>
@@ -38,7 +36,7 @@
         </div>
         <div class="header-right">
             <h:form>
-                <h:commandLink action="mainPage.xhtml?faces-redirect=true">
+                <h:commandLink action="#{sessionBean.goToMainPage}">
                     <h:graphicImage library="img" name="blockkbusterr.jpg" styleClass="logo-img"
                                    title="Go to Main Page" alt="Blockk Busterr Logo" />
                 </h:commandLink>

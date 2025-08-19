@@ -223,4 +223,32 @@ public class SessionBean implements Serializable {
     public boolean isGuest() {
         return !isAuthenticated();
     }
+    
+    /**
+     * Navigate to profile page
+     */
+    public String goToProfile() {
+        return "profile.xhtml?faces-redirect=true";
+    }
+    
+    /**
+     * Navigate to login page
+     */
+    public String goToLogin() {
+        return "login.xhtml?faces-redirect=true";
+    }
+    
+    /**
+     * Navigate to register page
+     */
+    public String goToRegister() {
+        return "register.xhtml?faces-redirect=true";
+    }
+    
+    /**
+     * Navigate to main page
+     */
+    public String goToMainPage() {
+        return "mainPage.xhtml?faces-redirect=true";
+    }
 }

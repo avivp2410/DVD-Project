@@ -30,7 +30,7 @@ public class RentalService {
     /**
      * Create a new rental
      */
-    public Rental createRental(Long userId, Long movieId, LocalDate returnDate, String phoneNumber) {
+    public Rental createRental(Long userId, Long movieId, LocalDate returnDate) {
         // Validate user
         Optional<User> userOpt = userRepository.findById(userId);
         if (userOpt.isEmpty()) {
@@ -83,7 +83,6 @@ public class RentalService {
         rental.setMovie(movie);
         rental.setBorrowDate(LocalDate.now());
         rental.setReturnDate(returnDate);
-        rental.setPhoneNumber(phoneNumber);
         rental.setStatus(RentalStatus.ACTIVE);
         
         // Decrease movie quantity
@@ -124,6 +123,13 @@ public class RentalService {
      */
     public Optional<Rental> findRentalById(Long rentalId) {
         return rentalRepository.findById(rentalId);
+    }
+    
+    /**
+     * Find rental by ID with user and movie eagerly loaded
+     */
+    public Optional<Rental> findRentalByIdWithDetails(Long rentalId) {
+        return rentalRepository.findByIdWithDetails(rentalId);
     }
     
     /**

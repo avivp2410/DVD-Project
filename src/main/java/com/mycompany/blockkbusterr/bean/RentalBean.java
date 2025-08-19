@@ -6,7 +6,7 @@ import com.mycompany.blockkbusterr.entity.RentalStatus;
 import com.mycompany.blockkbusterr.service.MovieService;
 import com.mycompany.blockkbusterr.service.RentalService;
 import jakarta.annotation.PostConstruct;
-import jakarta.enterprise.context.RequestScoped;
+import jakarta.faces.view.ViewScoped;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import jakarta.inject.Inject;
@@ -26,7 +26,7 @@ import java.util.logging.Logger;
  * JSF Managed Bean for handling rental operations
  */
 @Named("rentalBean")
-@RequestScoped
+@ViewScoped
 public class RentalBean implements Serializable {
     
     private static final long serialVersionUID = 1L;
@@ -48,10 +48,6 @@ public class RentalBean implements Serializable {
     @NotNull(message = "Return date is required")
     private LocalDate returnDate;
     
-    @NotBlank(message = "Phone number is required")
-    @Pattern(regexp = "^[0-9+\\-\\s()]+$", message = "Please enter a valid phone number")
-    private String phoneNumber;
-    
     private String notes;
     
     // Rental history
@@ -66,30 +62,44 @@ public class RentalBean implements Serializable {
     @PostConstruct
     public void init() {
         try {
+            logger.info("RentalBean.init() started");
+            
             // Get movie ID from URL parameter if present
             String movieIdParam = FacesContext.getCurrentInstance()
                 .getExternalContext().getRequestParameterMap().get("movieId");
             
+            logger.info("Movie ID parameter from URL: " + movieIdParam);
+            
             if (movieIdParam != null && !movieIdParam.isEmpty()) {
                 try {
                     movieId = Long.parseLong(movieIdParam);
+                    logger.info("Parsed movie ID: " + movieId);
                     loadSelectedMovie();
                 } catch (NumberFormatException e) {
-                    logger.warning("Invalid movie ID parameter: " + movieIdParam);
+                    logger.warning("Invalid movie ID parameter: " + movieIdParam + ", error: " + e.getMessage());
                     addErrorMessage("Invalid movie selection.");
                 }
+            } else {
+                logger.info("No movieId parameter provided in URL - this is normal for rental history page");
             }
             
             // Set default return date (1 week from now)
             returnDate = LocalDate.now().plusWeeks(1);
+            logger.info("Set default return date: " + returnDate);
             
             // Load user rentals if authenticated
             if (sessionBean.isAuthenticated()) {
+                logger.info("User is authenticated, loading user rentals");
                 loadUserRentals();
+            } else {
+                logger.info("User is not authenticated, skipping rental load");
             }
+            
+            logger.info("RentalBean.init() completed successfully");
             
         } catch (Exception e) {
             logger.severe("Error initializing RentalBean: " + e.getMessage());
+            e.printStackTrace();
             addErrorMessage("An error occurred while loading rental information.");
         }
     }
@@ -98,15 +108,29 @@ public class RentalBean implements Serializable {
      * Load the selected movie for rental
      */
     private void loadSelectedMovie() {
+        logger.info("loadSelectedMovie() called with movieId: " + movieId);
+        
         if (movieId != null) {
-            Optional<Movie> movieOpt = movieService.findMovieById(movieId);
-            if (movieOpt.isPresent()) {
-                selectedMovie = movieOpt.get();
-                logger.info("Loaded movie for rental: " + selectedMovie.getTitle());
-            } else {
-                addErrorMessage("Movie not found.");
-                logger.warning("Movie not found with ID: " + movieId);
+            try {
+                logger.info("Calling movieService.findMovieById(" + movieId + ")");
+                Optional<Movie> movieOpt = movieService.findMovieById(movieId);
+                
+                if (movieOpt.isPresent()) {
+                    selectedMovie = movieOpt.get();
+                    logger.info("Successfully loaded movie for rental: " + selectedMovie.getTitle() +
+                               " (ID: " + selectedMovie.getMovieId() + ", Available: " + selectedMovie.isAvailable() +
+                               ", Quantity: " + selectedMovie.getQuantity() + ")");
+                } else {
+                    logger.severe("Movie not found with ID: " + movieId + " - movieService returned empty Optional");
+                    addErrorMessage("Movie not found.");
+                }
+            } catch (Exception e) {
+                logger.severe("Exception occurred while loading movie ID " + movieId + ": " + e.getMessage());
+                e.printStackTrace();
+                addErrorMessage("An error occurred loading movie details.");
             }
+        } else {
+            logger.warning("loadSelectedMovie() called but movieId is null");
         }
     }
     
@@ -153,8 +177,7 @@ public class RentalBean implements Serializable {
             Rental rental = rentalService.createRental(
                 sessionBean.getCurrentUserId(),
                 selectedMovie.getMovieId(),
-                returnDate,
-                phoneNumber
+                returnDate
             );
             
             if (notes != null && !notes.trim().isEmpty()) {
@@ -175,6 +198,70 @@ public class RentalBean implements Serializable {
             return null;
         } catch (Exception e) {
             logger.severe("Error creating rental: " + e.getMessage());
+            addErrorMessage("An error occurred while processing your rental. Please try again.");
+            return null;
+        }
+    }
+    
+    /**
+     * Quick rental method - rent movie for 1 week automatically
+     */
+    public String quickRentMovie(Long movieId) {
+        try {
+            logger.info("Quick rental started for movieId: " + movieId);
+            
+            // Check authentication
+            if (!sessionBean.isAuthenticated()) {
+                addErrorMessage("You must be logged in to rent movies.");
+                return "login.xhtml?faces-redirect=true";
+            }
+            
+            // Load the movie
+            Optional<Movie> movieOpt = movieService.findMovieById(movieId);
+            if (movieOpt.isEmpty()) {
+                addErrorMessage("Movie not found.");
+                return null;
+            }
+            
+            Movie movie = movieOpt.get();
+            logger.info("Loaded movie for quick rental: " + movie.getTitle());
+            
+            // Check if movie is available
+            if (!movie.isAvailable()) {
+                addErrorMessage("This movie is currently out of stock.");
+                return null;
+            }
+            
+            // Check if user can rent this movie
+            if (!rentalService.canUserRentMovie(sessionBean.getCurrentUserId(), movieId)) {
+                addErrorMessage("You cannot rent this movie. You may already have an active rental for this movie or have reached the maximum number of rentals.");
+                return null;
+            }
+            
+            // Set return date to 1 week from now
+            LocalDate oneWeekFromNow = LocalDate.now().plusWeeks(1);
+            
+            // Create the rental
+            Rental rental = rentalService.createRental(
+                sessionBean.getCurrentUserId(),
+                movieId,
+                oneWeekFromNow
+            );
+            
+            logger.info("Quick rental created successfully: " + rental.getRentalId());
+            addSuccessMessage("Movie '" + movie.getTitle() + "' rented successfully for 1 week! Due back on " +
+                             oneWeekFromNow.format(DateTimeFormatter.ofPattern("MMM dd, yyyy")));
+            
+            // Redirect to rental history
+            return "rentalHistory.xhtml?faces-redirect=true";
+            
+        } catch (IllegalArgumentException e) {
+            logger.warning("Quick rental failed: " + e.getMessage());
+            addErrorMessage(e.getMessage());
+            return null;
+        } catch (Exception e) {
+            logger.severe("Error during quick rental: " + e.getMessage());
+            e.printStackTrace();
             addErrorMessage("An error occurred while processing your rental. Please try again.");
             return null;
         }
@@ -235,6 +322,89 @@ public class RentalBean implements Serializable {
         } catch (Exception e) {
             logger.severe("Error extending rental: " + e.getMessage());
             addErrorMessage("Error extending rental: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Return a movie for regular users (user self-service)
+     */
+    public void userReturnMovie(Long rentalId) {
+        try {
+            // Check authentication
+            if (!sessionBean.isAuthenticated()) {
+                addErrorMessage("You must be logged in to return movies.");
+                return;
+            }
+            
+            // Find the rental with user and movie details eagerly loaded
+            Optional<Rental> rentalOpt = rentalService.findRentalByIdWithDetails(rentalId);
+            if (rentalOpt.isEmpty()) {
+                addErrorMessage("Rental not found.");
+                return;
+            }
+            
+            Rental rental = rentalOpt.get();
+            
+            // Check if rental is active first
+            if (rental.getStatus() != RentalStatus.ACTIVE) {
+                addErrorMessage("This rental is not active and cannot be returned.");
+                return;
+            }
+            
+            // Validate that the rental belongs to the current user
+            // Handle potential lazy loading issue with user relationship
+            try {
+                if (rental.getUser() == null || !rental.getUser().getUserId().equals(sessionBean.getCurrentUserId())) {
+                    logger.warning("User " + sessionBean.getCurrentUserId() +
+                                 " attempted to return rental " + rentalId +
+                                 " - access denied or user relationship not loaded properly");
+                    addErrorMessage("Access denied. You can only return your own rentals.");
+                    return;
+                }
+            } catch (Exception userLoadException) {
+                // If we can't load the user due to lazy loading, use alternative validation
+                logger.warning("Could not validate user ownership due to lazy loading: " + userLoadException.getMessage());
+                
+                // Alternative validation: check if the rental ID exists in user's current rentals
+                boolean isUserRental = userRentals != null && userRentals.stream()
+                    .anyMatch(r -> r.getRentalId().equals(rentalId));
+                
+                if (!isUserRental) {
+                    addErrorMessage("Access denied. You can only return your own rentals.");
+                    return;
+                }
+            }
+            
+            // Process the return
+            boolean success = rentalService.returnRental(rentalId);
+            
+            if (success) {
+                // Get movie title safely
+                String movieTitle = "the movie";
+                try {
+                    if (rental.getMovie() != null && rental.getMovie().getTitle() != null) {
+                        movieTitle = "'" + rental.getMovie().getTitle() + "'";
+                    }
+                } catch (Exception e) {
+                    // If movie can't be loaded, use generic message
+                    logger.warning("Could not load movie title: " + e.getMessage());
+                }
+                
+                addSuccessMessage("Movie " + movieTitle + " returned successfully.");
+                
+                // Force refresh the rental lists to update the UI
+                loadUserRentals();
+                filterRentals(); // Also refresh the filtered list
+                
+                logger.info("Rental return successful, lists refreshed");
+            } else {
+                addErrorMessage("Failed to process movie return. Please try again.");
+            }
+            
+        } catch (Exception e) {
+            logger.severe("Error returning movie for user: " + e.getMessage());
+            e.printStackTrace();
+            addErrorMessage("An error occurred while processing the return: " + e.getMessage());
         }
     }
     
@@ -348,6 +518,14 @@ public class RentalBean implements Serializable {
     }
     
     /**
+     * Navigate to movie details page
+     */
+    public String viewMovieDetails(Long movieId) {
+        logger.info("Navigating to movie details for movieId: " + movieId);
+        return "movie.xhtml?faces-redirect=true&movieId=" + movieId;
+    }
+    
+    /**
      * Get formatted return date
      */
     public String getFormattedReturnDate() {
@@ -364,7 +542,6 @@ public class RentalBean implements Serializable {
         movieId = null;
         selectedMovie = null;
         returnDate = LocalDate.now().plusWeeks(1);
-        phoneNumber = "";
         notes = "";
     }
     
@@ -406,14 +583,6 @@ public class RentalBean implements Serializable {
     
     public void setReturnDate(LocalDate returnDate) {
         this.returnDate = returnDate;
-    }
-    
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-    
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
     }
     
     public String getNotes() {

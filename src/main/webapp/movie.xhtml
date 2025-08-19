@@ -94,6 +94,8 @@
                     <!-- Add Review Form -->
                     <h:panelGroup rendered="#{sessionBean.authenticated and not movieDetailsBean.userHasReviewed}">
                         <h:form class="review-form">
+                            <!-- Hidden field to preserve movieId during form submission -->
+                            <h:inputHidden value="#{movieDetailsBean.movieId}" />
                             <h3>Write Your Review</h3>
                             
                             <div class="form-group">
