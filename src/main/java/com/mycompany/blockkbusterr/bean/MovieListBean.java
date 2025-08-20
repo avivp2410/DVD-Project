@@ -134,6 +134,15 @@ public class MovieListBean implements Serializable {
      * Toggle availability filter
      */
     public void toggleAvailabilityFilter() {
+        logger.info("toggleAvailabilityFilter() called - showAvailableOnly: " + showAvailableOnly);
+        searchMovies();
+    }
+    
+    /**
+     * AJAX listener method for availability filter toggle
+     */
+    public void toggleAvailabilityFilter(AjaxBehaviorEvent event) {
+        logger.info("toggleAvailabilityFilter(AjaxBehaviorEvent) called - showAvailableOnly: " + showAvailableOnly);
         searchMovies();
     }
     

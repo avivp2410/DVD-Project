@@ -89,15 +89,17 @@
                                                 </div>
                                                 <div class="detail-line">
                                                     <strong>Date:</strong>
-                                                    <h:outputText value="#{rental.borrowDate}">
+                                                    <h:outputText value="#{rental.borrowDate}" rendered="#{rental.borrowDate != null}">
                                                         <f:convertDateTime pattern="MMM dd, yyyy" />
                                                     </h:outputText>
+                                                    <h:outputText value="N/A" rendered="#{rental.borrowDate == null}" />
                                                 </div>
                                                 <div class="detail-line" rendered="#{rental.active}">
                                                     <strong>Due:</strong>
-                                                    <h:outputText value="#{rental.returnDate}">
+                                                    <h:outputText value="#{rental.returnDate}" rendered="#{rental.returnDate != null}">
                                                         <f:convertDateTime pattern="MMM dd, yyyy" />
                                                     </h:outputText>
+                                                    <h:outputText value="N/A" rendered="#{rental.returnDate == null}" />
                                                 </div>
                                             </div>
                                             <div class="rental-actions" rendered="#{rental.active}">
@@ -140,9 +142,10 @@
                                         </div>
                                         <div class="detail-line">
                                             <strong>Due Date:</strong>
-                                            <h:outputText value="#{rental.returnDate}">
+                                            <h:outputText value="#{rental.returnDate}" rendered="#{rental.returnDate != null}">
                                                 <f:convertDateTime pattern="MMM dd, yyyy" />
                                             </h:outputText>
+                                            <h:outputText value="N/A" rendered="#{rental.returnDate == null}" />
                                         </div>
                                     </div>
                                     <div class="rental-actions">

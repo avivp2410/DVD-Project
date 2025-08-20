@@ -10,25 +10,27 @@
     <ui:define name="main-title">Main Page</ui:define>
 
     <ui:define name="header-left-content">
-        <h:form>
-            <!-- User Authentication Section -->
-            <h:panelGroup rendered="#{sessionBean.authenticated}">
-                <span class="welcome-text">Welcome, </span>
-                <h:commandLink action="#{sessionBean.goToProfile}" styleClass="username-display clickable">
-                    <h:outputText value="#{sessionBean.currentUserDisplayName}" />
-                </h:commandLink>
-                
+        <!-- User Authentication Section -->
+        <h:panelGroup rendered="#{sessionBean.authenticated}">
+            <span class="welcome-text">Welcome, </span>
+            <h:link outcome="profile" styleClass="username-display clickable">
+                <h:outputText value="#{sessionBean.currentUserDisplayName}" />
+            </h:link>
+            
+            <h:form style="display: inline;">
                 <h:commandLink value="Logout" action="#{authBean.logout}" styleClass="logout-link" />
-                <span class="separator">|</span>
-            </h:panelGroup>
-            
-            <h:panelGroup rendered="#{not sessionBean.authenticated}">
-                <h:commandLink value="Login" action="#{sessionBean.goToLogin}" styleClass="login-link" />
-                <h:commandLink value="Register" action="#{sessionBean.goToRegister}" styleClass="register-link" />
-                <span class="separator">|</span>
-            </h:panelGroup>
-            
-            <!-- Filter Controls -->
+            </h:form>
+            <span class="separator">|</span>
+        </h:panelGroup>
+        
+        <h:panelGroup rendered="#{not sessionBean.authenticated}">
+            <h:link value="Login" outcome="login" styleClass="login-link" />
+            <h:link value="Register" outcome="register" styleClass="register-link" />
+            <span class="separator">|</span>
+        </h:panelGroup>
+        
+        <!-- Filter Controls -->
+        <h:form id="filterForm">
             <h:selectOneMenu value="#{movieListBean.selectedGenre}" styleClass="filter-select">
                 <f:selectItem itemValue="" itemLabel="All Genres" />
                 <f:selectItems value="#{movieListBean.availableGenres}" var="genre" itemValue="#{genre}" itemLabel="#{genre}" />
@@ -109,9 +111,11 @@
                         <div class="alert alert-info">
                             <h:outputText value="No movies found matching your criteria." />
                             <br/>
-                            <h:commandLink value="Clear filters" action="#{movieListBean.clearFilters}" styleClass="link">
-                                <f:ajax execute="@form" render="movieGrid movieCount" />
-                            </h:commandLink>
+                            <h:form>
+                                <h:commandButton value="Clear filters" action="#{movieListBean.clearFilters}" styleClass="link btn btn-link">
+                                    <f:ajax execute="@form" render="movieGrid movieCount" />
+                                </h:commandButton>
+                            </h:form>
                         </div>
                     </h:panelGroup>
                 </div>
@@ -384,6 +388,21 @@
             
             .availability-filter {
                 margin: 0 5px;
+            }
+            
+            /* Button link style for clear filters */
+            .btn-link {
+                background: none;
+                border: none;
+                color: var(--secondary-color);
+                text-decoration: underline;
+                cursor: pointer;
+                padding: 0;
+                font-size: inherit;
+            }
+            
+            .btn-link:hover {
+                color: var(--hover-blue);
             }
             
         </style>
