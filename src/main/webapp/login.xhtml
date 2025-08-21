@@ -76,21 +76,7 @@
                            styleClass="signup-button"
                            immediate="true" />
             
-            <!-- Browse as guest link -->
-            <div class="guest-access">
-                <h:commandLink value="Browse as Guest"
-                             action="#{authBean.goToMainPage()}"
-                             styleClass="guest-link" />
-            </div>
             
-            <!-- Forgot password link -->
-            <div class="forgot-password">
-                <h:commandLink value="Forgot Password?"
-                             action="#{authBean.forgotPassword()}"
-                             styleClass="forgot-link">
-                    <f:ajax execute="@this" render="@form :messages" />
-                </h:commandLink>
-            </div>
         </h:form>
     </div>
     
@@ -230,23 +216,6 @@
         .signup-button:hover {
             transform: scale(1.05);
             box-shadow: 0 0 15px var(--shadow-dark);
-        }
-        
-        .guest-access, .forgot-password {
-            margin-top: 15px;
-            text-align: center;
-        }
-        
-        .guest-link, .forgot-link {
-            color: var(--secondary-color);
-            text-decoration: none;
-            font-size: 0.95em;
-            transition: color 0.3s ease;
-        }
-        
-        .guest-link:hover, .forgot-link:hover {
-            color: var(--hover-blue);
-            text-decoration: underline;
         }
         
         .messages {

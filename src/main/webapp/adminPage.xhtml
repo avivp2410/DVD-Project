@@ -89,17 +89,11 @@
                                                 </div>
                                                 <div class="detail-line">
                                                     <strong>Date:</strong>
-                                                    <h:outputText value="#{rental.borrowDate}" rendered="#{rental.borrowDate != null}">
-                                                        <f:convertDateTime pattern="MMM dd, yyyy" />
-                                                    </h:outputText>
-                                                    <h:outputText value="N/A" rendered="#{rental.borrowDate == null}" />
+                                                    <h:outputText value="#{adminBean.formatDate(rental.borrowDate)}" />
                                                 </div>
                                                 <div class="detail-line" rendered="#{rental.active}">
                                                     <strong>Due:</strong>
-                                                    <h:outputText value="#{rental.returnDate}" rendered="#{rental.returnDate != null}">
-                                                        <f:convertDateTime pattern="MMM dd, yyyy" />
-                                                    </h:outputText>
-                                                    <h:outputText value="N/A" rendered="#{rental.returnDate == null}" />
+                                                    <h:outputText value="#{adminBean.formatDate(rental.returnDate)}" />
                                                 </div>
                                             </div>
                                             <div class="rental-actions" rendered="#{rental.active}">
@@ -142,10 +136,7 @@
                                         </div>
                                         <div class="detail-line">
                                             <strong>Due Date:</strong>
-                                            <h:outputText value="#{rental.returnDate}" rendered="#{rental.returnDate != null}">
-                                                <f:convertDateTime pattern="MMM dd, yyyy" />
-                                            </h:outputText>
-                                            <h:outputText value="N/A" rendered="#{rental.returnDate == null}" />
+                                            <h:outputText value="#{adminBean.formatDate(rental.returnDate)}" />
                                         </div>
                                     </div>
                                     <div class="rental-actions">
@@ -163,47 +154,54 @@
                     </div>
                 </div>
 
-                <!-- Low Stock Movies Section -->
-                <div class="admin-section">
+                <!-- Movie Stock Section -->
+                <div class="admin-section" id="movieStockSection">
                     <div class="section-header">
-                        <h2>Low Stock Movies</h2>
+                        <h2>Movie Stock</h2>
                         <h:form>
                             <h:commandButton value="Add Movie" action="#{adminBean.addMovie}" styleClass="btn btn-primary btn-small" />
                         </h:form>
                     </div>
                     
-                    <h:panelGroup rendered="#{empty adminBean.lowStockMovies}">
-                        <div class="no-data">All movies are well stocked!</div>
-                    </h:panelGroup>
-                    
-                    <h:panelGroup rendered="#{not empty adminBean.lowStockMovies}">
-                        <div class="scroll-container">
-                            <div class="movie-stock-list">
-                                <ui:repeat value="#{adminBean.lowStockMovies}" var="movie">
-                                    <div class="movie-item #{adminBean.getStockLevelClass(movie)}">
-                                        <div class="movie-header">
-                                            <h4 class="movie-title">#{movie.title}</h4>
-                                            <span class="stock-count">Stock: #{movie.quantity}</span>
-                                        </div>
-                                        <div class="movie-details">
-                                            <div class="detail-line">
-                                                <strong>Genre:</strong> #{movie.genre}
+                    <h:panelGroup id="movieStockContent">
+                        <h:panelGroup rendered="#{empty adminBean.lowStockMovies}">
+                            <div class="no-data">All movies are well stocked!</div>
+                        </h:panelGroup>
+                        
+                        <h:panelGroup rendered="#{not empty adminBean.lowStockMovies}">
+                            <div class="scroll-container">
+                                <div class="movie-stock-list">
+                                    <ui:repeat value="#{adminBean.lowStockMovies}" var="movie">
+                                        <div class="movie-item #{adminBean.getStockLevelClass(movie)}">
+                                            <div class="movie-header">
+                                                <h4 class="movie-title">#{movie.title}</h4>
+                                                <span class="stock-count">Stock: #{movie.quantity}</span>
                                             </div>
-                                            <div class="detail-line">
-                                                <strong>Year:</strong> #{movie.releaseYear}
+                                            <div class="movie-details">
+                                                <div class="detail-line">
+                                                    <strong>Genre:</strong> #{movie.genre}
+                                                </div>
+                                                <div class="detail-line">
+                                                    <strong>Year:</strong> #{movie.releaseYear}
+                                                </div>
+                                            </div>
+                                            <div class="movie-actions">
+                                                <h:form>
+                                                    <h:commandButton value="Edit"
+                                                                   action="#{adminBean.editMovie(movie.movieId)}"
+                                                                   styleClass="btn btn-primary btn-small" />
+                                                    <h:commandButton value="Delete"
+                                                                   action="#{adminBean.deleteMovie(movie.movieId)}"
+                                                                   styleClass="btn btn-danger btn-small">
+                                                        <f:ajax execute="@form" render="movieStockContent :messages" />
+                                                    </h:commandButton>
+                                                </h:form>
                                             </div>
                                         </div>
-                                        <div class="movie-actions">
-                                            <h:form>
-                                                <h:commandButton value="Edit"
-                                                               action="#{adminBean.editMovie(movie.movieId)}"
-                                                               styleClass="btn btn-primary btn-small" />
-                                            </h:form>
-                                        </div>
-                                    </div>
-                                </ui:repeat>
+                                    </ui:repeat>
+                                </div>
                             </div>
-                        </div>
+                        </h:panelGroup>
                     </h:panelGroup>
                 </div>
 
@@ -211,29 +209,17 @@
                 <div class="admin-section">
                     <div class="section-header">
                         <h2>User Management</h2>
-                        <h:form class="search-form">
-                            <h:inputText value="#{adminBean.userSearchTerm}"
-                                       styleClass="search-input"
-                                       placeholder="Search users by name...">
-                                <f:ajax event="keyup" execute="@this" render="userList" listener="#{adminBean.searchUsers}" />
-                            </h:inputText>
-                            <h:commandButton value="Search"
-                                           action="#{adminBean.searchUsers}"
-                                           styleClass="btn btn-secondary btn-small">
-                                <f:ajax execute="@form" render="userList" />
-                            </h:commandButton>
-                        </h:form>
                     </div>
                     
                     <h:panelGroup id="userList">
-                        <h:panelGroup rendered="#{empty adminBean.filteredUsers}">
-                            <div class="no-data">No users found matching search criteria.</div>
+                        <h:panelGroup rendered="#{empty adminBean.users}">
+                            <div class="no-data">No users found.</div>
                         </h:panelGroup>
                         
-                        <h:panelGroup rendered="#{not empty adminBean.filteredUsers}">
+                        <h:panelGroup rendered="#{not empty adminBean.users}">
                             <div class="scroll-container">
                                 <div class="user-list">
-                                    <ui:repeat value="#{adminBean.filteredUsers}" var="user" varStatus="status">
+                                    <ui:repeat value="#{adminBean.users}" var="user" varStatus="status">
                                         <h:panelGroup rendered="#{status.index lt 20}">
                                             <div class="user-item #{adminBean.getUserStatusClass(user)}">
                                                 <div class="user-header">

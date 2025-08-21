@@ -23,21 +23,55 @@
         <!-- Admin content -->
         <h:panelGroup rendered="#{sessionBean.admin}">
         <div class="register-form-container">
-            <h2>Edit Movie Details</h2>
+            <h2>#{movieManagementBean.pageTitle}</h2>
+            
+            <!-- Display messages -->
+            <h:messages id="messages" styleClass="messages" errorClass="error-message"
+                       infoClass="info-message" warnClass="warn-message" />
+            
             <h:form class="register-form">
                 <h:outputLabel for="title" value="Title:" />
-                <h:inputText id="title" value="" />
+                <h:inputText id="title" value="#{movieManagementBean.title}" required="true"
+                           requiredMessage="Title is required" />
+                
                 <h:outputLabel for="releaseDate" value="Release Date:" />
-                <h:inputText id="releaseDate" value="" />
+                <h:inputText id="releaseDate" value="#{movieManagementBean.releaseDate}" required="true"
+                           requiredMessage="Release date is required">
+                    <f:convertDateTime pattern="yyyy-MM-dd" type="localDate" />
+                </h:inputText>
+                
                 <h:outputLabel for="duration" value="Duration (min):" />
-                <h:inputText id="duration" value="" />
+                <h:inputText id="duration" value="#{movieManagementBean.duration}" required="true"
+                           requiredMessage="Duration is required">
+                    <f:convertNumber integerOnly="true" />
+                </h:inputText>
+                
                 <h:outputLabel for="genre" value="Genre:" />
-                <h:inputText id="genre" value="" />
+                <h:inputText id="genre" value="#{movieManagementBean.genre}" required="true"
+                           requiredMessage="Genre is required" />
+                
                 <h:outputLabel for="quantity" value="Quantity:" />
-                <h:inputText id="quantity" value="" />
+                <h:inputText id="quantity" value="#{movieManagementBean.quantity}" required="true"
+                           requiredMessage="Quantity is required">
+                    <f:convertNumber integerOnly="true" />
+                </h:inputText>
+                
                 <h:outputLabel for="description" value="Description:" />
-                <h:inputTextarea id="description" value="" rows="3" cols="50" />
-                <h:commandButton value="Update Movie" type="submit" />
+                <h:inputTextarea id="description" value="#{movieManagementBean.description}"
+                               rows="3" cols="50" />
+                
+                <div class="form-buttons">
+                    <h:commandButton value="#{movieManagementBean.submitButtonLabel}"
+                                   action="#{movieManagementBean.updateMovie()}"
+                                   rendered="#{movieManagementBean.editMode}"
+                                   styleClass="btn btn-primary" />
+                    <h:commandButton value="#{movieManagementBean.submitButtonLabel}"
+                                   action="#{movieManagementBean.addMovie()}"
+                                   rendered="#{not movieManagementBean.editMode}"
+                                   styleClass="btn btn-primary" />
+                    <h:commandButton value="Cancel" action="#{movieManagementBean.cancel()}"
+                                   immediate="true" styleClass="btn btn-secondary" />
+                </div>
             </h:form>
         </div>
         </h:panelGroup>

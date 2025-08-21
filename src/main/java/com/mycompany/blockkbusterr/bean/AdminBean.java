@@ -196,6 +196,13 @@ public class AdminBean implements Serializable {
     }
     
     /**
+     * Search users by name - Ajax listener version
+     */
+    public void searchUsers(jakarta.faces.event.AjaxBehaviorEvent event) {
+        searchUsers();
+    }
+    
+    /**
      * Process return for a rental
      */
     public void processReturn(Long rentalId) {
@@ -292,6 +299,31 @@ public class AdminBean implements Serializable {
      */
     public String addMovie() {
         return "addMovie.xhtml?faces-redirect=true";
+    }
+    
+    /**
+     * Delete a movie
+     */
+    public void deleteMovie(Long movieId) {
+        try {
+            logger.info("Attempting to delete movie with ID: " + movieId);
+            boolean success = movieService.deleteMovie(movieId);
+            
+            if (success) {
+                addSuccessMessage("Movie deleted successfully.");
+                logger.info("Movie deleted successfully: " + movieId);
+                // Refresh all data to ensure UI is updated
+                loadLowStockMovies();
+                loadAllMovies();
+                loadStats();
+            } else {
+                addErrorMessage("Failed to delete movie. Movie may have active rentals or does not exist.");
+                logger.warning("Failed to delete movie: " + movieId);
+            }
+        } catch (Exception e) {
+            logger.severe("Error deleting movie: " + e.getMessage());
+            addErrorMessage("Error deleting movie: " + e.getMessage());
+        }
     }
     
     /**
@@ -477,5 +509,35 @@ public class AdminBean implements Serializable {
      */
     public String goToMainPage() {
         return "mainPage.xhtml?faces-redirect=true";
+    }
+    
+    /**
+     * Safely format date for display - prevents conversion errors
+     */
+    public String formatDate(java.time.LocalDate date) {
+        if (date == null) {
+            return "N/A";
+        }
+        try {
+            return date.format(java.time.format.DateTimeFormatter.ofPattern("MMM dd, yyyy"));
+        } catch (Exception e) {
+            logger.warning("Error formatting date: " + e.getMessage());
+            return "Invalid Date";
+        }
+    }
+    
+    /**
+     * Safely format date for display - prevents conversion errors
+     */
+    public String formatDate(java.time.LocalDateTime dateTime) {
+        if (dateTime == null) {
+            return "N/A";
+        }
+        try {
+            return dateTime.format(java.time.format.DateTimeFormatter.ofPattern("MMM dd, yyyy HH:mm"));
+        } catch (Exception e) {
+            logger.warning("Error formatting datetime: " + e.getMessage());
+            return "Invalid Date";
+        }
     }
 }

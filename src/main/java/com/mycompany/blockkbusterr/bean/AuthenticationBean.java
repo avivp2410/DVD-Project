@@ -139,15 +139,6 @@ public class AuthenticationBean implements Serializable {
     }
     
     /**
-     * Handle forgot password (placeholder for future implementation)
-     */
-    public String forgotPassword() {
-        // Placeholder for forgot password functionality
-        addInfoMessage("Forgot password functionality will be available soon. Please contact administrator.");
-        return null;
-    }
-    
-    /**
      * Validate login form
      */
     public boolean isFormValid() {
