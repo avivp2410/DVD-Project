@@ -9,47 +9,36 @@
     <ui:define name="title">Blockk Busterr - Main Page</ui:define>
     <ui:define name="main-title">Main Page</ui:define>
 
-    <ui:define name="header-left-content">
-        <!-- User Authentication Section -->
-        <h:panelGroup rendered="#{sessionBean.authenticated}">
-            <span class="welcome-text">Welcome, </span>
-            <h:link outcome="profile" styleClass="username-display clickable">
-                <h:outputText value="#{sessionBean.currentUserDisplayName}" />
-            </h:link>
-            
-            <h:form style="display: inline;">
-                <h:commandLink value="Logout" action="#{authBean.logout}" styleClass="logout-link" />
-            </h:form>
-            <span class="separator">|</span>
-        </h:panelGroup>
-        
-        <h:panelGroup rendered="#{not sessionBean.authenticated}">
-            <h:link value="Login" outcome="login" styleClass="login-link" />
-            <h:link value="Register" outcome="register" styleClass="register-link" />
-            <span class="separator">|</span>
-        </h:panelGroup>
-        
-        <!-- Filter Controls -->
-        <h:form id="filterForm">
-            <h:selectOneMenu value="#{movieListBean.selectedGenre}" styleClass="filter-select">
-                <f:selectItem itemValue="" itemLabel="All Genres" />
-                <f:selectItems value="#{movieListBean.availableGenres}" var="genre" itemValue="#{genre}" itemLabel="#{genre}" />
-                <f:ajax execute="@this" render="movieGrid movieCount" listener="#{movieListBean.onGenreChange}" />
-            </h:selectOneMenu>
-            
-            <h:selectBooleanCheckbox value="#{movieListBean.showAvailableOnly}" styleClass="availability-filter">
-                <f:ajax execute="@this" render="movieGrid movieCount" listener="#{movieListBean.toggleAvailabilityFilter}" />
-            </h:selectBooleanCheckbox>
-            <h:outputLabel value="Available Only" styleClass="filter-label" />
-            
-            <!-- Search Input -->
-            <h:inputText value="#{movieListBean.searchTerm}" styleClass="search-input" placeholder="Search movies...">
-                <f:ajax event="keyup" execute="@this" render="movieGrid movieCount" listener="#{movieListBean.onSearchKeyup}" />
-            </h:inputText>
-        </h:form>
-    </ui:define>
 
     <ui:define name="content">
+        <!-- Filter Controls Header (Main Page Only) -->
+        <div class="filters-header">
+            <h:form id="filterForm">
+                <div class="filter-controls">
+                    <div class="filter-group">
+                        <h:selectOneMenu value="#{movieListBean.selectedGenre}" styleClass="filter-select">
+                            <f:selectItem itemValue="" itemLabel="All Genres" />
+                            <f:selectItems value="#{movieListBean.availableGenres}" var="genre" itemValue="#{genre}" itemLabel="#{genre}" />
+                            <f:ajax execute="@this" render="movieGrid movieCount" listener="#{movieListBean.onGenreChange}" />
+                        </h:selectOneMenu>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <h:selectBooleanCheckbox value="#{movieListBean.showAvailableOnly}" styleClass="availability-filter">
+                            <f:ajax execute="@this" render="movieGrid movieCount" listener="#{movieListBean.toggleAvailabilityFilter}" />
+                        </h:selectBooleanCheckbox>
+                        <h:outputLabel value="Available Only" styleClass="filter-label" />
+                    </div>
+                    
+                    <div class="filter-group search-group">
+                        <h:inputText value="#{movieListBean.searchTerm}" styleClass="search-input" placeholder="Search movies...">
+                            <f:ajax event="keyup" execute="@this" render="movieGrid movieCount" listener="#{movieListBean.onSearchKeyup}" />
+                        </h:inputText>
+                    </div>
+                </div>
+            </h:form>
+        </div>
+        
         <div class="movies-grid-container">
             <div class="movies-header">
                 <h2>Movies</h2>
@@ -124,6 +113,68 @@
         
         <!-- Movie Grid Styles -->
         <style type="text/css">
+            /* Filter Header Styles */
+            .filters-header {
+                background: var(--darker-gray-bg);
+                border-bottom: 2px solid var(--secondary-color);
+                padding: 15px 0;
+                margin-bottom: 20px;
+                box-shadow: 0 2px 10px var(--shadow-dark);
+            }
+            
+            .filter-controls {
+                max-width: 1200px;
+                margin: 0 auto;
+                display: flex;
+                gap: 20px;
+                align-items: center;
+                justify-content: center;
+                flex-wrap: wrap;
+                padding: 0 20px;
+            }
+            
+            .filter-group {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            
+            .search-group {
+                flex-grow: 1;
+                max-width: 300px;
+            }
+            
+            .filter-select, .search-input {
+                padding: 8px 12px;
+                border: 1px solid var(--secondary-color);
+                border-radius: 6px;
+                background: var(--darker-gray-bg);
+                color: var(--light-text);
+                min-width: 150px;
+                transition: border-color 0.3s ease;
+            }
+            
+            .filter-select:focus, .search-input:focus {
+                outline: none;
+                border-color: var(--hover-blue);
+                box-shadow: 0 0 5px rgba(0, 86, 179, 0.3);
+            }
+            
+            .search-input {
+                min-width: 250px;
+                width: 100%;
+            }
+            
+            .filter-label {
+                color: var(--light-text);
+                font-weight: 500;
+                white-space: nowrap;
+            }
+            
+            .availability-filter {
+                margin: 0;
+            }
+            
             .movies-grid-container {
                 max-width: 1200px;
                 margin: 0 auto;
@@ -335,60 +386,6 @@
                 color: var(--hover-blue);
             }
             
-            /* Authentication Elements */
-            .welcome-text {
-                color: var(--light-text);
-                margin-right: 5px;
-            }
-            
-            .username-display.clickable {
-                color: var(--secondary-color);
-                text-decoration: none;
-                font-weight: bold;
-                margin-right: 15px;
-            }
-            
-            .username-display.clickable:hover {
-                color: var(--hover-blue);
-                text-decoration: underline;
-            }
-            
-            .logout-link, .login-link, .register-link {
-                color: var(--secondary-color);
-                text-decoration: none;
-                margin: 0 10px;
-                font-weight: bold;
-            }
-            
-            .logout-link:hover, .login-link:hover, .register-link:hover {
-                color: var(--hover-blue);
-                text-decoration: underline;
-            }
-            
-            .separator {
-                color: var(--light-text);
-                margin: 0 10px;
-            }
-            
-            /* Filter Controls in Header */
-            .filter-select, .search-input {
-                padding: 6px 12px;
-                border: 1px solid var(--secondary-color);
-                border-radius: 4px;
-                background: var(--darker-gray-bg);
-                color: var(--light-text);
-                margin: 0 8px;
-            }
-            
-            .filter-label {
-                color: var(--light-text);
-                margin-left: 5px;
-                margin-right: 10px;
-            }
-            
-            .availability-filter {
-                margin: 0 5px;
-            }
             
             /* Button link style for clear filters */
             .btn-link {
@@ -403,6 +400,32 @@
             
             .btn-link:hover {
                 color: var(--hover-blue);
+            }
+            
+            /* Responsive Design for Filter Header */
+            @media (max-width: 768px) {
+                .filter-controls {
+                    flex-direction: column;
+                    gap: 15px;
+                    align-items: stretch;
+                }
+                
+                .filter-group {
+                    justify-content: center;
+                }
+                
+                .search-group {
+                    max-width: none;
+                }
+                
+                .filter-select, .search-input {
+                    min-width: auto;
+                    width: 100%;
+                }
+                
+                .search-input {
+                    min-width: auto;
+                }
             }
             
         </style>
