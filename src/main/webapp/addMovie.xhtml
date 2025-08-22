@@ -37,7 +37,7 @@
                 <h:outputLabel for="releaseYear" value="Release Year:" />
                 <h:inputText id="releaseYear" value="#{movieManagementBean.releaseYear}" required="true"
                            requiredMessage="Release year is required">
-                    <f:convertNumber integerOnly="true" />
+                    <f:convertNumber integerOnly="true" groupingUsed="false" />
                     <f:validateLongRange minimum="1888" maximum="2030" />
                 </h:inputText>
                 
