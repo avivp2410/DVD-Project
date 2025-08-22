@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tomee>
-    <!-- MySQL DataSource Configuration -->
+<resources>
+    <!-- MySQL DataSource Configuration for TomEE -->
     <Resource id="blockkbusterrDS" type="DataSource">
         JdbcDriver com.mysql.cj.jdbc.Driver
         JdbcUrl jdbc:mysql://localhost:3306/blockkbusterr?useSSL=false&amp;allowPublicKeyRetrieval=true&amp;serverTimezone=UTC
@@ -39,4 +39,4 @@
         TimeBetweenEvictionRunsMillis 30000
         MinEvictableIdleTimeMillis 60000
     </Resource>
-</tomee>
+</resources>

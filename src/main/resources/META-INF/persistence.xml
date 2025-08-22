@@ -14,9 +14,10 @@
         <exclude-unlisted-classes>false</exclude-unlisted-classes>
         
         <properties>
-            <!-- OpenJPA properties for table creation with HSQL compatibility -->
+            <!-- OpenJPA properties for table creation with MySQL compatibility -->
             <property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema(ForeignKeys=true)"/>
-            <property name="openjpa.jdbc.DBDictionary" value="hsql"/>
+            <property name="openjpa.jdbc.DBDictionary" value="org.apache.openjpa.jdbc.sql.MySQLDictionary"/>
+            <property name="openjpa.jdbc.Schema" value="blockkbusterr"/>
             <property name="openjpa.Log" value="DefaultLevel=INFO, Tool=INFO, SQL=TRACE"/>
         </properties>
     </persistence-unit>
