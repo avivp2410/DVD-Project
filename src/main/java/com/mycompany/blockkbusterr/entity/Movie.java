@@ -1,12 +1,12 @@
 package com.mycompany.blockkbusterr.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,9 +34,11 @@ public class Movie implements Serializable {
     @Column(name = "title", nullable = false, length = 200)
     private String title;
     
-    @NotNull(message = "Release date is required")
-    @Column(name = "release_date", nullable = false)
-    private LocalDate releaseDate;
+    @NotNull(message = "Release year is required")
+    @Min(value = 1888, message = "Release year must be 1888 or later")
+    @Max(value = 2030, message = "Release year cannot be more than 5 years in future")
+    @Column(name = "release_year", nullable = false)
+    private Integer releaseYear;
     
     @NotNull(message = "Duration is required")
     @Min(value = 1, message = "Duration must be at least 1 minute")
@@ -78,10 +80,10 @@ public class Movie implements Serializable {
         this.createdAt = LocalDateTime.now();
     }
     
-    public Movie(String title, LocalDate releaseDate, Integer duration, String genre, Integer quantity) {
+    public Movie(String title, Integer releaseYear, Integer duration, String genre, Integer quantity) {
         this();
         this.title = title;
-        this.releaseDate = releaseDate;
+        this.releaseYear = releaseYear;
         this.duration = duration;
         this.genre = genre;
         this.quantity = quantity;
@@ -110,12 +112,12 @@ public class Movie implements Serializable {
         this.title = title;
     }
     
-    public LocalDate getReleaseDate() {
-        return releaseDate;
+    public Integer getReleaseYear() {
+        return releaseYear;
     }
     
-    public void setReleaseDate(LocalDate releaseDate) {
-        this.releaseDate = releaseDate;
+    public void setReleaseYear(Integer releaseYear) {
+        this.releaseYear = releaseYear;
     }
     
     public Integer getDuration() {
@@ -196,9 +198,6 @@ public class Movie implements Serializable {
         return quantity != null && quantity > 0;
     }
     
-    public int getReleaseYear() {
-        return releaseDate != null ? releaseDate.getYear() : 0;
-    }
     
     public String getDurationFormatted() {
         if (duration == null) return "Unknown";
@@ -227,7 +226,7 @@ public class Movie implements Serializable {
         return "Movie{" +
                 "movieId=" + movieId +
                 ", title='" + title + '\'' +
-                ", releaseDate=" + releaseDate +
+                ", releaseYear=" + releaseYear +
                 ", duration=" + duration +
                 ", genre='" + genre + '\'' +
                 ", quantity=" + quantity +

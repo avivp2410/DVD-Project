@@ -22,13 +22,30 @@ public class DatabaseStartupBean {
     
     @PostConstruct
     public void initialize() {
-        logger.info("DatabaseStartupBean initializing...");
+        logger.info("=== DatabaseStartupBean @PostConstruct called ===");
+        
+        // Check if properties are loaded
+        String initProperty = System.getProperty("blockkbusterr.db.initialize");
+        String adminUsername = System.getProperty("blockkbusterr.admin.username");
+        logger.info("System property 'blockkbusterr.db.initialize': " + initProperty);
+        logger.info("System property 'blockkbusterr.admin.username': " + adminUsername);
+        
+        // Check if DatabaseInitializationService is available
+        if (initService == null) {
+            logger.severe("DatabaseInitializationService is NULL - CDI injection failed!");
+            return;
+        } else {
+            logger.info("DatabaseInitializationService injected successfully");
+        }
+        
         try {
-            // The DatabaseInitializationService already observes application startup,
-            // but this provides an additional trigger point if needed
-            logger.info("Database initialization triggered via startup bean.");
+            // Explicitly trigger initialization since CDI event observer might not work
+            logger.info("=== Manually triggering database initialization ===");
+            initService.initializeDefaultData();
+            logger.info("=== Database initialization completed via startup bean ===");
         } catch (Exception e) {
             logger.severe("Database startup initialization failed: " + e.getMessage());
+            e.printStackTrace();
         }
     }
     

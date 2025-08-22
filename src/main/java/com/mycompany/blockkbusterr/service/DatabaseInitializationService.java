@@ -36,25 +36,59 @@ public class DatabaseInitializationService {
      * Initialize database on application startup
      */
     public void onApplicationStart(@Observes @Initialized(ApplicationScoped.class) Object init) {
-        if (!shouldInitialize()) {
+        logger.info("=== CDI ApplicationScoped @Initialized event received ===");
+        logger.info("Event object type: " + (init != null ? init.getClass().getName() : "null"));
+        
+        // Log configuration check
+        boolean shouldInit = shouldInitialize();
+        logger.info("shouldInitialize() returned: " + shouldInit);
+        logger.info("System property 'blockkbusterr.db.initialize': " + System.getProperty(INIT_PROPERTY, "not set"));
+        
+        if (!shouldInit) {
             logger.info("Database initialization disabled by configuration.");
             return;
         }
         
         try {
-            logger.info("Starting database initialization...");
+            logger.info("=== Starting database initialization via CDI event ===");
             initializeDefaultData();
-            logger.info("Database initialization completed successfully.");
+            logger.info("=== Database initialization completed successfully via CDI event ===");
         } catch (Exception e) {
-            logger.severe("Database initialization failed: " + e.getMessage());
+            logger.severe("Database initialization failed via CDI event: " + e.getMessage());
             e.printStackTrace();
         }
     }
     
     @Transactional
     public void initializeDefaultData() {
-        initializeAdminUser();
-        initializeSampleMovies();
+        logger.info("=== initializeDefaultData() method called ===");
+        
+        // Check if repositories are available
+        if (userRepository == null) {
+            logger.severe("UserRepository is NULL - CDI injection failed!");
+            throw new RuntimeException("UserRepository injection failed");
+        }
+        if (movieRepository == null) {
+            logger.severe("MovieRepository is NULL - CDI injection failed!");
+            throw new RuntimeException("MovieRepository injection failed");
+        }
+        
+        logger.info("All repositories injected successfully");
+        
+        try {
+            logger.info("Initializing admin user...");
+            initializeAdminUser();
+            logger.info("Admin user initialization completed");
+            
+            logger.info("Initializing sample movies...");
+            initializeSampleMovies();
+            logger.info("Sample movies initialization completed");
+            
+        } catch (Exception e) {
+            logger.severe("Error during data initialization: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
     
     /**
@@ -102,35 +136,35 @@ public class DatabaseInitializationService {
         logger.info("Creating sample movie dataset...");
         
         Movie[] sampleMovies = {
-            createMovie("The Shawshank Redemption", "1994-09-23", 142, "Drama", 3, "Two imprisoned friends bond over a number of years, finding solace and eventual redemption through acts of common decency."),
+            createMovie("The Shawshank Redemption", 1994, 142, "Drama", 3, "Two imprisoned friends bond over a number of years, finding solace and eventual redemption through acts of common decency."),
                 
-            createMovie("The Godfather", "1972-03-24", 175, "Crime", 2, "An organized crime dynasty's aging patriarch transfers control of his clandestine empire to his reluctant son."),
+            createMovie("The Godfather", 1972, 175, "Crime", 2, "An organized crime dynasty's aging patriarch transfers control of his clandestine empire to his reluctant son."),
                 
-            createMovie("The Dark Knight", "2008-07-18", 152, "Action", 4, "When the menace known as the Joker wreaks havoc on Gotham City, Batman must face his greatest challenge."),
+            createMovie("The Dark Knight", 2008, 152, "Action", 4, "When the menace known as the Joker wreaks havoc on Gotham City, Batman must face his greatest challenge."),
                 
-            createMovie("Pulp Fiction", "1994-10-14", 154, "Crime", 2, "The lives of two mob hitmen, a boxer, a gangster and his wife intertwine in four tales of violence and redemption."),
+            createMovie("Pulp Fiction", 1994, 154, "Crime", 2, "The lives of two mob hitmen, a boxer, a gangster and his wife intertwine in four tales of violence and redemption."),
                 
-            createMovie("Forrest Gump", "1994-07-06", 142, "Drama", 3, "The presidencies of Kennedy and Johnson through the eyes of an Alabama man with an IQ of 75."),
+            createMovie("Forrest Gump", 1994, 142, "Drama", 3, "The presidencies of Kennedy and Johnson through the eyes of an Alabama man with an IQ of 75."),
                 
-            createMovie("Inception", "2010-07-16", 148, "Sci-Fi", 3, "A thief who steals corporate secrets through dream-sharing technology is given the inverse task of planting an idea."),
+            createMovie("Inception", 2010, 148, "Sci-Fi", 3, "A thief who steals corporate secrets through dream-sharing technology is given the inverse task of planting an idea."),
                 
-            createMovie("The Matrix", "1999-03-31", 136, "Sci-Fi", 2, "A computer programmer discovers that reality as he knows it is a simulation and must fight to free humanity."),
+            createMovie("The Matrix", 1999, 136, "Sci-Fi", 2, "A computer programmer discovers that reality as he knows it is a simulation and must fight to free humanity."),
                 
-            createMovie("Goodfellas", "1990-09-21", 146, "Crime", 2, "The story of Henry Hill and his life in the mob, covering his relationship with his wife and partners."),
+            createMovie("Goodfellas", 1990, 146, "Crime", 2, "The story of Henry Hill and his life in the mob, covering his relationship with his wife and partners."),
                 
-            createMovie("The Lord of the Rings: The Fellowship of the Ring", "2001-12-19", 178, "Fantasy", 2, "A meek Hobbit and eight companions set out on a journey to destroy the powerful One Ring."),
+            createMovie("The Lord of the Rings: The Fellowship of the Ring", 2001, 178, "Fantasy", 2, "A meek Hobbit and eight companions set out on a journey to destroy the powerful One Ring."),
                 
-            createMovie("Star Wars: Episode IV - A New Hope", "1977-05-25", 121, "Sci-Fi", 3, "Luke Skywalker joins forces with a Jedi Knight to rescue Princess Leia and save the galaxy."),
+            createMovie("Star Wars: Episode IV - A New Hope", 1977, 121, "Sci-Fi", 3, "Luke Skywalker joins forces with a Jedi Knight to rescue Princess Leia and save the galaxy."),
                 
-            createMovie("The Silence of the Lambs", "1991-02-14", 118, "Thriller", 2, "A young FBI cadet must receive help from Dr. Hannibal Lecter to catch another serial killer."),
+            createMovie("The Silence of the Lambs", 1991, 118, "Thriller", 2, "A young FBI cadet must receive help from Dr. Hannibal Lecter to catch another serial killer."),
                 
-            createMovie("Saving Private Ryan", "1998-07-24", 169, "War", 2, "Following the Normandy Landings, a group of soldiers go behind enemy lines to retrieve a paratrooper."),
+            createMovie("Saving Private Ryan", 1998, 169, "War", 2, "Following the Normandy Landings, a group of soldiers go behind enemy lines to retrieve a paratrooper."),
                 
-            createMovie("Interstellar", "2014-11-07", 169, "Sci-Fi", 3, "A team of explorers travel through a wormhole in space in an attempt to ensure humanity's survival."),
+            createMovie("Interstellar", 2014, 169, "Sci-Fi", 3, "A team of explorers travel through a wormhole in space in an attempt to ensure humanity's survival."),
                 
-            createMovie("The Departed", "2006-10-06", 151, "Crime", 2, "An undercover cop and a police informant play a cat-and-mouse game in the Boston underworld."),
+            createMovie("The Departed", 2006, 151, "Crime", 2, "An undercover cop and a police informant play a cat-and-mouse game in the Boston underworld."),
                 
-            createMovie("Gladiator", "2000-05-05", 155, "Action", 2, "A former Roman General seeks vengeance against the corrupt emperor who murdered his family.")
+            createMovie("Gladiator", 2000, 155, "Action", 2, "A former Roman General seeks vengeance against the corrupt emperor who murdered his family.")
         };
         
         int successCount = 0;
@@ -150,10 +184,10 @@ public class DatabaseInitializationService {
     /**
      * Helper method to create movie objects
      */
-    private Movie createMovie(String title, String releaseDateStr, int duration, String genre, int quantity, String description) {
+    private Movie createMovie(String title, Integer releaseYear, int duration, String genre, int quantity, String description) {
         Movie movie = new Movie();
         movie.setTitle(title);
-        movie.setReleaseDate(LocalDate.parse(releaseDateStr));
+        movie.setReleaseYear(releaseYear);
         movie.setDuration(duration);
         movie.setGenre(genre);
         movie.setQuantity(quantity);

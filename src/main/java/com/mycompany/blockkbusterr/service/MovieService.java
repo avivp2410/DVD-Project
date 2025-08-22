@@ -6,7 +6,6 @@ import com.mycompany.blockkbusterr.repository.ReviewRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,13 +22,16 @@ public class MovieService {
     /**
      * Add a new movie
      */
-    public Movie addMovie(String title, LocalDate releaseDate, Integer duration, String genre, Integer quantity, String description) {
+    public Movie addMovie(String title, Integer releaseYear, Integer duration, String genre, Integer quantity, String description) {
         // Validate input
         if (title == null || title.trim().isEmpty()) {
             throw new IllegalArgumentException("Title is required");
         }
-        if (releaseDate == null) {
-            throw new IllegalArgumentException("Release date is required");
+        if (releaseYear == null) {
+            throw new IllegalArgumentException("Release year is required");
+        }
+        if (releaseYear < 1888 || releaseYear > java.time.LocalDate.now().getYear() + 5) {
+            throw new IllegalArgumentException("Release year must be between 1888 and " + (java.time.LocalDate.now().getYear() + 5));
         }
         if (duration == null || duration <= 0) {
             throw new IllegalArgumentException("Duration must be a positive number");
@@ -44,7 +46,7 @@ public class MovieService {
         // Create new movie
         Movie movie = new Movie();
         movie.setTitle(title.trim());
-        movie.setReleaseDate(releaseDate);
+        movie.setReleaseYear(releaseYear);
         movie.setDuration(duration);
         movie.setGenre(genre.trim());
         movie.setQuantity(quantity);
@@ -57,7 +59,7 @@ public class MovieService {
     /**
      * Update an existing movie
      */
-    public Movie updateMovie(Long movieId, String title, LocalDate releaseDate, Integer duration, String genre, Integer quantity, String description) {
+    public Movie updateMovie(Long movieId, String title, Integer releaseYear, Integer duration, String genre, Integer quantity, String description) {
         Optional<Movie> movieOpt = movieRepository.findById(movieId);
         if (movieOpt.isEmpty()) {
             throw new IllegalArgumentException("Movie not found");
@@ -69,8 +71,11 @@ public class MovieService {
         if (title == null || title.trim().isEmpty()) {
             throw new IllegalArgumentException("Title is required");
         }
-        if (releaseDate == null) {
-            throw new IllegalArgumentException("Release date is required");
+        if (releaseYear == null) {
+            throw new IllegalArgumentException("Release year is required");
+        }
+        if (releaseYear < 1888 || releaseYear > java.time.LocalDate.now().getYear() + 5) {
+            throw new IllegalArgumentException("Release year must be between 1888 and " + (java.time.LocalDate.now().getYear() + 5));
         }
         if (duration == null || duration <= 0) {
             throw new IllegalArgumentException("Duration must be a positive number");
@@ -84,7 +89,7 @@ public class MovieService {
         
         // Update movie fields
         movie.setTitle(title.trim());
-        movie.setReleaseDate(releaseDate);
+        movie.setReleaseYear(releaseYear);
         movie.setDuration(duration);
         movie.setGenre(genre.trim());
         movie.setQuantity(quantity);

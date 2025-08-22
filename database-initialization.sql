@@ -32,11 +32,11 @@ VALUES (
 -- ============================================
 
 -- Insert sample movies only if the table is empty
-INSERT INTO movies (title, release_date, duration, genre, quantity, description, created_at, active)
+INSERT INTO movies (title, release_year, duration, genre, quantity, description, created_at, active)
 SELECT * FROM (
     SELECT 
         'The Shawshank Redemption' as title,
-        '1994-09-23' as release_date,
+        1994 as release_year,
         142 as duration,
         'Drama' as genre,
         3 as quantity,
@@ -46,7 +46,7 @@ SELECT * FROM (
     UNION ALL
     SELECT 
         'The Godfather',
-        '1972-03-24',
+        1972,
         175,
         'Crime',
         2,
@@ -56,7 +56,7 @@ SELECT * FROM (
     UNION ALL
     SELECT 
         'The Dark Knight',
-        '2008-07-18',
+        2008,
         152,
         'Action',
         4,
@@ -66,7 +66,7 @@ SELECT * FROM (
     UNION ALL
     SELECT 
         'Pulp Fiction',
-        '1994-10-14',
+        1994,
         154,
         'Crime',
         2,
@@ -76,7 +76,7 @@ SELECT * FROM (
     UNION ALL
     SELECT 
         'Forrest Gump',
-        '1994-07-06',
+        1994,
         142,
         'Drama',
         3,
@@ -86,7 +86,7 @@ SELECT * FROM (
     UNION ALL
     SELECT 
         'Inception',
-        '2010-07-16',
+        2010,
         148,
         'Sci-Fi',
         3,
@@ -96,7 +96,7 @@ SELECT * FROM (
     UNION ALL
     SELECT 
         'The Matrix',
-        '1999-03-31',
+        1999,
         136,
         'Sci-Fi',
         2,
@@ -106,7 +106,7 @@ SELECT * FROM (
     UNION ALL
     SELECT 
         'Goodfellas',
-        '1990-09-21',
+        1990,
         146,
         'Crime',
         2,
@@ -116,7 +116,7 @@ SELECT * FROM (
     UNION ALL
     SELECT 
         'The Lord of the Rings: The Fellowship of the Ring',
-        '2001-12-19',
+        2001,
         178,
         'Fantasy',
         2,
@@ -126,7 +126,7 @@ SELECT * FROM (
     UNION ALL
     SELECT 
         'Star Wars: Episode IV - A New Hope',
-        '1977-05-25',
+        1977,
         121,
         'Sci-Fi',
         3,
@@ -136,7 +136,7 @@ SELECT * FROM (
     UNION ALL
     SELECT 
         'The Silence of the Lambs',
-        '1991-02-14',
+        1991,
         118,
         'Thriller',
         2,
@@ -146,7 +146,7 @@ SELECT * FROM (
     UNION ALL
     SELECT 
         'Saving Private Ryan',
-        '1998-07-24',
+        1998,
         169,
         'War',
         2,
@@ -156,7 +156,7 @@ SELECT * FROM (
     UNION ALL
     SELECT 
         'Interstellar',
-        '2014-11-07',
+        2014,
         169,
         'Sci-Fi',
         3,
@@ -166,7 +166,7 @@ SELECT * FROM (
     UNION ALL
     SELECT 
         'The Departed',
-        '2006-10-06',
+        2006,
         151,
         'Crime',
         2,
@@ -176,7 +176,7 @@ SELECT * FROM (
     UNION ALL
     SELECT 
         'Gladiator',
-        '2000-05-05',
+        2000,
         155,
         'Action',
         2,
@@ -203,7 +203,7 @@ FROM movies;
 
 -- Display all movies
 SELECT 'Sample movies:' as status;
-SELECT movie_id, title, release_date, genre, quantity 
+SELECT movie_id, title, release_year, genre, quantity
 FROM movies 
 ORDER BY title;
 

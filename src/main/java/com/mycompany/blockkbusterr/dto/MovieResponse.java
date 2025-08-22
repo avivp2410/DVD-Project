@@ -17,7 +17,7 @@ public class MovieResponse {
     private String title;
     
     @XmlElement
-    private String releaseDate;
+    private Integer releaseYear;
     
     @XmlElement
     private Integer duration;
@@ -64,7 +64,7 @@ public class MovieResponse {
         if (movie != null) {
             this.movieId = movie.getMovieId();
             this.title = movie.getTitle();
-            this.releaseDate = movie.getReleaseDate() != null ? movie.getReleaseDate().toString() : null;
+            this.releaseYear = movie.getReleaseYear();
             this.duration = movie.getDuration();
             this.genre = movie.getGenre();
             this.quantity = movie.getQuantity();
@@ -104,12 +104,12 @@ public class MovieResponse {
         this.title = title;
     }
     
-    public String getReleaseDate() {
-        return releaseDate;
+    public Integer getReleaseYear() {
+        return releaseYear;
     }
     
-    public void setReleaseDate(String releaseDate) {
-        this.releaseDate = releaseDate;
+    public void setReleaseYear(Integer releaseYear) {
+        this.releaseYear = releaseYear;
     }
     
     public Integer getDuration() {

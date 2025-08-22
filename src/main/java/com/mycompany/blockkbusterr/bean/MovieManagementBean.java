@@ -9,7 +9,6 @@ import jakarta.faces.context.FacesContext;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.util.Optional;
 import java.util.logging.Logger;
 
@@ -31,7 +30,7 @@ public class MovieManagementBean implements Serializable {
     
     // Movie properties for form binding
     private String title;
-    private LocalDate releaseDate;
+    private Integer releaseYear;
     private Integer duration;
     private String genre;
     private Integer quantity;
@@ -85,7 +84,7 @@ public class MovieManagementBean implements Serializable {
                 
                 // Pre-fill form fields
                 this.title = movie.getTitle();
-                this.releaseDate = movie.getReleaseDate();
+                this.releaseYear = movie.getReleaseYear();
                 this.duration = movie.getDuration();
                 this.genre = movie.getGenre();
                 this.quantity = movie.getQuantity();
@@ -110,7 +109,7 @@ public class MovieManagementBean implements Serializable {
         try {
             logger.info("Adding new movie: " + title);
             
-            Movie movie = movieService.addMovie(title, releaseDate, duration, genre, quantity, description);
+            Movie movie = movieService.addMovie(title, releaseYear, duration, genre, quantity, description);
             
             addSuccessMessage("Movie '" + movie.getTitle() + "' added successfully!");
             logger.info("Movie added successfully with ID: " + movie.getMovieId());
@@ -139,7 +138,7 @@ public class MovieManagementBean implements Serializable {
         try {
             logger.info("Updating movie with ID: " + movieId);
             
-            Movie movie = movieService.updateMovie(movieId, title, releaseDate, duration, genre, quantity, description);
+            Movie movie = movieService.updateMovie(movieId, title, releaseYear, duration, genre, quantity, description);
             
             addSuccessMessage("Movie '" + movie.getTitle() + "' updated successfully!");
             logger.info("Movie updated successfully: " + movie.getMovieId());
@@ -170,7 +169,7 @@ public class MovieManagementBean implements Serializable {
      */
     private void clearForm() {
         title = null;
-        releaseDate = null;
+        releaseYear = null;
         duration = null;
         genre = null;
         quantity = null;
@@ -202,12 +201,12 @@ public class MovieManagementBean implements Serializable {
         this.title = title;
     }
     
-    public LocalDate getReleaseDate() {
-        return releaseDate;
+    public Integer getReleaseYear() {
+        return releaseYear;
     }
     
-    public void setReleaseDate(LocalDate releaseDate) {
-        this.releaseDate = releaseDate;
+    public void setReleaseYear(Integer releaseYear) {
+        this.releaseYear = releaseYear;
     }
     
     public Integer getDuration() {

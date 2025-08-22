@@ -13,7 +13,7 @@ public class MovieRequest {
     private String title;
     
     @XmlElement(required = true)
-    private String releaseDate; // Format: YYYY-MM-DD
+    private Integer releaseYear;
     
     @XmlElement(required = true)
     private Integer duration;
@@ -31,16 +31,16 @@ public class MovieRequest {
     // Default constructor for JAXB
     public MovieRequest() {}
     
-    public MovieRequest(String title, String releaseDate, Integer duration, String genre, Integer quantity) {
+    public MovieRequest(String title, Integer releaseYear, Integer duration, String genre, Integer quantity) {
         this.title = title;
-        this.releaseDate = releaseDate;
+        this.releaseYear = releaseYear;
         this.duration = duration;
         this.genre = genre;
         this.quantity = quantity;
     }
     
-    public MovieRequest(String title, String releaseDate, Integer duration, String genre, Integer quantity, String description) {
-        this(title, releaseDate, duration, genre, quantity);
+    public MovieRequest(String title, Integer releaseYear, Integer duration, String genre, Integer quantity, String description) {
+        this(title, releaseYear, duration, genre, quantity);
         this.description = description;
     }
     
@@ -53,12 +53,12 @@ public class MovieRequest {
         this.title = title;
     }
     
-    public String getReleaseDate() {
-        return releaseDate;
+    public Integer getReleaseYear() {
+        return releaseYear;
     }
     
-    public void setReleaseDate(String releaseDate) {
-        this.releaseDate = releaseDate;
+    public void setReleaseYear(Integer releaseYear) {
+        this.releaseYear = releaseYear;
     }
     
     public Integer getDuration() {

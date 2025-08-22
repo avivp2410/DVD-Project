@@ -34,10 +34,11 @@
                 <h:inputText id="title" value="#{movieManagementBean.title}" required="true"
                            requiredMessage="Title is required" />
                 
-                <h:outputLabel for="releaseDate" value="Release Date:" />
-                <h:inputText id="releaseDate" value="#{movieManagementBean.releaseDate}" required="true"
-                           requiredMessage="Release date is required">
-                    <f:convertDateTime pattern="yyyy-MM-dd" type="localDate" />
+                <h:outputLabel for="releaseYear" value="Release Year:" />
+                <h:inputText id="releaseYear" value="#{movieManagementBean.releaseYear}" required="true"
+                           requiredMessage="Release year is required">
+                    <f:convertNumber integerOnly="true" />
+                    <f:validateLongRange minimum="1888" maximum="2030" />
                 </h:inputText>
                 
                 <h:outputLabel for="duration" value="Duration (min):" />

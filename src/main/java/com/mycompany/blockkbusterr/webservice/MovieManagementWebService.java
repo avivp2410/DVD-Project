@@ -12,7 +12,6 @@ import jakarta.jws.WebParam;
 import jakarta.jws.WebResult;
 import jakarta.jws.WebService;
 import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -44,17 +43,15 @@ public class MovieManagementWebService {
                 return MovieResponse.error("Movie request cannot be null");
             }
             
-            // Parse release date
-            LocalDate releaseDate;
-            try {
-                releaseDate = LocalDate.parse(request.getReleaseDate());
-            } catch (DateTimeParseException e) {
-                return MovieResponse.error("Invalid date format. Use YYYY-MM-DD");
+            // Validate release year
+            Integer releaseYear = request.getReleaseYear();
+            if (releaseYear == null || releaseYear < 1888 || releaseYear > LocalDate.now().getYear() + 5) {
+                return MovieResponse.error("Invalid release year. Must be between 1888 and " + (LocalDate.now().getYear() + 5));
             }
             
             Movie movie = movieService.addMovie(
                 request.getTitle(),
-                releaseDate,
+                releaseYear,
                 request.getDuration(),
                 request.getGenre(),
                 request.getQuantity(),
@@ -88,18 +85,16 @@ public class MovieManagementWebService {
                 return MovieResponse.error("Movie request cannot be null");
             }
             
-            // Parse release date
-            LocalDate releaseDate;
-            try {
-                releaseDate = LocalDate.parse(request.getReleaseDate());
-            } catch (DateTimeParseException e) {
-                return MovieResponse.error("Invalid date format. Use YYYY-MM-DD");
+            // Validate release year
+            Integer releaseYear = request.getReleaseYear();
+            if (releaseYear == null || releaseYear < 1888 || releaseYear > LocalDate.now().getYear() + 5) {
+                return MovieResponse.error("Invalid release year. Must be between 1888 and " + (LocalDate.now().getYear() + 5));
             }
             
             Movie movie = movieService.updateMovie(
                 movieId,
                 request.getTitle(),
-                releaseDate,
+                releaseYear,
                 request.getDuration(),
                 request.getGenre(),
                 request.getQuantity(),

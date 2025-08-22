@@ -65,10 +65,10 @@ public class MovieRepository extends BaseRepository<Movie, Long> {
         LocalDate startDate = LocalDate.of(startYear, 1, 1);
         LocalDate endDate = LocalDate.of(endYear, 12, 31);
         
-        String jpql = "SELECT m FROM Movie m WHERE m.releaseDate BETWEEN :startDate AND :endDate ORDER BY m.releaseDate DESC";
+        String jpql = "SELECT m FROM Movie m WHERE m.releaseYear BETWEEN :startYear AND :endYear ORDER BY m.releaseYear DESC";
         TypedQuery<Movie> query = entityManager.createQuery(jpql, Movie.class);
-        query.setParameter("startDate", startDate);
-        query.setParameter("endDate", endDate);
+        query.setParameter("startYear", startDate.getYear());
+        query.setParameter("endYear", endDate.getYear());
         return query.getResultList();
     }
     
@@ -120,7 +120,7 @@ public class MovieRepository extends BaseRepository<Movie, Long> {
      * Find newest movies
      */
     public List<Movie> findNewestMovies(int limit) {
-        String jpql = "SELECT m FROM Movie m ORDER BY m.releaseDate DESC";
+        String jpql = "SELECT m FROM Movie m ORDER BY m.releaseYear DESC";
         TypedQuery<Movie> query = entityManager.createQuery(jpql, Movie.class);
         query.setMaxResults(limit);
         return query.getResultList();
