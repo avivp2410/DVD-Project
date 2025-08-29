@@ -129,25 +129,6 @@ public class MovieService {
         return movieRepository.findAvailableMovies();
     }
     
-    /**
-     * Search movies by title
-     */
-    public List<Movie> searchMoviesByTitle(String title) {
-        if (title == null || title.trim().isEmpty()) {
-            return getAllMovies();
-        }
-        return movieRepository.findByTitle(title.trim());
-    }
-    
-    /**
-     * Search movies by genre
-     */
-    public List<Movie> searchMoviesByGenre(String genre) {
-        if (genre == null || genre.trim().isEmpty()) {
-            return getAllMovies();
-        }
-        return movieRepository.findByGenre(genre.trim());
-    }
     
     /**
      * Search movies by multiple criteria
@@ -215,15 +196,6 @@ public class MovieService {
         return movieRepository.findOutOfStockMovies();
     }
     
-    /**
-     * Update movie quantity
-     */
-    public boolean updateMovieQuantity(Long movieId, int newQuantity) {
-        if (newQuantity < 0) {
-            throw new IllegalArgumentException("Quantity cannot be negative");
-        }
-        return movieRepository.updateQuantity(movieId, newQuantity);
-    }
     
     /**
      * Increase movie quantity (for returns)
@@ -247,13 +219,6 @@ public class MovieService {
         return movieOpt.isPresent() && movieOpt.get().isAvailable();
     }
     
-    /**
-     * Get movie availability count
-     */
-    public int getMovieAvailabilityCount(Long movieId) {
-        Optional<Movie> movieOpt = movieRepository.findById(movieId);
-        return movieOpt.map(Movie::getQuantity).orElse(0);
-    }
     
     /**
      * Delete movie
@@ -267,6 +232,17 @@ public class MovieService {
      */
     public List<String> getAllGenres() {
         return movieRepository.getDistinctGenres();
+    }
+    
+    
+    /**
+     * Update movie quantity
+     */
+    public boolean updateMovieQuantity(Long movieId, int newQuantity) {
+        if (newQuantity < 0) {
+            throw new IllegalArgumentException("Quantity cannot be negative");
+        }
+        return movieRepository.updateQuantity(movieId, newQuantity);
     }
     
     /**
@@ -295,20 +271,6 @@ public class MovieService {
         long reviewCount = reviewRepository.countReviewsForMovie(movieId);
         
         return new MovieWithRating(movie, averageRating != null ? averageRating : 0.0, reviewCount);
-    }
-    
-    /**
-     * Get all movies with their ratings
-     */
-    public List<MovieWithRating> getAllMoviesWithRatings() {
-        List<Movie> movies = movieRepository.findAll();
-        return movies.stream()
-                .map(movie -> {
-                    Double avgRating = reviewRepository.getAverageRatingForMovie(movie.getMovieId());
-                    long reviewCount = reviewRepository.countReviewsForMovie(movie.getMovieId());
-                    return new MovieWithRating(movie, avgRating != null ? avgRating : 0.0, reviewCount);
-                })
-                .toList();
     }
     
     // Inner class for movie statistics

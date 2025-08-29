@@ -287,13 +287,6 @@ public class RentalService {
         return true;
     }
     
-    /**
-     * Get rental history for a user
-     */
-    public List<Rental> getRentalHistory(Long userId, int limit) {
-        List<Rental> rentals = rentalRepository.findByUserId(userId);
-        return rentals.stream().limit(limit).toList();
-    }
     
     /**
      * Get rental history for a movie
@@ -308,82 +301,29 @@ public class RentalService {
     public RentalStats getRentalStats() {
         long totalRentals = rentalRepository.count();
         long activeRentals = rentalRepository.countByStatus(RentalStatus.ACTIVE);
-        long returnedRentals = rentalRepository.countByStatus(RentalStatus.RETURNED);
         long overdueRentals = rentalRepository.countOverdueRentals();
+        long returnedRentals = rentalRepository.countByStatus(RentalStatus.RETURNED);
         
-        return new RentalStats(totalRentals, activeRentals, returnedRentals, overdueRentals);
-    }
-    
-    /**
-     * Get user rental statistics
-     */
-    public UserRentalStats getUserRentalStats(Long userId) {
-        Object[] stats = rentalRepository.getUserRentalStats(userId);
-        
-        long totalRentals = ((Number) stats[0]).longValue();
-        long activeRentals = ((Number) stats[1]).longValue();
-        long returnedRentals = ((Number) stats[2]).longValue();
-        long overdueRentals = ((Number) stats[3]).longValue();
-        
-        return new UserRentalStats(totalRentals, activeRentals, returnedRentals, overdueRentals);
-    }
-    
-    /**
-     * Process overdue rentals (mark as overdue)
-     */
-    public int processOverdueRentals() {
-        List<Rental> overdueRentals = rentalRepository.findOverdueRentals();
-        int processedCount = 0;
-        
-        for (Rental rental : overdueRentals) {
-            if (rental.getStatus() == RentalStatus.ACTIVE) {
-                rental.setStatus(RentalStatus.OVERDUE);
-                rentalRepository.update(rental);
-                processedCount++;
-            }
-        }
-        
-        return processedCount;
+        return new RentalStats(totalRentals, activeRentals, overdueRentals, returnedRentals);
     }
     
     // Inner class for rental statistics
     public static class RentalStats {
         private final long totalRentals;
         private final long activeRentals;
-        private final long returnedRentals;
         private final long overdueRentals;
+        private final long returnedRentals;
         
-        public RentalStats(long totalRentals, long activeRentals, long returnedRentals, long overdueRentals) {
+        public RentalStats(long totalRentals, long activeRentals, long overdueRentals, long returnedRentals) {
             this.totalRentals = totalRentals;
             this.activeRentals = activeRentals;
-            this.returnedRentals = returnedRentals;
             this.overdueRentals = overdueRentals;
+            this.returnedRentals = returnedRentals;
         }
         
         public long getTotalRentals() { return totalRentals; }
         public long getActiveRentals() { return activeRentals; }
-        public long getReturnedRentals() { return returnedRentals; }
         public long getOverdueRentals() { return overdueRentals; }
-        public long getCancelledRentals() { return totalRentals - activeRentals - returnedRentals - overdueRentals; }
-    }
-    
-    // Inner class for user rental statistics
-    public static class UserRentalStats {
-        private final long totalRentals;
-        private final long activeRentals;
-        private final long returnedRentals;
-        private final long overdueRentals;
-        
-        public UserRentalStats(long totalRentals, long activeRentals, long returnedRentals, long overdueRentals) {
-            this.totalRentals = totalRentals;
-            this.activeRentals = activeRentals;
-            this.returnedRentals = returnedRentals;
-            this.overdueRentals = overdueRentals;
-        }
-        
-        public long getTotalRentals() { return totalRentals; }
-        public long getActiveRentals() { return activeRentals; }
         public long getReturnedRentals() { return returnedRentals; }
-        public long getOverdueRentals() { return overdueRentals; }
     }
 }
