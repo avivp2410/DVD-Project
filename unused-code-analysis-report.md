@@ -147,10 +147,9 @@ The web services (`MovieManagementWebService` and `UserManagementWebService`) an
 
 **All configuration files are in active use:**
 - `persistence.xml` - JPA configuration ✅
-- `web.xml` - Web application configuration ✅  
+- `web.xml` - Web application configuration ✅
 - `beans.xml` - CDI configuration ✅
-- `glassfish-web.xml` - Server configuration ✅
-- `tomee.xml` - Alternative server configuration ✅
+- `tomee.xml` - Apache TomEE server configuration ✅
 
 ---
 

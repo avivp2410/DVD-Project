@@ -279,3 +279,18 @@ This application underwent a comprehensive code cleanup process to remove unused
 - Removed over 1,400 lines of genuinely unused code
 
 This cleanup demonstrates that the original SOAP web services and DTO layers were completely unused by the JSF frontend application, making them safe for removal while maintaining all working features.
+
+### GlassFish Migration to Apache TomEE:
+
+**Additional Cleanup - GlassFish Components Removed:**
+- `glassfish-web.xml` - GlassFish-specific configuration file
+- `setup-glassfish-datasource.bat` - GlassFish setup script
+- `setup-glassfish-datasource-fixed.bat` - GlassFish setup script (fixed version)
+- `glassfish-admin-console-setup-guide.md` - GlassFish admin documentation
+- `command-line-setup-instructions.md` - GlassFish command-line setup guide
+
+**Migration Benefits:**
+- Simplified deployment configuration focused on Apache TomEE
+- Removed server-specific configuration files
+- Cleaner project structure without dual-server support
+- Maintained all functionality while streamlining server dependencies

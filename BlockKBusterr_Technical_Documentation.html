@@ -526,6 +526,29 @@ Presentation Layer (JSF Beans) → Service Layer → Repository Layer → Entity
 
         <p><strong>Conclusion:</strong> This cleanup demonstrates that the original SOAP web services and DTO layers were completely unused by the JSF frontend application, making them safe for removal while maintaining all working features.</p>
 
+        <h3>GlassFish Migration to Apache TomEE:</h3>
+
+        <div class="class-section">
+            <h4>Additional Cleanup - GlassFish Components Removed:</h4>
+            <ul>
+                <li><code>glassfish-web.xml</code> - GlassFish-specific configuration file</li>
+                <li><code>setup-glassfish-datasource.bat</code> - GlassFish setup script</li>
+                <li><code>setup-glassfish-datasource-fixed.bat</code> - GlassFish setup script (fixed version)</li>
+                <li><code>glassfish-admin-console-setup-guide.md</code> - GlassFish admin documentation</li>
+                <li><code>command-line-setup-instructions.md</code> - GlassFish command-line setup guide</li>
+            </ul>
+        </div>
+
+        <div class="flow-step">
+            <strong>Migration Benefits:</strong>
+            <ul>
+                <li>Simplified deployment configuration focused on Apache TomEE</li>
+                <li>Removed server-specific configuration files</li>
+                <li>Cleaner project structure without dual-server support</li>
+                <li>Maintained all functionality while streamlining server dependencies</li>
+            </ul>
+        </div>
+
         <hr>
         
         <footer style="text-align: center; margin-top: 40px; color: #7f8c8d; border-top: 1px solid #ecf0f1; padding-top: 20px;">
