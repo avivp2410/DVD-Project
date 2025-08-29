@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlockKBusterr - Technical Documentation</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        
+        .container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        
+        h2 {
+            color: #34495e;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 8px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+        }
+        
+        h3 {
+            color: #2980b9;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+        
+        h4 {
+            color: #8e44ad;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .class-section {
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .purpose {
+            font-weight: bold;
+            color: #27ae60;
+        }
+        
+        .key-features {
+            color: #e67e22;
+            font-weight: bold;
+        }
+        
+        .relationships {
+            color: #9b59b6;
+            font-weight: bold;
+        }
+        
+        .design-pattern {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        code {
+            background-color: #f1f2f6;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #2c3e50;
+        }
+        
+        pre {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        
+        .flow-step {
+            background-color: #e8f5e8;
+            border-left: 4px solid #27ae60;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        
+        .architecture-diagram {
+            text-align: center;
+            background-color: #ecf0f1;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        
+        ul, ol {
+            margin-bottom: 15px;
+        }
+        
+        li {
+            margin-bottom: 5px;
+        }
+        
+        .toc {
+            background-color: #ecf0f1;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        .toc ul ul {
+            padding-left: 20px;
+            list-style-type: disc;
+        }
+        
+        .toc a {
+            text-decoration: none;
+            color: #2980b9;
+        }
+        
+        .toc a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>BlockKBusterr - Technical Documentation</h1>
+
+        <div class="toc">
+            <h3>Table of Contents</h3>
+            <ul>
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#architecture">Architecture Overview</a></li>
+                <li><a href="#entities">Entity Classes (Data Models)</a></li>
+                <li><a href="#repositories">Repository Classes (Data Access Layer)</a></li>
+                <li><a href="#services">Service Classes (Business Logic Layer)</a></li>
+                <li><a href="#beans">Bean Classes (Presentation Layer/JSF Controllers)</a></li>
+                <li><a href="#dtos">DTO Classes (Data Transfer Objects)</a></li>
+                <li><a href="#webservices">Web Service Classes (SOAP API Endpoints)</a></li>
+                <li><a href="#utilities">Utility Classes</a></li>
+                <li><a href="#configuration">Configuration Classes</a></li>
+                <li><a href="#flow">Application Flow</a></li>
+                <li><a href="#design-decisions">Key Design Decisions</a></li>
+            </ul>
+        </div>
+
+        <h2 id="overview">Overview</h2>
+        <p>BlockKBusterr is a movie rental system built using Jakarta EE (formerly Java EE) with JSF (JavaServer Faces) for the frontend. The application follows a layered architecture pattern with clear separation of concerns across Entity, Repository, Service, Bean, DTO, and Web Service layers.</p>
+
+        <h2 id="architecture">Architecture Overview</h2>
+        <p>The application follows a classic n-tier architecture:</p>
+
+        <div class="architecture-diagram">
+            <pre>
+Presentation Layer (JSF Beans) → Service Layer → Repository Layer → Entity Layer (Database)
+                                      |
+                              Web Services (SOAP)
+                                      |
+                                 DTO Layer
+            </pre>
+        </div>
+
+        <h4>Design Patterns Used:</h4>
+        <ul>
+            <li>Repository Pattern for data access abstraction</li>
+            <li>Service Layer Pattern for business logic encapsulation</li>
+            <li>Data Transfer Object (DTO) Pattern for web service communication</li>
+            <li>Managed Bean Pattern for JSF integration</li>
+            <li>Dependency Injection with CDI (Contexts and Dependency Injection)</li>
+        </ul>
+
+        <hr>
+
+        <h2 id="entities">Entity Classes (Data Models)</h2>
+
+        <div class="class-section">
+            <h3>User.java</h3>
+            <p><span class="purpose">Purpose:</span> Core entity representing system users with authentication and role management.</p>
+            <p><span class="key-features">Key Features:</span> JPA entity with Bean Validation, supports both regular users and administrators.</p>
+            <p><span class="relationships">Relationships:</span> One-to-many with <code>Rental</code> and <code>Review</code> entities.</p>
+            <p><span class="design-pattern">Design Pattern:</span> Entity with automatic timestamp management using <code>@PreUpdate</code>.</p>
+        </div>
+
+        <div class="class-section">
+            <h3>Movie.java</h3>
+            <p><span class="purpose">Purpose:</span> Represents movie inventory with availability tracking and rating aggregation.</p>
+            <p><span class="key-features">Key Features:</span> Complex business logic for availability calculation, formatted duration display, and average rating computation.</p>
+            <p><span class="relationships">Relationships:</span> One-to-many with <code>Rental</code> and <code>Review</code> entities for tracking rentals and reviews.</p>
+            <p><span class="design-pattern">Business Logic:</span> Built-in methods for stock management and rating calculations.</p>
+        </div>
+
+        <div class="class-section">
+            <h3>Rental.java</h3>
+            <p><span class="purpose">Purpose:</span> Manages the rental transaction lifecycle between users and movies.</p>
+            <p><span class="key-features">Key Features:</span> State management through <code>RentalStatus</code> enum, automatic date calculations for overdue tracking.</p>
+            <p><span class="relationships">Relationships:</span> Many-to-one relationships with both <code>User</code> and <code>Movie</code> entities.</p>
+            <p><span class="design-pattern">Business Methods:</span> Includes duration calculation, overdue detection, and rental state transitions.</p>
+        </div>
+
+        <div class="class-section">
+            <h3>Review.java</h3>
+            <p><span class="purpose">Purpose:</span> Handles user ratings and comments for movies with validation and formatting.</p>
+            <p><span class="key-features">Key Features:</span> Rating validation (1-5 stars), star display formatting, and comment truncation for UI display.</p>
+            <p><span class="relationships">Relationships:</span> Many-to-one relationships with <code>User</code> and <code>Movie</code>.</p>
+            <p><span class="design-pattern">UI Integration:</span> Provides formatted methods for star display and comment preview.</p>
+        </div>
+
+        <div class="class-section">
+            <h3>UserRole.java</h3>
+            <p><span class="purpose">Purpose:</span> Enum defining user privilege levels (USER, ADMIN) with display names.</p>
+            <p><span class="design-pattern">Implementation:</span> Simple enum with toString override for UI-friendly display.</p>
+        </div>
+
+        <div class="class-section">
+            <h3>RentalStatus.java</h3>
+            <p><span class="purpose">Purpose:</span> Enum managing rental lifecycle states (ACTIVE, RETURNED, OVERDUE, CANCELLED).</p>
+            <p><span class="design-pattern">Implementation:</span> Provides state tracking for rental workflow management.</p>
+        </div>
+
+        <hr>
+
+        <h2 id="repositories">Repository Classes (Data Access Layer)</h2>
+
+        <div class="class-section">
+            <h3>BaseRepository.java</h3>
+            <p><span class="purpose">Purpose:</span> Abstract base repository providing common CRUD operations using JPA EntityManager.</p>
+            <p><span class="design-pattern">Design Pattern:</span> Generic Repository Pattern with type safety for entity operations.</p>
+            <p><span class="key-features">Key Features:</span> Transactional support, common operations (save, find, delete, count), and entity lifecycle management.</p>
+            <p><span class="design-pattern">Architecture:</span> Eliminates code duplication across specific repository implementations.</p>
+        </div>
+
+        <div class="class-section">
+            <h3>UserRepository.java</h3>
+            <p><span class="purpose">Purpose:</span> Specialized repository for user management with authentication and search capabilities.</p>
+            <p><span class="relationships">Extends:</span> <code>BaseRepository&lt;User, Long&gt;</code> for common operations.</p>
+            <p><span class="key-features">Key Methods:</span> Username/email lookup, authentication queries, role-based filtering, and user activation management.</p>
+            <p><span class="design-pattern">Security Integration:</span> Provides methods for credential validation and user status management.</p>
+        </div>
+
+        <div class="class-section">
+            <h3>MovieRepository.java</h3>
+            <p><span class="purpose">Purpose:</span> Comprehensive movie data access with advanced filtering, search, and inventory management.</p>
+            <p><span class="relationships">Extends:</span> <code>BaseRepository&lt;Movie, Long&gt;</code> with specialized movie queries.</p>
+            <p><span class="key-features">Advanced Features:</span> Full-text search, availability tracking, stock management, popularity rankings, and genre categorization.</p>
+            <p><span class="design-pattern">Business Intelligence:</span> Provides methods for analytics like most popular movies and stock level monitoring.</p>
+        </div>
+
+        <div class="class-section">
+            <h3>RentalRepository.java</h3>
+            <p><span class="purpose">Purpose:</span> Manages rental transactions with complex querying for business analytics and overdue tracking.</p>
+            <p><span class="relationships">Extends:</span> <code>BaseRepository&lt;Rental, Long&gt;</code> with rental-specific operations.</p>
+            <p><span class="key-features">Complex Queries:</span> Date range filtering, overdue detection, active rental tracking, and user rental statistics.</p>
+            <p><span class="design-pattern">Business Logic Integration:</span> Supports rental workflow management and reporting requirements.</p>
+        </div>
+
+        <div class="class-section">
+            <h3>ReviewRepository.java</h3>
+            <p><span class="purpose">Purpose:</span> Handles review and rating data with aggregation functions for movie ratings and user review management.</p>
+            <p><span class="relationships">Extends:</span> <code>BaseRepository&lt;Review, Long&gt;</code> with review-specific queries.</p>
+            <p><span class="key-features">Aggregation Functions:</span> Average rating calculations, rating distributions, and review statistics.</p>
+            <p><span class="design-pattern">Data Integrity:</span> Prevents duplicate reviews and provides soft delete functionality.</p>
+        </div>
+
+        <hr>
+
+        <h2 id="services">Service Classes (Business Logic Layer)</h2>
+
+        <div class="class-section">
+            <h3>DatabaseInitializationService.java</h3>
+            <p><span class="purpose">Purpose:</span> Application startup service that initializes database with default admin user and sample movie data.</p>
+            <p><span class="design-pattern">Design Pattern:</span> Observer Pattern using CDI events to trigger on application startup.</p>
+            <p><span class="key-features">Key Features:</span> Conditional initialization (only runs if database is empty), transaction management for data seeding.</p>
+            <p><span class="design-pattern">Bootstrap Logic:</span> Creates admin user and populates sample movies for demo purposes.</p>
+        </div>
+
+        <div class="class-section">
+            <h3>UserService.java</h3>
+            <p><span class="purpose">Purpose:</span> Comprehensive user management service handling registration, authentication, profile management, and role administration.</p>
+            <p><span class="relationships">Dependencies:</span> Injects <code>UserRepository</code> and <code>PasswordUtil</code> for data access and password validation.</p>
+            <p><span class="key-features">Security Features:</span> Password hashing, credential validation, role management, and account activation.</p>
+            <p><span class="design-pattern">Business Rules:</span> Username/email uniqueness validation, password strength enforcement, and user statistics generation.</p>
+        </div>
+
+        <div class="class-section">
+            <h3>MovieService.java</h3>
+            <p><span class="purpose">Purpose:</span> Movie catalog management with inventory control, search capabilities, and rating integration.</p>
+            <p><span class="relationships">Dependencies:</span> Injects <code>MovieRepository</code> and <code>ReviewRepository</code> for comprehensive movie data.</p>
+            <p><span class="key-features">Inventory Management:</span> Stock level monitoring, availability checking, and quantity updates with business rule validation.</p>
+            <p><span class="design-pattern">Advanced Features:</span> Provides movie statistics, rating aggregation, and popularity tracking through inner classes.</p>
+        </div>
+
+        <div class="class-section">
+            <h3>RentalService.java</h3>
+            <p><span class="purpose">Purpose:</span> Core rental business logic managing the complete rental lifecycle from creation to return.</p>
+            <p><span class="relationships">Complex Dependencies:</span> Coordinates between <code>RentalRepository</code>, <code>UserRepository</code>, and <code>MovieRepository</code>.</p>
+            <p><span class="key-features">Business Rules:</span> Availability validation, rental period management, overdue processing, and inventory updates.</p>
+            <p><span class="design-pattern">Workflow Management:</span> Handles rental creation, extension, return, and cancellation with proper state transitions.</p>
+        </div>
+
+        <div class="class-section">
+            <h3>ReviewService.java</h3>
+            <p><span class="purpose">Purpose:</span> Review and rating system management with validation, aggregation, and business rule enforcement.</p>
+            <p><span class="key-features">Data Integrity:</span> Prevents duplicate reviews, validates rating ranges, and ensures users can only review movies they've rented.</p>
+            <p><span class="design-pattern">Analytics:</span> Provides rating distributions, review statistics, and movie review summaries for business intelligence.</p>
+            <p><span class="design-pattern">User Experience:</span> Includes methods for checking review eligibility and managing review lifecycle.</p>
+        </div>
+
+        <hr>
+
+        <h2 id="beans">Bean Classes (Presentation Layer/JSF Controllers)</h2>
+
+        <div class="class-section">
+            <h3>SessionBean.java</h3>
+            <p><span class="purpose">Purpose:</span> Session-scoped bean managing user authentication state and security context throughout the application.</p>
+            <p><span class="design-pattern">Scope:</span> <code>@SessionScoped</code> - maintains user state across multiple requests and page navigation.</p>
+            <p><span class="key-features">Security Integration:</span> Provides authentication checks, role-based access control, and session management.</p>
+            <p><span class="design-pattern">Navigation Control:</span> Handles login/logout workflows and redirects based on user roles.</p>
+        </div>
+
+        <div class="class-section">
+            <h3>AuthenticationBean.java</h3>
+            <p><span class="purpose">Purpose:</span> Request-scoped bean handling login form processing with validation and user feedback.</p>
+            <p><span class="relationships">Dependencies:</span> Integrates with <code>UserService</code> for authentication and <code>SessionBean</code> for session management.</p>
+            <p><span class="key-features">User Experience:</span> Provides form validation, error messaging, and login state management.</p>
+            <p><span class="design-pattern">Security Features:</span> Prevents multiple login attempts and handles authentication failures gracefully.</p>
+        </div>
+
+        <div class="class-section">
+            <h3>UserRegistrationBean.java</h3>
+            <p><span class="purpose">Purpose:</span> Handles new user registration with comprehensive validation, availability checks, and real-time feedback.</p>
+            <p><span class="key-features">Complex Validation:</span> Ajax-enabled username/email availability checking, password confirmation, and form validation.</p>
+            <p><span class="design-pattern">User Experience:</span> Real-time validation feedback, form state management, and registration workflow guidance.</p>
+            <p><span class="relationships">Integration:</span> Coordinates with <code>UserService</code> for user creation and validation.</p>
+        </div>
+
+        <div class="class-section">
+            <h3>MovieListBean.java</h3>
+            <p><span class="purpose">Purpose:</span> View-scoped bean managing movie catalog display with filtering, searching, and pagination capabilities.</p>
+            <p><span class="key-features">Advanced Features:</span> Genre filtering, availability filtering, search functionality, and dynamic content loading.</p>
+            <p><span class="design-pattern">Performance:</span> Efficient data loading with lazy loading patterns and filtered result sets.</p>
+            <p><span class="design-pattern">User Interface:</span> Provides methods for dynamic styling based on availability and movie status.</p>
+        </div>
+
+        <div class="class-section">
+            <h3>MovieDetailsBean.java</h3>
+            <p><span class="purpose">Purpose:</span> Detailed movie view controller handling movie information display, rental creation, and review submission.</p>
+            <p><span class="relationships">Multi-Service Integration:</span> Coordinates <code>MovieService</code>, <code>RentalService</code>, and <code>ReviewService</code>.</p>
+            <p><span class="key-features">Business Logic:</span> Handles rental eligibility checking, review submission, and rating display formatting.</p>
+            <p><span class="design-pattern">User Experience:</span> Provides contextual actions based on user's rental history and review status.</p>
+        </div>
+
+        <div class="class-section">
+            <h3>RentalBean.java</h3>
+            <p><span class="purpose">Purpose:</span> Comprehensive rental management bean handling rental creation, tracking, returns, and history display.</p>
+            <p><span class="key-features">Complex Workflows:</span> Manages rental lifecycle, date calculations, status updates, and inventory coordination.</p>
+            <p><span class="design-pattern">Multi-View Support:</span> Supports both user rental history and admin rental management interfaces.</p>
+            <p><span class="design-pattern">Business Intelligence:</span> Provides rental statistics, overdue tracking, and rental period calculations.</p>
+        </div>
+
+        <div class="class-section">
+            <h3>ProfileBean.java</h3>
+            <p><span class="purpose">Purpose:</span> User profile management with edit capabilities, validation, and account statistics display.</p>
+            <p><span class="key-features">State Management:</span> Handles edit mode toggling, form validation, and profile update workflows.</p>
+            <p><span class="design-pattern">User Experience:</span> Provides profile statistics like active rentals, member duration, and rental history.</p>
+            <p><span class="design-pattern">Security:</span> Ensures users can only edit their own profiles with proper validation.</p>
+        </div>
+
+        <div class="class-section">
+            <h3>AdminBean.java</h3>
+            <p><span class="purpose">Purpose:</span> Administrator dashboard providing system-wide management capabilities and business analytics.</p>
+            <p><span class="key-features">Comprehensive Management:</span> User management, movie management, rental oversight, and system statistics.</p>
+            <p><span class="design-pattern">Business Intelligence:</span> Dashboard with key metrics, overdue tracking, low stock alerts, and user activity monitoring.</p>
+            <p><span class="design-pattern">Bulk Operations:</span> Supports bulk user management, movie quantity updates, and rental processing.</p>
+        </div>
+
+        <div class="class-section">
+            <h3>MovieManagementBean.java</h3>
+            <p><span class="purpose">Purpose:</span> Dedicated bean for movie catalog management supporting both add and edit operations.</p>
+            <p><span class="key-features">CRUD Operations:</span> Complete movie lifecycle management with validation and form handling.</p>
+            <p><span class="design-pattern">Admin Features:</span> Movie creation, editing, validation, and form state management.</p>
+            <p><span class="relationships">Integration:</span> Works with <code>MovieService</code> for business logic and validation.</p>
+        </div>
+
+        <div class="class-section">
+            <h3>DatabaseStartupBean.java</h3>
+            <p><span class="purpose">Purpose:</span> Singleton bean providing administrative control over database initialization for development and testing.</p>
+            <p><span class="design-pattern">Lifecycle Management:</span> Application-scoped singleton for database state management.</p>
+            <p><span class="key-features">Development Support:</span> Allows manual database reinitialization for testing purposes.</p>
+            <p><span class="relationships">Integration:</span> Coordinates with <code>DatabaseInitializationService</code> for data seeding.</p>
+        </div>
+
+        <hr>
+
+        <h2 id="dtos">DTO Classes (Data Transfer Objects)</h2>
+
+        <div class="class-section">
+            <h3>UserRequest.java / UserResponse.java</h3>
+            <p><span class="purpose">Purpose:</span> Data transfer objects for user-related SOAP web service operations with XML serialization.</p>
+            <p><span class="design-pattern">Pattern Implementation:</span> Request/Response DTO pattern for clean web service interfaces.</p>
+            <p><span class="key-features">XML Support:</span> JAXB annotations for SOAP web service serialization and deserialization.</p>
+            <p><span class="design-pattern">Data Encapsulation:</span> Separates web service data contracts from internal entity representations.</p>
+        </div>
+
+        <div class="class-section">
+            <h3>MovieRequest.java / MovieResponse.java</h3>
+            <p><span class="purpose">Purpose:</span> Movie-specific DTOs for web service communication with business logic integration.</p>
+            <p><span class="key-features">Enhanced Features:</span> <code>MovieResponse</code> includes formatted duration display and rating information.</p>
+            <p><span class="design-pattern">Flexibility:</span> Multiple constructors supporting different data scenarios (with/without descriptions).</p>
+            <p><span class="design-pattern">Service Integration:</span> Designed specifically for SOAP web service operations with proper XML mapping.</p>
+        </div>
+
+        <div class="class-section">
+            <h3>LoginRequest.java</h3>
+            <p><span class="purpose">Purpose:</span> Simplified DTO for authentication operations in web services.</p>
+            <p><span class="key-features">Security Focus:</span> Minimal data transfer for credential validation without exposing sensitive information.</p>
+            <p><span class="design-pattern">Web Service Integration:</span> XML-serializable for SOAP authentication endpoints.</p>
+        </div>
+
+        <hr>
+
+        <h2 id="webservices">Web Service Classes (SOAP API Endpoints)</h2>
+
+        <div class="class-section">
+            <h3>UserManagementWebService.java</h3>
+            <p><span class="purpose">Purpose:</span> SOAP web service providing comprehensive user management API for external system integration.</p>
+            <p><span class="key-features">API Operations:</span> User registration, authentication, profile management, role administration, and user statistics.</p>
+            <p><span class="design-pattern">Enterprise Integration:</span> Follows JAX-WS standards for enterprise application integration.</p>
+            <p><span class="design-pattern">Business Logic Delegation:</span> Delegates to <code>UserService</code> while providing web service-specific error handling and response formatting.</p>
+        </div>
+
+        <div class="class-section">
+            <h3>MovieManagementWebService.java</h3>
+            <p><span class="purpose">Purpose:</span> Comprehensive movie catalog API supporting full CRUD operations and advanced querying for external systems.</p>
+            <p><span class="key-features">Rich API Surface:</span> Movie management, search operations, availability checking, stock management, and analytics.</p>
+            <p><span class="design-pattern">Data Transformation:</span> Converts between internal entities and DTOs for clean web service interfaces.</p>
+            <p><span class="design-pattern">Business Intelligence:</span> Exposes movie statistics, popularity metrics, and inventory management through web service calls.</p>
+        </div>
+
+        <hr>
+
+        <h2 id="utilities">Utility Classes</h2>
+
+        <div class="class-section">
+            <h3>PasswordUtil.java</h3>
+            <p><span class="purpose">Purpose:</span> Utility class providing password security operations including hashing and validation.</p>
+            <p><span class="key-features">Security Implementation:</span> Uses secure hashing algorithms for password storage and validation.</p>
+            <p><span class="design-pattern">Validation Rules:</span> Enforces password strength requirements for user registration and password changes.</p>
+            <p><span class="design-pattern">Stateless Design:</span> Pure utility class with static methods for password operations.</p>
+        </div>
+
+        <hr>
+
+        <h2 id="configuration">Configuration Classes</h2>
+
+        <div class="class-section">
+            <h3>JakartaRestConfiguration.java</h3>
+            <p><span class="purpose">Purpose:</span> Jakarta EE REST configuration class setting up REST API endpoints.</p>
+            <p><span class="key-features">Path Configuration:</span> Defines base path for REST services as "resources".</p>
+            <p><span class="design-pattern">Framework Integration:</span> Integrates Jakarta EE REST capabilities with the application.</p>
+        </div>
+
+        <hr>
+
+        <h2 id="flow">Application Flow</h2>
+
+        <h3>User Registration & Authentication Flow</h3>
+        <div class="flow-step">1. <code>UserRegistrationBean</code> handles form submission</div>
+        <div class="flow-step">2. <code>UserService</code> validates and creates user via <code>UserRepository</code></div>
+        <div class="flow-step">3. <code>AuthenticationBean</code> processes login</div>
+        <div class="flow-step">4. <code>SessionBean</code> maintains session state</div>
+
+        <h3>Movie Rental Flow</h3>
+        <div class="flow-step">1. <code>MovieListBean</code> displays available movies</div>
+        <div class="flow-step">2. <code>MovieDetailsBean</code> handles rental creation</div>
+        <div class="flow-step">3. <code>RentalService</code> validates and processes rental</div>
+        <div class="flow-step">4. <code>RentalBean</code> manages rental lifecycle</div>
+
+        <h3>Review System Flow</h3>
+        <div class="flow-step">1. <code>MovieDetailsBean</code> provides review interface</div>
+        <div class="flow-step">2. <code>ReviewService</code> validates and processes reviews</div>
+        <div class="flow-step">3. Rating aggregation updates movie ratings automatically</div>
+
+        <hr>
+
+        <h2 id="design-decisions">Key Design Decisions</h2>
+
+        <ul>
+            <li><strong>Layered Architecture:</strong> Clear separation between presentation (Beans), business logic (Services), and data access (Repositories).</li>
+            <li><strong>Dependency Injection:</strong> Extensive use of CDI for loose coupling and testability.</li>
+            <li><strong>Transaction Management:</strong> Service layer handles transaction boundaries with proper rollback support.</li>
+            <li><strong>Security:</strong> Role-based access control with session management and password security.</li>
+            <li><strong>Web Services:</strong> SOAP-based APIs for enterprise integration with proper DTO patterns.</li>
+            <li><strong>Validation:</strong> Multi-layer validation (Bean Validation, service-layer business rules, and presentation-layer validation).</li>
+        </ul>
+
+        <hr>
+        
+        <footer style="text-align: center; margin-top: 40px; color: #7f8c8d; border-top: 1px solid #ecf0f1; padding-top: 20px;">
+            <p>BlockKBusterr Technical Documentation - Generated for Developer Reference</p>
+        </footer>
+    </div>
+</body>
+</html>
