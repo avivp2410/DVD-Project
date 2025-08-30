@@ -127,10 +127,15 @@ public class RentalRepository extends BaseRepository<Rental, Long> {
      */
     public List<Rental> findRecentRentals(int days) {
         LocalDate cutoffDate = LocalDate.now().minusDays(days);
-        String jpql = "SELECT r FROM Rental r WHERE r.borrowDate >= :cutoffDate ORDER BY r.borrowDate DESC";
+        String jpql = "SELECT r FROM Rental r " +
+                     "LEFT JOIN FETCH r.user " +
+                     "LEFT JOIN FETCH r.movie " +
+                     "WHERE r.borrowDate >= :cutoffDate ORDER BY r.borrowDate DESC";
         TypedQuery<Rental> query = entityManager.createQuery(jpql, Rental.class);
         query.setParameter("cutoffDate", cutoffDate);
-        return query.getResultList();
+        List<Rental> results = query.getResultList();
+        System.out.println("DEBUG: findRecentRentals returned " + results.size() + " rentals with eager loading");
+        return results;
     }
     
     /**

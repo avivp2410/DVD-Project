@@ -11,9 +11,7 @@ import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -187,6 +185,12 @@ public class RentalBean implements Serializable {
             logger.info("Rental created successfully: " + rental.getRentalId());
             addSuccessMessage("Movie rented successfully! Rental ID: " + rental.getRentalId());
             
+            // Force refresh of movie data to update availability status
+            selectedMovie = movieService.findMovieById(selectedMovie.getMovieId()).orElse(null);
+            if (selectedMovie != null) {
+                logger.info("Movie quantity after rental: " + selectedMovie.getQuantity());
+            }
+            
             // Clear form
             clearForm();
             
@@ -251,6 +255,10 @@ public class RentalBean implements Serializable {
             logger.info("Quick rental created successfully: " + rental.getRentalId());
             addSuccessMessage("Movie '" + movie.getTitle() + "' rented successfully for 1 week! Due back on " +
                              oneWeekFromNow.format(DateTimeFormatter.ofPattern("MMM dd, yyyy")));
+            
+            // Force refresh of movie data to ensure UI shows updated availability
+            movie = movieService.findMovieById(movieId).orElse(movie);
+            logger.info("Movie quantity after quick rental: " + movie.getQuantity());
             
             // Redirect to rental history
             return "rentalHistory.xhtml?faces-redirect=true";

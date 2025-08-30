@@ -86,11 +86,16 @@ public class RentalService {
         rental.setStatus(RentalStatus.ACTIVE);
         
         // Decrease movie quantity
+        System.out.println("DEBUG: Attempting to decrease quantity for movie ID: " + movieId + " from " + movie.getQuantity());
         if (!movieRepository.decreaseQuantity(movieId)) {
+            System.err.println("ERROR: Failed to decrease quantity for movie ID: " + movieId);
             throw new RuntimeException("Failed to update movie quantity");
         }
+        System.out.println("DEBUG: Successfully decreased quantity for movie ID: " + movieId);
         
-        return rentalRepository.save(rental);
+        Rental savedRental = rentalRepository.save(rental);
+        System.out.println("DEBUG: Rental created successfully with ID: " + savedRental.getRentalId());
+        return savedRental;
     }
     
     /**

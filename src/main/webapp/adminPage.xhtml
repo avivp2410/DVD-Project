@@ -240,15 +240,7 @@
                                                         <strong>Rentals:</strong> #{adminBean.getUserRentalHistory(user.userId).size()}
                                                     </div>
                                                 </div>
-                                                <div class="user-actions">
-                                                    <h:form>
-                                                        <h:commandButton value="#{user.active ? 'Deactivate' : 'Activate'}"
-                                                                       action="#{adminBean.toggleUserStatus(user.userId)}"
-                                                                       styleClass="btn btn-warning btn-small">
-                                                            <f:ajax execute="@form" render="@form :messages" />
-                                                        </h:commandButton>
-                                                    </h:form>
-                                                </div>
+                                                <!-- User actions section removed as per requirements -->
                                             </div>
                                         </h:panelGroup>
                                     </ui:repeat>

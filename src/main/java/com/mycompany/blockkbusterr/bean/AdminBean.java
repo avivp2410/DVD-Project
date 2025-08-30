@@ -241,39 +241,7 @@ public class AdminBean implements Serializable {
         }
     }
     
-    /**
-     * Toggle user active status
-     */
-    public void toggleUserStatus(Long userId) {
-        try {
-            Optional<User> userOpt = userService.findUserById(userId);
-            if (userOpt.isPresent()) {
-                User user = userOpt.get();
-                boolean success;
-                
-                if (user.getActive()) {
-                    success = userService.deactivateUser(userId);
-                    if (success) {
-                        addSuccessMessage("User " + user.getUsername() + " deactivated.");
-                    }
-                } else {
-                    success = userService.activateUser(userId);
-                    if (success) {
-                        addSuccessMessage("User " + user.getUsername() + " activated.");
-                    }
-                }
-                
-                if (success) {
-                    loadUsers(); // Refresh user data
-                } else {
-                    addErrorMessage("Failed to update user status.");
-                }
-            }
-        } catch (Exception e) {
-            logger.severe("Error toggling user status: " + e.getMessage());
-            addErrorMessage("Error updating user status: " + e.getMessage());
-        }
-    }
+    // User deactivation functionality removed as per requirements
     
     /**
      * Get user rental history

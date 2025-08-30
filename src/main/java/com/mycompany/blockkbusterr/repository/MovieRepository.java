@@ -171,6 +171,7 @@ public class MovieRepository extends BaseRepository<Movie, Long> {
         int updatedRows = entityManager.createQuery(jpql)
                 .setParameter("movieId", movieId)
                 .executeUpdate();
+        System.out.println("DEBUG: decreaseQuantity for movie " + movieId + " - updated " + updatedRows + " rows");
         return updatedRows > 0;
     }
     
@@ -182,6 +183,7 @@ public class MovieRepository extends BaseRepository<Movie, Long> {
         int updatedRows = entityManager.createQuery(jpql)
                 .setParameter("movieId", movieId)
                 .executeUpdate();
+        System.out.println("DEBUG: increaseQuantity for movie " + movieId + " - updated " + updatedRows + " rows");
         return updatedRows > 0;
     }
     
