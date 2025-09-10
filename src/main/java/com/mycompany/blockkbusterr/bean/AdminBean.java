@@ -44,6 +44,7 @@ public class AdminBean implements Serializable {
     private List<Rental> recentRentals;
     private List<Rental> overdueRentals;
     private List<Movie> lowStockMovies;
+    private List<Movie> allMoviesForStock; // All movies for Movie Stock section
     private List<User> users;
     private List<User> filteredUsers;
     
@@ -100,6 +101,7 @@ public class AdminBean implements Serializable {
             loadRecentRentals();
             loadOverdueRentals();
             loadLowStockMovies();
+            loadAllMoviesForStock(); // Load all movies for Movie Stock section
             loadStats();
             loadUsers();
             loadAllMovies();
@@ -177,6 +179,48 @@ public class AdminBean implements Serializable {
     }
     
     /**
+     * Load all movies for Movie Stock section (admin management view)
+     */
+    private void loadAllMoviesForStock() {
+        try {
+            logger.info("DEBUG: Loading all movies for Movie Stock section");
+            allMoviesForStock = movieService.getAllMovies();
+            logger.info("DEBUG: Loaded " + allMoviesForStock.size() + " movies for Movie Stock");
+            
+            // Debug: log each movie found
+            for (Movie movie : allMoviesForStock) {
+                logger.info("DEBUG: Movie Stock - Movie: " + movie.getTitle() + " (Quantity: " + movie.getQuantity() + ")");
+            }
+        } catch (Exception e) {
+            logger.severe("Error loading all movies for stock: " + e.getMessage());
+            e.printStackTrace();
+            allMoviesForStock = new ArrayList<>();
+        }
+    }
+    
+    /**
+     * Load all movies for Movie Stock section with forced refresh
+     */
+    private void loadAllMoviesForStockForceRefresh() {
+        try {
+            logger.info("DEBUG: Force loading all movies for Movie Stock section");
+            // Use the existing getAllMovies method but clear cache first
+            movieService.clearMovieCache(); // We'll add this method
+            allMoviesForStock = movieService.getAllMovies();
+            logger.info("DEBUG: Force loaded " + allMoviesForStock.size() + " movies for Movie Stock");
+            
+            // Debug: log each movie found
+            for (Movie movie : allMoviesForStock) {
+                logger.info("DEBUG: Force refresh - Movie Stock - Movie: " + movie.getTitle() + " (Quantity: " + movie.getQuantity() + ")");
+            }
+        } catch (Exception e) {
+            logger.severe("Error force loading all movies for stock: " + e.getMessage());
+            e.printStackTrace();
+            allMoviesForStock = new ArrayList<>();
+        }
+    }
+    
+    /**
      * Load system statistics
      */
     private void loadStats() {
@@ -199,10 +243,12 @@ public class AdminBean implements Serializable {
             // Clear any cached data at bean level
             lowStockMovies = null;
             allMovies = null;
+            allMoviesForStock = null;
             movieStats = null;
             
             // Force complete reload with cache clearing
             loadLowStockMoviesForceRefresh();
+            loadAllMoviesForStockForceRefresh(); // Refresh the Movie Stock section
             loadStats();
             loadAllMovies();
             
@@ -452,6 +498,10 @@ public class AdminBean implements Serializable {
     
     public List<Movie> getLowStockMovies() {
         return lowStockMovies;
+    }
+    
+    public List<Movie> getAllMoviesForStock() {
+        return allMoviesForStock;
     }
     
     public List<User> getUsers() {

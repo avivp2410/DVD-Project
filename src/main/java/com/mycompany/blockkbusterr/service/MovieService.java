@@ -245,6 +245,15 @@ public class MovieService {
     }
     
     /**
+     * Clear movie cache (persistence context)
+     */
+    public void clearMovieCache() {
+        System.out.println("DEBUG: MovieService.clearMovieCache() called");
+        movieRepository.clear();
+        System.out.println("DEBUG: Movie cache cleared");
+    }
+    
+    /**
      * Get out of stock movies
      */
     public List<Movie> getOutOfStockMovies() {

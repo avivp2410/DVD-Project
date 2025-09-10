@@ -157,7 +157,7 @@
                 <!-- Movie Stock Section -->
                 <div class="admin-section" id="movieStockSection">
                     <div class="section-header">
-                        <h2>Movie Stock</h2>
+                        <h2>Movie Stock - All Movies (#{adminBean.allMoviesForStock.size()} movies)</h2>
                         <h:form>
                             <h:commandButton value="Add Movie" action="#{adminBean.addMovie}" styleClass="btn btn-primary btn-small" />
                             <h:commandButton value="Refresh Stock" action="#{adminBean.refreshMovieStock}" styleClass="btn btn-secondary btn-small">
@@ -167,14 +167,14 @@
                     </div>
                     
                     <h:panelGroup id="movieStockContent">
-                        <h:panelGroup rendered="#{empty adminBean.lowStockMovies}">
-                            <div class="no-data">All movies are well stocked!</div>
+                        <h:panelGroup rendered="#{empty adminBean.allMoviesForStock}">
+                            <div class="no-data">No movies found in the database.</div>
                         </h:panelGroup>
                         
-                        <h:panelGroup rendered="#{not empty adminBean.lowStockMovies}">
+                        <h:panelGroup rendered="#{not empty adminBean.allMoviesForStock}">
                             <div class="scroll-container">
                                 <div class="movie-stock-list">
-                                    <ui:repeat value="#{adminBean.lowStockMovies}" var="movie">
+                                    <ui:repeat value="#{adminBean.allMoviesForStock}" var="movie">
                                         <div class="movie-item #{adminBean.getStockLevelClass(movie)}">
                                             <div class="movie-header">
                                                 <h4 class="movie-title">#{movie.title}</h4>
@@ -186,6 +186,12 @@
                                                 </div>
                                                 <div class="detail-line">
                                                     <strong>Year:</strong> #{movie.releaseYear}
+                                                </div>
+                                                <div class="detail-line">
+                                                    <strong>Duration:</strong> #{movie.durationFormatted}
+                                                </div>
+                                                <div class="detail-line" rendered="#{movie.description != null and movie.description.length() > 0}">
+                                                    <strong>Description:</strong> #{movie.description}
                                                 </div>
                                             </div>
                                             <div class="movie-actions">
