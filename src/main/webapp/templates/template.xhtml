@@ -21,7 +21,7 @@
                             <h:outputText value="#{sessionBean.currentUserDisplayName}" />
                         </h:commandLink>
                         
-                        <h:commandLink value="Logout" action="#{authBean.logout}" styleClass="logout-link" />
+                        <h:commandLink value="Logout" action="#{sessionBean.logout}" styleClass="logout-link" />
                     </h:panelGroup>
                     
                     <h:panelGroup rendered="#{not sessionBean.authenticated}">
