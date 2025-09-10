@@ -134,6 +134,13 @@ public abstract class BaseRepository<T, ID extends Serializable> {
     }
     
     /**
+     * Clear the persistence context
+     */
+    public void clear() {
+        entityManager.clear();
+    }
+    
+    /**
      * Refresh entity from database
      */
     public void refresh(T entity) {

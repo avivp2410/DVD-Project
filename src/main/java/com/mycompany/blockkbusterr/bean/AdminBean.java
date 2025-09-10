@@ -171,6 +171,26 @@ public class AdminBean implements Serializable {
     }
     
     /**
+     * Refresh movie stock data specifically (for AJAX calls)
+     */
+    public void refreshMovieStock() {
+        logger.info("DEBUG: AdminBean.refreshMovieStock() called");
+        try {
+            // Clear any cached data
+            lowStockMovies = null;
+            
+            // Force reload of movie stock data
+            loadLowStockMovies();
+            loadStats(); // Refresh stats as well since they include movie counts
+            
+            logger.info("DEBUG: Movie stock refreshed successfully");
+        } catch (Exception e) {
+            logger.severe("Error refreshing movie stock: " + e.getMessage());
+            addErrorMessage("Error refreshing movie stock data.");
+        }
+    }
+    
+    /**
      * Load all users for management
      */
     private void loadUsers() {

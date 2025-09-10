@@ -58,6 +58,21 @@ public class MovieService {
         Movie savedMovie = movieRepository.save(movie);
         System.out.println("DEBUG: MovieService.addMovie() - Movie saved with ID: " + savedMovie.getMovieId() + ", Quantity: " + savedMovie.getQuantity());
         
+        // Force immediate flush and clear to ensure data is committed
+        movieRepository.flush();
+        System.out.println("DEBUG: MovieService.addMovie() - Changes flushed to database");
+        
+        // Add a small delay to ensure transaction is fully committed
+        try {
+            Thread.sleep(100); // 100ms delay
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        
+        // Force persistence context to be cleared to avoid caching issues
+        movieRepository.clear();
+        System.out.println("DEBUG: MovieService.addMovie() - Persistence context cleared");
+        
         return savedMovie;
     }
     
