@@ -23,7 +23,9 @@
 
             <!-- Rental history for authenticated users -->
             <h:panelGroup rendered="#{sessionBean.authenticated}">
-                <f:event type="preRenderView" listener="#{rentalBean.loadUserRentals}" />
+                <f:metadata>
+                    <f:event type="preRenderView" listener="#{rentalBean.loadUserRentalsSafe}" />
+                </f:metadata>
                 
                 <!-- Header section -->
                 <h:panelGroup id="headerStats">

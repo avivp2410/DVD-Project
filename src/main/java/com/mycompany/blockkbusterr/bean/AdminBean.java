@@ -230,8 +230,10 @@ public class AdminBean implements Serializable {
             
             if (success) {
                 addSuccessMessage("Movie quantity updated successfully.");
-                loadLowStockMovies(); // Refresh low stock data
-                loadAllMovies(); // Refresh movie data
+                // Refresh all movie-related data
+                loadLowStockMovies();
+                loadAllMovies();
+                loadStats(); // Update total movie count
             } else {
                 addErrorMessage("Failed to update movie quantity.");
             }

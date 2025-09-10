@@ -817,6 +817,24 @@ Solution:
 3. Review session management
 ```
 
+**Problem**: Admin dashboard movie stock not updating after adding movies
+```
+Solution:
+1. Added refresh button to movie stock section
+2. AdminBean now refreshes all movie data after operations
+3. Statistics are updated when movies are added/deleted
+4. Use the "Refresh Stock" button to manually update the display
+```
+
+**Problem**: ViewExpiredException when logging out after renting movies
+```
+Solution:
+1. Implemented safer preRenderView listener (loadUserRentalsSafe)
+2. Added proper session validation before data loading
+3. Graceful handling of session expiry without error messages
+4. Fixed rental history page to handle session expiration properly
+```
+
 ### Debugging Tips
 
 #### Enable Debug Logging

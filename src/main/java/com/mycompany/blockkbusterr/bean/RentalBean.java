@@ -280,17 +280,45 @@ public class RentalBean implements Serializable {
      */
     public void loadUserRentals() {
         try {
-            if (sessionBean.isAuthenticated()) {
+            // Check if user is still authenticated before loading rentals
+            if (sessionBean != null && sessionBean.isAuthenticated()) {
                 userRentals = rentalService.getRentalsByUser(sessionBean.getCurrentUserId());
                 filterRentals();
                 logger.info("Loaded " + userRentals.size() + " rentals for user");
             } else {
+                logger.info("User not authenticated, initializing empty rental list");
                 userRentals = new ArrayList<>();
+                filteredRentals = new ArrayList<>();
             }
         } catch (Exception e) {
             logger.severe("Error loading user rentals: " + e.getMessage());
             userRentals = new ArrayList<>();
-            addErrorMessage("Error loading rental history.");
+            filteredRentals = new ArrayList<>();
+            // Don't add error message if it's just a session issue
+            if (sessionBean != null && sessionBean.isAuthenticated()) {
+                addErrorMessage("Error loading rental history.");
+            }
+        }
+    }
+    
+    /**
+     * Load user rental history - safe version for preRenderView
+     */
+    public void loadUserRentalsSafe() {
+        try {
+            // Only proceed if we have a valid session and authenticated user
+            if (sessionBean != null && sessionBean.isAuthenticated() && sessionBean.getCurrentUserId() != null) {
+                loadUserRentals();
+            } else {
+                logger.info("Session not available or user not authenticated - skipping rental load");
+                userRentals = new ArrayList<>();
+                filteredRentals = new ArrayList<>();
+            }
+        } catch (Exception e) {
+            logger.warning("Safe rental loading failed (likely due to session expiry): " + e.getMessage());
+            userRentals = new ArrayList<>();
+            filteredRentals = new ArrayList<>();
+            // Don't show error message for session expiry issues
         }
     }
     

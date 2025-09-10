@@ -160,6 +160,9 @@
                         <h2>Movie Stock</h2>
                         <h:form>
                             <h:commandButton value="Add Movie" action="#{adminBean.addMovie}" styleClass="btn btn-primary btn-small" />
+                            <h:commandButton value="Refresh Stock" action="#{adminBean.loadDashboardData}" styleClass="btn btn-secondary btn-small">
+                                <f:ajax execute="@form" render="movieStockContent" />
+                            </h:commandButton>
                         </h:form>
                     </div>
                     
