@@ -59,7 +59,7 @@
                         <h2>Recent Rentals</h2>
                         <h:form>
                             <h:commandButton value="Refresh" action="#{adminBean.loadDashboardData}" styleClass="btn btn-secondary btn-small">
-                                <f:ajax execute="@form" render="@form :messages" />
+                                <f:ajax execute="@form" render="@all" />
                             </h:commandButton>
                         </h:form>
                     </div>
@@ -101,7 +101,7 @@
                                                     <h:commandButton value="Process Return"
                                                                    action="#{adminBean.processReturn(rental.rentalId)}"
                                                                    styleClass="btn btn-success btn-small">
-                                                        <f:ajax execute="@form" render="@form :messages" />
+                                                        <f:ajax execute="@form" render="@all" />
                                                     </h:commandButton>
                                                 </h:form>
                                             </div>
@@ -144,7 +144,7 @@
                                             <h:commandButton value="Process Return"
                                                            action="#{adminBean.processReturn(rental.rentalId)}"
                                                            styleClass="btn btn-danger btn-small">
-                                                <f:ajax execute="@form" render="@form :messages" />
+                                                <f:ajax execute="@form" render="@all" />
                                             </h:commandButton>
                                         </h:form>
                                     </div>
@@ -193,7 +193,7 @@
                                                     <h:commandButton value="Delete"
                                                                    action="#{adminBean.deleteMovie(movie.movieId)}"
                                                                    styleClass="btn btn-danger btn-small">
-                                                        <f:ajax execute="@form" render="movieStockContent :messages" />
+                                                        <f:ajax execute="@form" render="@all" />
                                                     </h:commandButton>
                                                 </h:form>
                                             </div>
