@@ -24,7 +24,10 @@ public abstract class BaseRepository<T, ID extends Serializable> {
      * Persist a new entity
      */
     public T save(T entity) {
+        System.out.println("DEBUG: BaseRepository.save() called for entity: " + entityClass.getSimpleName());
         entityManager.persist(entity);
+        entityManager.flush(); // Force immediate write to database
+        System.out.println("DEBUG: Entity persisted and flushed");
         return entity;
     }
     

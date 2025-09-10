@@ -23,6 +23,8 @@ public class MovieService {
      * Add a new movie
      */
     public Movie addMovie(String title, Integer releaseYear, Integer duration, String genre, Integer quantity, String description) {
+        System.out.println("DEBUG: MovieService.addMovie() called - Title: " + title + ", Quantity: " + quantity);
+        
         // Validate input
         if (title == null || title.trim().isEmpty()) {
             throw new IllegalArgumentException("Title is required");
@@ -53,7 +55,10 @@ public class MovieService {
         movie.setDescription(description != null ? description.trim() : null);
         movie.setActive(true);
         
-        return movieRepository.save(movie);
+        Movie savedMovie = movieRepository.save(movie);
+        System.out.println("DEBUG: MovieService.addMovie() - Movie saved with ID: " + savedMovie.getMovieId() + ", Quantity: " + savedMovie.getQuantity());
+        
+        return savedMovie;
     }
     
     /**
@@ -186,7 +191,19 @@ public class MovieService {
      * Get low stock movies
      */
     public List<Movie> getLowStockMovies(int threshold) {
-        return movieRepository.findLowStockMovies(threshold);
+        System.out.println("DEBUG: MovieService.getLowStockMovies() called with threshold: " + threshold);
+        try {
+            List<Movie> result = movieRepository.findLowStockMovies(threshold);
+            System.out.println("DEBUG: MovieService found " + result.size() + " low stock movies");
+            for (Movie movie : result) {
+                System.out.println("DEBUG: MovieService - Low stock movie: " + movie.getTitle() + " (Quantity: " + movie.getQuantity() + ")");
+            }
+            return result;
+        } catch (Exception e) {
+            System.out.println("DEBUG: Exception in MovieService.getLowStockMovies: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
     
     /**

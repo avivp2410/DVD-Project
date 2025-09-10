@@ -71,6 +71,19 @@ public class AdminBean implements Serializable {
                 return;
             }
             
+            // Check if we're returning from movie management (refresh parameter)
+            String refreshParam = FacesContext.getCurrentInstance()
+                .getExternalContext().getRequestParameterMap().get("refresh");
+            
+            if ("true".equals(refreshParam)) {
+                logger.info("DEBUG: Refresh parameter detected, forcing full data reload");
+                // Force a complete refresh by explicitly clearing any caches
+                lowStockMovies = null;
+                allMovies = null;
+            } else {
+                logger.info("DEBUG: No refresh parameter detected, normal initialization");
+            }
+            
             loadDashboardData();
             
         } catch (Exception e) {
@@ -128,10 +141,17 @@ public class AdminBean implements Serializable {
      */
     private void loadLowStockMovies() {
         try {
+            logger.info("DEBUG: Loading low stock movies with threshold=3");
             lowStockMovies = movieService.getLowStockMovies(3); // 3 or fewer copies
-            logger.info("Loaded " + lowStockMovies.size() + " low stock movies");
+            logger.info("DEBUG: Loaded " + lowStockMovies.size() + " low stock movies");
+            
+            // Debug: log each movie found
+            for (Movie movie : lowStockMovies) {
+                logger.info("DEBUG: Low stock movie: " + movie.getTitle() + " (Quantity: " + movie.getQuantity() + ")");
+            }
         } catch (Exception e) {
             logger.severe("Error loading low stock movies: " + e.getMessage());
+            e.printStackTrace();
             lowStockMovies = new ArrayList<>();
         }
     }

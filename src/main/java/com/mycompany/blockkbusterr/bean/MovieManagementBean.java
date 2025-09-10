@@ -117,8 +117,8 @@ public class MovieManagementBean implements Serializable {
             // Clear form
             clearForm();
             
-            // Redirect to admin page
-            return "adminPage.xhtml?faces-redirect=true";
+            // Redirect to admin page with a parameter to force refresh
+            return "adminPage.xhtml?faces-redirect=true&refresh=true";
             
         } catch (IllegalArgumentException e) {
             logger.warning("Validation error adding movie: " + e.getMessage());
@@ -143,8 +143,8 @@ public class MovieManagementBean implements Serializable {
             addSuccessMessage("Movie '" + movie.getTitle() + "' updated successfully!");
             logger.info("Movie updated successfully: " + movie.getMovieId());
             
-            // Redirect to admin page
-            return "adminPage.xhtml?faces-redirect=true";
+            // Redirect to admin page with a parameter to force refresh
+            return "adminPage.xhtml?faces-redirect=true&refresh=true";
             
         } catch (IllegalArgumentException e) {
             logger.warning("Validation error updating movie: " + e.getMessage());

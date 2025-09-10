@@ -101,10 +101,17 @@ public class MovieRepository extends BaseRepository<Movie, Long> {
      * Find movies with low stock
      */
     public List<Movie> findLowStockMovies(int threshold) {
+        System.out.println("DEBUG: MovieRepository.findLowStockMovies() called with threshold: " + threshold);
         String jpql = "SELECT m FROM Movie m WHERE m.quantity <= :threshold AND m.quantity > 0 ORDER BY m.quantity ASC";
+        System.out.println("DEBUG: JPQL Query: " + jpql);
         TypedQuery<Movie> query = entityManager.createQuery(jpql, Movie.class);
         query.setParameter("threshold", threshold);
-        return query.getResultList();
+        List<Movie> result = query.getResultList();
+        System.out.println("DEBUG: MovieRepository found " + result.size() + " low stock movies");
+        for (Movie movie : result) {
+            System.out.println("DEBUG: MovieRepository - Low stock movie: " + movie.getTitle() + " (ID: " + movie.getMovieId() + ", Quantity: " + movie.getQuantity() + ")");
+        }
+        return result;
     }
     
     /**
