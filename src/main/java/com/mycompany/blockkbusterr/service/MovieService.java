@@ -222,6 +222,29 @@ public class MovieService {
     }
     
     /**
+     * Get low stock movies with forced refresh (clears cache first)
+     */
+    public List<Movie> getLowStockMoviesRefresh(int threshold) {
+        System.out.println("DEBUG: MovieService.getLowStockMoviesRefresh() called with threshold: " + threshold);
+        try {
+            // Clear persistence context to force fresh database query
+            movieRepository.clear();
+            System.out.println("DEBUG: Persistence context cleared before query");
+            
+            List<Movie> result = movieRepository.findLowStockMovies(threshold);
+            System.out.println("DEBUG: MovieService found " + result.size() + " low stock movies after refresh");
+            for (Movie movie : result) {
+                System.out.println("DEBUG: MovieService - Low stock movie: " + movie.getTitle() + " (Quantity: " + movie.getQuantity() + ")");
+            }
+            return result;
+        } catch (Exception e) {
+            System.out.println("DEBUG: Exception in MovieService.getLowStockMoviesRefresh: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
+    }
+    
+    /**
      * Get out of stock movies
      */
     public List<Movie> getOutOfStockMovies() {

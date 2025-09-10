@@ -157,6 +157,26 @@ public class AdminBean implements Serializable {
     }
     
     /**
+     * Load low stock movies with forced refresh (for refresh button)
+     */
+    private void loadLowStockMoviesForceRefresh() {
+        try {
+            logger.info("DEBUG: Force loading low stock movies with threshold=3");
+            lowStockMovies = movieService.getLowStockMoviesRefresh(3); // 3 or fewer copies with cache clear
+            logger.info("DEBUG: Force loaded " + lowStockMovies.size() + " low stock movies");
+            
+            // Debug: log each movie found
+            for (Movie movie : lowStockMovies) {
+                logger.info("DEBUG: Force refresh - Low stock movie: " + movie.getTitle() + " (Quantity: " + movie.getQuantity() + ")");
+            }
+        } catch (Exception e) {
+            logger.severe("Error force loading low stock movies: " + e.getMessage());
+            e.printStackTrace();
+            lowStockMovies = new ArrayList<>();
+        }
+    }
+    
+    /**
      * Load system statistics
      */
     private void loadStats() {
@@ -176,17 +196,22 @@ public class AdminBean implements Serializable {
     public void refreshMovieStock() {
         logger.info("DEBUG: AdminBean.refreshMovieStock() called");
         try {
-            // Clear any cached data
+            // Clear any cached data at bean level
             lowStockMovies = null;
+            allMovies = null;
+            movieStats = null;
             
-            // Force reload of movie stock data
-            loadLowStockMovies();
-            loadStats(); // Refresh stats as well since they include movie counts
+            // Force complete reload with cache clearing
+            loadLowStockMoviesForceRefresh();
+            loadStats();
+            loadAllMovies();
             
-            logger.info("DEBUG: Movie stock refreshed successfully");
+            addSuccessMessage("Movie stock data refreshed successfully.");
+            logger.info("DEBUG: Movie stock refreshed successfully - found " + (lowStockMovies != null ? lowStockMovies.size() : 0) + " low stock movies");
         } catch (Exception e) {
             logger.severe("Error refreshing movie stock: " + e.getMessage());
-            addErrorMessage("Error refreshing movie stock data.");
+            e.printStackTrace();
+            addErrorMessage("Error refreshing movie stock data: " + e.getMessage());
         }
     }
     

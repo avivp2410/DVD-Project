@@ -161,7 +161,7 @@
                         <h:form>
                             <h:commandButton value="Add Movie" action="#{adminBean.addMovie}" styleClass="btn btn-primary btn-small" />
                             <h:commandButton value="Refresh Stock" action="#{adminBean.refreshMovieStock}" styleClass="btn btn-secondary btn-small">
-                                <f:ajax execute="@form" render="movieStockContent" />
+                                <f:ajax execute="@form" render="@all" />
                             </h:commandButton>
                         </h:form>
                     </div>
